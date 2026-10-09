@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="Laptop Stand">
+<title>Laptop Stand demo illustration</title>
+<defs>
+<linearGradient id="metal" x2=".8" y2="1"><stop stop-color="#ecf1f5"/><stop offset=".45" stop-color="#bdcad6"/><stop offset="1" stop-color="#8da0b3"/></linearGradient>
+<linearGradient id="dark" x2=".8" y2="1"><stop stop-color="#53667c"/><stop offset=".5" stop-color="#28394c"/><stop offset="1" stop-color="#152333"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#324356" flood-opacity=".14"/></filter>
+</defs>
+<rect width="640" height="400" fill="#fff"/>
+<g filter="url(#shadow)"><path d="m242 117 74-19 81 201-56 18z" fill="#aab9c8"/><path d="m252 129 50-10 65 173-31 10z" fill="url(#metal)"/><path d="m186 310 220-51 78 27-228 64z" fill="url(#metal)"/><path d="m145 140 248-63 87 54-249 74z" fill="url(#metal)"/><path d="m145 140 86 65v21l-86-59z" fill="#9aaabb"/><path d="m231 205 249-74v22l-249 73z" fill="#bdc8d3"/><path d="m170 136 220-51 20 12-218 54z" fill="#728194"/><path d="m225 174 218-55 20 12-218 65z" fill="#728194"/></g>
+</svg>

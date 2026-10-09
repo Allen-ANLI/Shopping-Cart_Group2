@@ -1,0 +1,45 @@
+<!--
+ 展示商品图片、名称、价格、详细描述及详情状态提示。
+ @author 王重一
+ @author Letian Xie 加购表单接入
+-->
+<main class="store-container detail-page" id="main-content">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a [href]="listUrl">All products</a><span>/</span><span>Product details</span>
+  </nav>
+  @if (loading()) {
+    <div class="state-panel" role="status"><span class="loading-ring"></span><h1>Loading product...</h1></div>
+  } @else if (error()) {
+    <div class="state-panel" role="alert"><app-icon name="bag" />
+      <h1>{{ notFound() ? 'Product not found.' : 'Unable to load product.' }}</h1>
+      <p>{{ notFound() ? 'This product is unavailable. Explore the collection for something else.' : error() }}</p>
+      @if (!notFound()) { <button type="button" class="button-primary" (click)="retry()">Try again</button> }
+      <a class="button-primary" [href]="listUrl">Back to products <app-icon name="arrow" /></a>
+    </div>
+  } @else if (product(); as item) {
+    <article class="detail-card">
+      <div class="detail-photo">
+        <span class="detail-photo-label">TAKE A CLOSER LOOK</span>
+        @if (item.imageUrl) { <img [src]="item.imageUrl" [alt]="item.name"> }
+        @else { <app-icon name="bag" /> }
+        <span class="detail-photo-caption">The everyday edit / Shopping Cart</span>
+      </div>
+      <div class="detail-content">
+        <span class="section-eyebrow">EVERYDAY ESSENTIALS</span>
+        <h1>{{ item.name }}</h1>
+        <span class="detail-availability"><app-icon name="check" />Available in the collection</span>
+        <div class="detail-price"><span>SGD</span> {{ item.price.toFixed(2) }}<small>Price in Singapore dollars</small></div>
+        <section class="detail-description"><h2>About this product</h2>
+          <p>{{ item.description || 'No description is available for this product.' }}</p>
+        </section>
+        <app-add-to-cart [productId]="item.id" />
+        <a class="button-primary detail-back" [href]="listUrl">Back to products <app-icon name="arrow" /></a>
+        <p class="detail-note">Find the little things that fit your everyday.</p>
+      </div>
+    </article>
+  }
+  <section class="detail-bottom-note" id="catalog">
+    <app-icon name="grid" /><div><h2>There's more to explore.</h2><p>Take another look at the everyday collection.</p></div>
+    <a [href]="listUrl">Explore all products <app-icon name="arrow" /></a>
+  </section>
+</main>

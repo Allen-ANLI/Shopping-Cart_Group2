@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="Monitor">
+<title>Monitor demo illustration</title>
+<defs>
+<linearGradient id="metal" x2=".8" y2="1"><stop stop-color="#ecf1f5"/><stop offset=".45" stop-color="#bdcad6"/><stop offset="1" stop-color="#8da0b3"/></linearGradient>
+<linearGradient id="dark" x2=".8" y2="1"><stop stop-color="#53667c"/><stop offset=".5" stop-color="#28394c"/><stop offset="1" stop-color="#152333"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#324356" flood-opacity=".14"/></filter>
+</defs>
+<rect width="640" height="400" fill="#fff"/>
+<g filter="url(#shadow)"><path d="M290 273h61l14 53h-87z" fill="url(#metal)"/><path d="M240 326h160l15 20H226z" fill="#a7b7c5"/><rect x="99" y="67" width="443" height="225" rx="16" fill="url(#dark)"/><rect x="113" y="81" width="415" height="190" rx="5" fill="#c8dfe9"/><circle cx="443" cy="128" r="24" fill="#ffe5ad"/><path d="m113 242 110-80 126 90 73-54 106 42v31H113z" fill="#729aae"/><path d="m113 257 136-48 160 43 119-49v68H113z" fill="#4b758b"/><circle cx="320" cy="282" r="3" fill="#a6b8c5"/></g>
+</svg>

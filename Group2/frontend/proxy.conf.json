@@ -1,0 +1,21 @@
+{
+  "/api/**": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/images/**": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/login": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/logout": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/register": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/forbidden": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/account": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/account/**": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/cart": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/cart/**": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/checkout": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/checkout/**": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/orders": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/orders/**": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/admin": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/admin/**": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/auth-assets/**": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/cart-assets/**": { "target": "http://127.0.0.1:18080", "secure": false },
+  "/css/**": { "target": "http://127.0.0.1:18080", "secure": false }
+}

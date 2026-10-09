@@ -1,0 +1,6 @@
+/**
+ * 设置商城图标宿主和 SVG 的显示尺寸。
+ * @author 王重一
+ */
+:host { display: inline-flex; }
+svg { display: block; width: 100%; height: 100%; }

@@ -1,0 +1,5 @@
+/**
+ * 设置商品前端根组件的宿主显示方式。
+ * @author 王重一
+ */
+:host { display: block; }

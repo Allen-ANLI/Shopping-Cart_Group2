@@ -1,0 +1,13 @@
+/* B navigation only; does not replace C/E business-page styles. */
+.navbar .auth-nav { min-height:62px; height:auto; display:flex; flex-wrap:wrap;
+    align-items:center; justify-content:space-between; gap:12px 22px; padding-top:12px; padding-bottom:12px; }
+.navbar .auth-links { display:flex; flex-wrap:wrap; align-items:center; gap:12px 16px; }
+.navbar .auth-links a { margin:0; }
+.navbar .auth-links form { margin:0; display:inline; }
+.navbar .auth-links button { padding:0; background:none; border:0; font:inherit;
+    color:#534ab7; cursor:pointer; }
+.navbar .auth-links button:hover { text-decoration:underline; }
+@media (max-width:720px) {
+    .navbar .auth-nav { flex-direction:column; align-items:flex-start; }
+    .navbar .auth-links { font-size:14px; }
+}

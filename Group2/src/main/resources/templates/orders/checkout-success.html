@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{cart/fragments :: head('Order placed')}"></head>
+<body>
+<header th:replace="~{cart/fragments :: navbar}"></header>
+<main class="container">
+    <div class="page-header">
+        <div><h1>Order placed successfully</h1><p class="muted">Your order has been saved.</p></div>
+        <a th:href="@{/products}" class="btn btn-secondary">Continue shopping</a>
+    </div>
+    <div class="checkout-layout">
+        <section class="card">
+            <h2 th:text="'Order #' + ${receipt.id}">Order</h2>
+            <p class="muted small" th:text="${receipt.createdAt}">Date</p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Product</th><th>Unit price</th><th>Qty</th><th>Subtotal</th></tr></thead>
+                    <tbody><tr th:each="item : ${receipt.items}">
+                        <td th:text="${item.productName}">Product</td>
+                        <td th:text="'S$' + ${item.unitPrice}">Price</td>
+                        <td th:text="${item.quantity}">Qty</td>
+                        <td th:text="'S$' + ${item.subtotal}">Subtotal</td>
+                    </tr></tbody>
+                </table>
+            </div>
+        </section>
+        <aside class="card cart-summary">
+            <h2>Order total</h2>
+            <p class="summary-total" th:text="'Total: S$' + ${receipt.totalAmount}">Total</p>
+            <a th:href="@{/cart}" class="btn btn-block">View cart</a>
+        </aside>
+    </div>
+</main>
+<footer th:replace="~{cart/fragments :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="USB Microphone">
+<title>USB Microphone demo illustration</title>
+<defs>
+<linearGradient id="metal" x2=".8" y2="1"><stop stop-color="#ecf1f5"/><stop offset=".45" stop-color="#bdcad6"/><stop offset="1" stop-color="#8da0b3"/></linearGradient>
+<linearGradient id="dark" x2=".8" y2="1"><stop stop-color="#53667c"/><stop offset=".5" stop-color="#28394c"/><stop offset="1" stop-color="#152333"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#324356" flood-opacity=".14"/></filter>
+</defs>
+<rect width="640" height="400" fill="#fff"/>
+<g filter="url(#shadow)"><ellipse cx="320" cy="336" rx="80" ry="20" fill="#344455"/><path d="M320 320v-55" stroke="#71869b" stroke-width="19"/><path d="M235 181v57a85 55 0 0 0 170 0v-57" fill="none" stroke="#4d6176" stroke-width="14"/><rect x="266" y="59" width="109" height="217" rx="53" fill="url(#dark)"/><rect x="273" y="67" width="94" height="126" rx="43" fill="#7c8d9b"/><path d="M283 102h74M279 115h82M279 128h82M279 141h82M281 154h78M287 167h66" stroke="#3d5264" stroke-width="4"/><circle cx="320" cy="226" r="14" fill="#dea86c"/><circle cx="320" cy="255" r="4" fill="#69b599"/></g>
+</svg>

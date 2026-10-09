@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="Headphones">
+<title>Headphones demo illustration</title>
+<defs>
+<linearGradient id="metal" x2=".8" y2="1"><stop stop-color="#ecf1f5"/><stop offset=".45" stop-color="#bdcad6"/><stop offset="1" stop-color="#8da0b3"/></linearGradient>
+<linearGradient id="dark" x2=".8" y2="1"><stop stop-color="#53667c"/><stop offset=".5" stop-color="#28394c"/><stop offset="1" stop-color="#152333"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#324356" flood-opacity=".14"/></filter>
+</defs>
+<rect width="640" height="400" fill="#fff"/>
+<path d="M190 222v-39a130 130 0 0 1 260 0v39" fill="none" stroke="#253141" stroke-width="32"/><path d="M194 175a126 126 0 0 1 252 0" fill="none" stroke="#738399" stroke-width="12"/><g filter="url(#shadow)"><rect x="161" y="180" width="73" height="132" rx="32" fill="url(#dark)"/><rect x="406" y="180" width="73" height="132" rx="32" fill="url(#dark)"/><rect x="206" y="187" width="40" height="117" rx="18" fill="#e87549"/><rect x="394" y="187" width="40" height="117" rx="18" fill="#e87549"/></g>
+</svg>

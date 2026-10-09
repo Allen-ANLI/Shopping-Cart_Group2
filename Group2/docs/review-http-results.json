@@ -1,0 +1,127 @@
+[
+  {
+    "check": "Angular entry",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Pagination",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "/api/products/999999",
+    "passed": true,
+    "detail": "HTTP 404; None"
+  },
+  {
+    "check": "/api/cart/form",
+    "passed": true,
+    "detail": "HTTP 401; application/json;charset=UTF-8"
+  },
+  {
+    "check": "/api/products?page=-1&size=6",
+    "passed": true,
+    "detail": "HTTP 400; application/json"
+  },
+  {
+    "check": "/api/products?page=0&size=0",
+    "passed": true,
+    "detail": "HTTP 400; application/json"
+  },
+  {
+    "check": "/no-such-page",
+    "passed": true,
+    "detail": "HTTP 404; text/html;charset=UTF-8"
+  },
+  {
+    "check": "/images/no-such.png",
+    "passed": true,
+    "detail": "HTTP 404; text/html;charset=UTF-8"
+  },
+  {
+    "check": "Wrong password rejected",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Login",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Add to cart",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Invalid quantity keeps cart",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Customer cannot enter admin",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Checkout receipt",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Cart cleared",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Purchase history",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Repeated checkout creates one order",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Repeated checkout retains new cart item",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Session cart isolation",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Order ownership",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Admin page",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Admin input validated",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "New hidden product excluded from store",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "New hidden product saved in admin",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "check": "Logout removes API access",
+    "passed": true,
+    "detail": ""
+  }
+]

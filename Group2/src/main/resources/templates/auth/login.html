@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{auth/fragments :: head('Log in')}"></head>
+<body>
+<header th:replace="~{auth/fragments :: navbar}"></header>
+<main class="container auth-layout">
+    <section class="intro">
+        <p class="eyebrow">YOUR SHOPPING ACCOUNT</p>
+        <h1>Welcome back</h1>
+        <p class="muted">Log in to add products, place an order and view your purchase history.</p>
+        <p class="muted">You can browse products without an account.</p>
+        <a th:href="@{/products}">Browse products →</a>
+    </section>
+    <section class="card">
+        <h2>Log in</h2>
+        <div th:replace="~{auth/fragments :: alerts}"></div>
+        <form th:action="@{/login}" th:object="${loginForm}" method="post">
+            <div class="alert error" role="alert" th:if="${#fields.hasAnyErrors()}">
+                <p th:each="message : ${#fields.allErrors()}" th:text="${message}"></p>
+            </div>
+            <label for="username">Username</label>
+            <input id="username" type="text" th:field="*{username}" maxlength="50"
+                   autocomplete="username" required>
+            <label for="password">Password</label>
+            <!-- Never echo a password through th:field/value after a failed request. -->
+            <input id="password" name="password" type="password" maxlength="72"
+                   autocomplete="current-password" required>
+            <button class="btn primary full" type="submit">Log in</button>
+        </form>
+        <p class="small muted">New here? <a th:href="@{/register}">Create an account</a></p>
+        <aside th:if="${showDemoAccounts}" class="demo small">
+            <strong>Isolated demo accounts</strong>
+            <p>alice / demo123 · bob / demo123</p>
+            <p>admin / admin123</p>
+        </aside>
+    </section>
+</main>
+<footer th:replace="~{auth/fragments :: footer}"></footer>
+</body>
+</html>

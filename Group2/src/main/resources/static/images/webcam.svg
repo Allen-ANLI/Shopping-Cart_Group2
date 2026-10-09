@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="Webcam">
+<title>Webcam demo illustration</title>
+<defs>
+<linearGradient id="metal" x2=".8" y2="1"><stop stop-color="#ecf1f5"/><stop offset=".45" stop-color="#bdcad6"/><stop offset="1" stop-color="#8da0b3"/></linearGradient>
+<linearGradient id="dark" x2=".8" y2="1"><stop stop-color="#53667c"/><stop offset=".5" stop-color="#28394c"/><stop offset="1" stop-color="#152333"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#324356" flood-opacity=".14"/></filter>
+</defs>
+<rect width="640" height="400" fill="#fff"/>
+<g filter="url(#shadow)"><path d="m258 250 18 73h111l-30-87z" fill="#293849"/><path d="m232 316 165-20 8 40-160 16z" fill="#7c8da0"/><rect x="153" y="112" width="335" height="157" rx="47" fill="url(#dark)"/><rect x="169" y="128" width="303" height="124" rx="35" fill="#38495b"/><circle cx="320" cy="189" r="58" fill="#121d2a"/><circle cx="320" cy="189" r="41" fill="#547186"/><circle cx="320" cy="189" r="28" fill="#142d45"/><circle cx="305" cy="176" r="10" fill="#a5d8ed" opacity=".8"/><circle cx="433" cy="167" r="6" fill="#69b599"/><path d="M192 177v24m9-24v24m9-24v24" stroke="#8190a0" stroke-width="4" stroke-linecap="round"/></g>
+</svg>

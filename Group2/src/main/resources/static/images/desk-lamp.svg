@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="Desk Lamp">
+<title>Desk Lamp demo illustration</title>
+<defs>
+<linearGradient id="metal" x2=".8" y2="1"><stop stop-color="#ecf1f5"/><stop offset=".45" stop-color="#bdcad6"/><stop offset="1" stop-color="#8da0b3"/></linearGradient>
+<linearGradient id="dark" x2=".8" y2="1"><stop stop-color="#53667c"/><stop offset=".5" stop-color="#28394c"/><stop offset="1" stop-color="#152333"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#324356" flood-opacity=".14"/></filter>
+</defs>
+<rect width="640" height="400" fill="#fff"/>
+<ellipse cx="320" cy="332" rx="90" ry="19" fill="#e3e8ec"/><g filter="url(#shadow)"><ellipse cx="320" cy="316" rx="88" ry="22" fill="url(#dark)"/><path d="m320 311-50-121 76-70" fill="none" stroke="#344455" stroke-width="15" stroke-linecap="round"/><circle cx="270" cy="190" r="14" fill="#bcc9d2"/><circle cx="346" cy="120" r="14" fill="#bcc9d2"/><path d="m343 111 77-28 41 72-99 26z" fill="#eba44b"/><ellipse cx="412" cy="167" rx="51" ry="13" transform="rotate(-15 412 167)" fill="#ffe9b4"/></g>
+</svg>

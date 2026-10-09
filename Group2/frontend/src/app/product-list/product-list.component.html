@@ -1,0 +1,98 @@
+<!--
+ 展示推荐区、商品卡片、页大小选项、分页按钮及列表状态提示。
+ @author 王重一
+-->
+<main id="main-content" class="store-container">
+  <section class="store-intro" aria-label="Explore the store">
+    <aside class="category-panel">
+      <h2><app-icon name="grid" />Your everyday, sorted</h2>
+      <ul>
+        <li><app-icon name="monitor" /><span>Computer accessories<small>A better desk setup</small></span></li>
+        <li><app-icon name="keyboard" /><span>Typing essentials<small>Make every key count</small></span></li>
+        <li><app-icon name="mouse" /><span>Desk companions<small>For work and study</small></span></li>
+      </ul>
+      <a [href]="catalogUrl">Explore all products <app-icon name="arrow" /></a>
+    </aside>
+    <div class="feature-banner">
+      <div class="feature-copy">
+        <span class="eyebrow">THE EVERYDAY EDIT</span>
+        <h1>Small upgrades.<br>Better days.</h1>
+        <p>Find the essentials that make<br class="desktop-break"> your desk feel like yours.</p>
+        <a class="banner-link" [href]="catalogUrl">Find your essentials <app-icon name="arrow" /></a>
+      </div>
+      <div class="feature-art" aria-hidden="true">
+        <span class="feature-orbit"></span>
+        <img class="feature-keyboard" src="/images/keyboard.png" alt="">
+        <img class="feature-mouse" src="/images/mouse.png" alt="">
+        <span class="feature-stamp">WORK.<br>STUDY.<br>EVERYDAY.</span>
+      </div>
+    </div>
+    <aside class="shopping-guide" id="shopping-guide">
+      <span class="guide-icon"><app-icon name="bag" /></span>
+      <h2>A good place<br>to start.</h2>
+      <p>Explore the collection, then take a closer look at your favourites.</p>
+      <a [href]="catalogUrl">Browse the collection <app-icon name="arrow" /></a>
+      <div class="guide-currency"><span>Shopping made simple</span><strong>All prices in SGD</strong></div>
+    </aside>
+  </section>
+  <section class="catalog-section" id="catalog" aria-labelledby="catalog-heading">
+    <div class="catalog-heading">
+      <div><span class="section-eyebrow">PICK YOUR EVERYDAY</span>
+        <h2 id="catalog-heading"><app-icon name="heart" />Just for your desk</h2></div>
+      <a class="guide-link" [href]="guideUrl">A little shopping inspiration <app-icon name="arrow" /></a>
+    </div>
+    <div class="catalog-toolbar">
+      <span class="collection-label"><span class="status-dot"></span>All products</span>
+      <p aria-live="polite">
+        @if (loading()) { Finding your essentials… }
+        @else if (error()) { Collection unavailable }
+        @else { {{ totalElements() }} products in the collection }
+      </p>
+      <label class="page-size">Per page
+        <select #pageSize [value]="size()" (change)="changeSize(+pageSize.value)"
+          [disabled]="loading()" aria-label="Products per page">
+          <option value="1">1</option><option value="6">6</option><option value="12">12</option>
+        </select>
+      </label>
+    </div>
+    @if (loading()) {
+      <div class="state-panel" role="status"><span class="loading-ring"></span>
+        <h3>Loading products...</h3><p>Your collection is on its way.</p></div>
+    } @else if (error()) {
+      <div class="state-panel" role="alert"><app-icon name="monitor" />
+        <h3>We couldn't load the collection.</h3><p>{{ error() }}</p>
+        <button type="button" class="button-primary" (click)="retry()">Try again</button></div>
+    } @else if (products().length === 0) {
+      <div class="state-panel"><app-icon name="bag" /><h3>No products available.</h3>
+        <p>Check back soon for more everyday essentials.</p></div>
+    } @else {
+      <ul class="product-grid">
+        @for (product of products(); track product.id) {
+          <li class="product-card">
+            <a class="product-photo" [href]="productUrl(product.id)" [attr.aria-label]="'View ' + product.name + ' details'">
+              @if (product.imageUrl) { <img [src]="product.imageUrl" [alt]="product.name"> }
+              @else { <app-icon name="bag" /> }
+              <span class="product-availability"><span class="status-dot"></span>Available</span>
+              <span class="photo-arrow"><app-icon name="arrow" /></span>
+            </a>
+            <div class="product-card-body">
+              <span class="product-category">EVERYDAY ESSENTIALS</span>
+              <h3><a [href]="productUrl(product.id)">{{ product.name }}</a></h3>
+              <div class="product-card-bottom">
+                <p class="product-price"><span>SGD</span> {{ product.price.toFixed(2) }}</p>
+                <a class="product-details-link" [href]="productUrl(product.id)">View details <app-icon name="arrow" /></a>
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+      <nav class="pagination" aria-label="Product pages">
+        <p>Page <strong>{{ page() + 1 }}</strong> of {{ totalPages() }}</p>
+        <div>
+          <button type="button" [disabled]="loading() || page() === 0" (click)="changePage(page() - 1)">Previous</button>
+          <button type="button" [disabled]="loading() || page() >= totalPages() - 1" (click)="changePage(page() + 1)">Next <app-icon name="arrow" /></button>
+        </div>
+      </nav>
+    }
+  </section>
+</main>

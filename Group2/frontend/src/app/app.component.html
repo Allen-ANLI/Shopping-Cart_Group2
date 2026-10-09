@@ -1,0 +1,11 @@
+<!--
+ 组合商城公共布局，并按商品 ID 显示商品列表或详情。
+ @author 王重一
+-->
+<app-store-layout>
+  @if (productId !== null) {
+    <app-product-detail [productId]="productId" />
+  } @else {
+    <app-product-list />
+  }
+</app-store-layout>

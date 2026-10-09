@@ -1,0 +1,22 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Product, ProductPage } from '../models/product';
+
+/**
+ * 通过 HttpClient 调用商品分页和详情接口，向组件提供查询结果。
+ * @author 王重一
+ */
+@Injectable({ providedIn: 'root' })
+export class ProductService {
+  private readonly http = inject(HttpClient);
+
+  getPage(page: number, size: number): Observable<ProductPage> {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<ProductPage>('/api/products', { params });
+  }
+
+  getProduct(id: string): Observable<Product> {
+    return this.http.get<Product>(`/api/products/${encodeURIComponent(id)}`);
+  }
+}

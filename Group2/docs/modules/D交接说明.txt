@@ -1,0 +1,99 @@
+﻿D 模块完整交付 — 邱弈杰
+整理日期：2026-10-06（补充新版 A 兼容说明）
+
+一、当前完成情况
+订单与明细实体、数据库访问、重新核价、成交快照、事务保存、防重复下单、
+成功后清空购物车、结账 Controller 与本次订单回执均已完成。
+Service Layer 已落实；模拟支付尚未实现，属于核心功能稳定后的可选扩展。
+
+二、使用方法
+本包用于合并到当前 Spring Boot 购物车工程。复制本包的 src 到工程根目录
+（pom.xml 所在目录），合并同名目录。不要复制进原有 src 里面。
+本次交付基于新版 shopping-cart-A-angular；组员合并时仍需配套 B/C 模块。
+运行完整工程仍需要 A 的商品、B 的用户和登录、C 的购物车与结账页面。
+本包的 src 只包含 D 的 11 个 Java 文件；A/B/C 的代码由对应成员交付。
+适配基线：Java 17，Spring Boot 4.1.1，包名 sg.edu.nus.iss.shoppingcart。
+数据库沿用 shopping_cart；连接由工程的 DB_USERNAME、DB_PASSWORD 配置。
+本包不含数据库密码。schema 创建方式沿用现有工程的 JPA ddl-auto=update。
+
+三、代码分工
+entity/Order.java：订单主表，关联用户、记录总额、时间和唯一结账标识。
+entity/OrderItem.java：明细表，关联订单及商品，保存成交名称、单价和数量。
+repository/OrderRepository.java：按结账标识与用户 ID 查询订单。
+repository/OrderItemRepository.java：按订单 ID 查询明细。
+service/CheckoutTransactionService.java：在一个事务中重新核价、保存订单和明细。
+service/CheckoutService.java：校验结账输入，处理重复请求及数据库唯一约束冲突。
+service/CheckoutCoordinator.java：协调 Session、购物车版本和事务完成后的清空。
+service/CheckoutReceiptService.java：查询当前用户的本次订单成交数据。
+dto/CheckoutReceipt.java：向成功页提供订单回执与明细数据。
+controller/CheckoutController.java：结账确认、提交和成功回执路由。
+controller/CheckoutPageAdvice.java：处理结账页面的登录与业务错误。
+CheckoutCoordinator 保留 C 作者 Letian Xie 的版本检查思路来源说明。
+所有交付类已标注邱弈杰；未把 A/B/C 文件计为 D 开发内容。
+
+四、调用过程
+浏览器提交 → CheckoutController → CheckoutCoordinator → CheckoutService
+→ CheckoutTransactionService → Repository → MySQL。
+事务成功返回后，CheckoutCoordinator 才调用 C 的 clearCart。
+任何写入失败会回滚订单和明细，购物车保留。
+成功页由 CheckoutReceiptService 查询已成交的名称、价格和数量。
+
+五、与组员对接
+A：ProductService.findProductById(Long) 必须只返回存在且可售的商品。
+   商品使用 BigDecimal 价格和 active 状态；成交价格不信任浏览器输入。
+B：验证数据库账号成功后，在服务器 Session 保存 Long 类型 loginUserId。
+C：提供 CartService.requireUserId、revision、readForCheckout、clearCart、
+   getCartItems、calculateTotal、countTotalQuantity、canCheckout，
+   并约定 CHECKOUT_STATE_ATTRIBUTE；退出或切换用户时清理旧会话状态。
+   保留 templates/orders/checkout.html 和 checkout-success.html，
+   确认表单 POST /checkout，隐藏参数名 checkoutToken。
+   确认页模型：cartItems、cartTotal、totalQuantity、canCheckout、checkoutToken。
+   成功页模型：receipt，其字段 id、createdAt、totalAmount、items；
+   每行字段 productName、unitPrice、quantity、subtotal。
+E：使用本包 Order 与 OrderItem 实体开发历史查询。必须按当前登录用户过滤。
+   orders 字段：id、user_id、created_at、total_amount、checkout_token。
+   order_items 字段：id、order_id、product_id、product_name_snapshot、unit_price、quantity。
+   历史名称和价格使用明细快照；商品下架保留记录，避免删除被引用商品。
+   新增历史查询 Repository 方法时与 D 协调合并。
+F：将本包与 A/B/C/E 合并，统一依赖、数据库配置、导航和最终提交视频。
+
+六、页面地址
+http://localhost:18080/login
+http://localhost:18080/cart/products
+http://localhost:18080/cart
+http://localhost:18080/checkout
+成功页由提交后自动跳转 /checkout/success?key=结账标识。
+当前成功回执与登录会话绑定，只保留最近五次回执记录；长期购买历史由 E 提供。
+Session 的 synchronized 保护当前单实例应用的同会话操作；
+数据库 checkout_token 唯一约束负责订单写入的重复保护。
+
+七、验证证据
+隔离自动测试使用 H2 MySQL 模式内存数据库：
+1. 核心结账测试 13 次执行，全部通过。
+   覆盖核价与快照、非法输入、下架/不存在商品、金额范围、归属、
+   重复请求、并发请求、明细写入失败时整笔订单回滚。
+2. C/D 联调测试 12 项，全部通过。
+   覆盖页面渲染、正常下单、失效表单、失败保留购物车、
+   重复旧请求不清空后来新加的商品、账号切换与 Session 隔离。
+3. B 登录接入测试 5 项，全部通过。
+   覆盖真实密码验证、非法输入、登录更新会话、退出、登录后下单。
+这些是历史测试报告；打包时已核对 D 源码与通过联调测试的版本，
+忽略注释和排版后代码一致。打包未重新执行上述测试。
+验证目录保留原始测试报告，便于 F 查看；H2 测试不等同于 MySQL 并发压力测试。
+
+实机验证：邱弈杰 在当前 IDEA 工程、本机 MySQL 和浏览器完成操作。
+订单 #1：Keyboard ×2、Mouse ×1，总额 120.00；Workbench 返回一行订单、两行明细。
+随后用两个预先打开的同次结账表单提交，两页均返回订单 #2，
+创建时间 2026-10-06T16:02:24.213028，总额 120.00。
+对应标识 fbeafc80-2dab-49eb-95d4-8b1cbe6bba18。
+2026-10-06 邱弈杰 确认最终验证完成（同标识仅一笔订单、购物车清空）。
+最后两项依据用户确认记录，未另附数据库结果截图。
+
+八、演示时可以这样讲
+我负责订单与结账后端。商品价格从数据库重新读取，
+成交名称和单价保存在订单明细中，所以之后改价不会改变历史订单。
+订单和明细放在同一个事务里，失败一起回滚。
+每次结账用唯一请求标识避免重复订单，数据库提交成功后才清空购物车。
+业务逻辑放在 Service，Controller 负责请求和页面响应。
+
+这份是 D 的模块交接包。全组最终作业还需由 F 汇总完整工程、其他模块和演示视频。

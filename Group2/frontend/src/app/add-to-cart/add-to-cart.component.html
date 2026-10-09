@@ -1,0 +1,32 @@
+<!--
+ 商品详情的加购表单与登录、加载、重试状态。
+ @author Letian Xie
+-->
+<section class="add-to-cart" aria-label="Add to cart">
+  @if (loading()) {
+    <p class="cart-message" role="status">Preparing your cart...</p>
+  } @else if (loginRequired()) {
+    <a class="button-primary cart-action" [href]="loginUrl">Log in to add to cart</a>
+  } @else if (error()) {
+    <p class="cart-error" role="alert">{{ error() }}</p>
+    <button type="button" class="button-primary cart-action" (click)="refresh()">Try again</button>
+  } @else if (cartFormToken()) {
+    <form method="post" action="/cart/add" (submit)="submit($event)"
+          [attr.aria-busy]="submitting() ? 'true' : null">
+      <input type="hidden" name="productId" [value]="productId">
+      <input type="hidden" name="cartFormToken" [value]="cartFormToken()">
+      <div class="cart-controls">
+        <label class="quantity-control" [attr.for]="quantityId">Quantity
+          <input [id]="quantityId" type="number" name="quantity" value="1"
+                 min="1" max="99" step="1" required>
+        </label>
+        <button type="submit" class="button-primary cart-action" [disabled]="submitting()">
+          {{ submitting() ? 'Adding to cart...' : 'Add to cart' }}
+        </button>
+      </div>
+      <p class="cart-message" role="status" aria-live="polite">
+        {{ submitting() ? 'Please wait while your cart is updated.' : 'Choose between 1 and 99 per product.' }}
+      </p>
+    </form>
+  }
+</section>

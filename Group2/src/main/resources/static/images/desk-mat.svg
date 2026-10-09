@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="Desk Mat">
+<title>Desk Mat demo illustration</title>
+<defs>
+<linearGradient id="metal" x2=".8" y2="1"><stop stop-color="#ecf1f5"/><stop offset=".45" stop-color="#bdcad6"/><stop offset="1" stop-color="#8da0b3"/></linearGradient>
+<linearGradient id="dark" x2=".8" y2="1"><stop stop-color="#53667c"/><stop offset=".5" stop-color="#28394c"/><stop offset="1" stop-color="#152333"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#324356" flood-opacity=".14"/></filter>
+</defs>
+<rect width="640" height="400" fill="#fff"/>
+<g filter="url(#shadow)"><path d="M152 124h352l62 152-343 51L78 199z" fill="#447d7c"/><path d="M152 124h352l52 130-333 54L88 198z" fill="#79aaa2"/><path d="m157 137 335 1 47 107-313 50L107 195z" fill="none" stroke="#bad5cf" stroke-width="3" stroke-dasharray="5 5"/><path d="m172 151 245 1 18 48-244 17-48-26z" fill="#e5ebe9"/><path d="M184 164h217m-206 15h215m-205 13 122-5" stroke="#a0b4b1" stroke-width="5" stroke-dasharray="10 5"/><ellipse cx="443" cy="234" rx="29" ry="38" transform="rotate(-23 443 234)" fill="#f0e7d4"/><path d="m437 213 7 14" stroke="#c3b49b" stroke-width="4" stroke-linecap="round"/></g>
+</svg>

@@ -1,0 +1,19 @@
+/**
+ * 加购控件沿用商品页按钮和橙色主题。
+ * @author Letian Xie
+ */
+:host { display: block; }
+.add-to-cart { margin-block: 20px; }
+.cart-controls { display: flex; align-items: end; gap: 12px; }
+.quantity-control { display: grid; gap: 6px; font-size: 12px; color: var(--muted); }
+.quantity-control input { width: 88px; min-height: 42px; padding: 9px 10px; border: 1px solid var(--border); border-radius: 8px; font: inherit; color: #252525; }
+.quantity-control input:focus-visible { outline: 3px solid #a33200; outline-offset: 3px; }
+.cart-action { min-height: 42px; flex: 1; }
+.cart-action:disabled { background: var(--orange); opacity: .65; cursor: wait; }
+.cart-message { font-size: 12px; color: var(--muted); margin: 10px 0 0; }
+.cart-error { font-size: 13px; color: #a33200; margin: 0 0 12px; }
+@media (max-width: 420px) {
+  .cart-controls { align-items: stretch; flex-direction: column; }
+  .quantity-control input { width: 100%; }
+  .cart-action { width: 100%; }
+}

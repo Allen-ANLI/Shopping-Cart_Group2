@@ -1,0 +1,33 @@
+<!--
+ 显示购物车及账户导航；管理员入口只用于展示，真正权限仍由后端检查。
+ @author luopeiwen
+-->
+<nav class="account-navigation" aria-label="Account navigation">
+  <div class="account-links">
+    <a href="/cart/products">Add products</a>
+    <a href="/cart">Cart</a>
+    @if (state().loggedIn && state().user) {
+      <a href="/orders">Orders</a>
+      <a href="/account">Account</a>
+      @if (state().user?.role === 'ADMIN') {
+        <a href="/admin/products">Admin</a>
+      }
+    }
+  </div>
+  <div class="account-identity" aria-live="polite">
+    @if (loading()) {
+      <span class="account-status">Checking account...</span>
+    } @else if (state().loggedIn && state().user) {
+      <span class="account-name">{{ state().user?.displayName }}</span>
+      <form action="/logout" method="post">
+        <button type="submit">Log out</button>
+      </form>
+    } @else {
+      <a href="/login">Log in</a>
+      <a class="register-link" href="/register">Register</a>
+    }
+    @if (unavailable()) {
+      <button class="retry-status" type="button" (click)="refresh()">Retry account status</button>
+    }
+  </div>
+</nav>

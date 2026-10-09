@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{auth/fragments :: head('Create account')}"></head>
+<body>
+<header th:replace="~{auth/fragments :: navbar}"></header>
+<main class="container auth-layout">
+    <section class="intro">
+        <p class="eyebrow">GET STARTED</p>
+        <h1>Create your account</h1>
+        <p class="muted">Keep your purchase history in one place.</p>
+        <p class="muted">Registration creates a customer account. Administrator access is not available through this form.</p>
+        <a th:href="@{/login}">Already have an account? Log in →</a>
+    </section>
+    <section class="card">
+        <h2>Account details</h2>
+        <div th:replace="~{auth/fragments :: alerts}"></div>
+        <form th:action="@{/register}" th:object="${registerForm}" method="post">
+            <div class="alert error" role="alert" th:if="${#fields.hasAnyErrors()}">
+                <p th:each="message : ${#fields.allErrors()}" th:text="${message}"></p>
+            </div>
+            <label for="username">Username</label>
+            <input id="username" th:field="*{username}" minlength="4" maxlength="20"
+                   pattern="[A-Za-z0-9]+" autocomplete="username" required>
+            <p class="hint">4–20 letters and digits; usernames are case-insensitive.</p>
+            <label for="displayName">Display name</label>
+            <input id="displayName" th:field="*{displayName}" maxlength="100" autocomplete="name" required>
+            <label for="email">Email</label>
+            <input id="email" type="email" th:field="*{email}" maxlength="255" autocomplete="email" required>
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" minlength="6" maxlength="50"
+                   autocomplete="new-password" required>
+            <p class="hint">6–50 characters, at most 72 UTF-8 bytes.</p>
+            <label for="confirmPassword">Confirm password</label>
+            <input id="confirmPassword" name="confirmPassword" type="password" minlength="6" maxlength="50"
+                   autocomplete="new-password" required>
+            <button class="btn primary full" type="submit">Create account</button>
+        </form>
+    </section>
+</main>
+<footer th:replace="~{auth/fragments :: footer}"></footer>
+</body>
+</html>

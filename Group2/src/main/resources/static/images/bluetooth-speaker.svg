@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="Bluetooth Speaker">
+<title>Bluetooth Speaker demo illustration</title>
+<defs>
+<linearGradient id="metal" x2=".8" y2="1"><stop stop-color="#ecf1f5"/><stop offset=".45" stop-color="#bdcad6"/><stop offset="1" stop-color="#8da0b3"/></linearGradient>
+<linearGradient id="dark" x2=".8" y2="1"><stop stop-color="#53667c"/><stop offset=".5" stop-color="#28394c"/><stop offset="1" stop-color="#152333"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#324356" flood-opacity=".14"/></filter>
+</defs>
+<rect width="640" height="400" fill="#fff"/>
+<g filter="url(#shadow)"><rect x="204" y="83" width="230" height="242" rx="49" fill="#cf6954"/><rect x="219" y="111" width="200" height="199" rx="34" fill="#df8b77"/><path d="M237 143h164M237 156h164M237 169h164M237 182h164M237 195h164M237 208h164M237 221h164M237 234h164M237 247h164M237 260h164M237 273h164" stroke="#b4604c" stroke-width="4" stroke-dasharray="3 7"/><path d="M277 96h20m31 0h20m30-7v15" stroke="#6d352d" stroke-width="5" stroke-linecap="round"/><path d="M428 134c68-26 65 97 6 88" fill="none" stroke="#51382e" stroke-width="12"/><circle cx="320" cy="292" r="4" fill="#ffead4"/></g>
+</svg>

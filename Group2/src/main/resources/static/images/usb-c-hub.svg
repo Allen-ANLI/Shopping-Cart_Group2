@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="USB-C Hub">
+<title>USB-C Hub demo illustration</title>
+<defs>
+<linearGradient id="metal" x2=".8" y2="1"><stop stop-color="#ecf1f5"/><stop offset=".45" stop-color="#bdcad6"/><stop offset="1" stop-color="#8da0b3"/></linearGradient>
+<linearGradient id="dark" x2=".8" y2="1"><stop stop-color="#53667c"/><stop offset=".5" stop-color="#28394c"/><stop offset="1" stop-color="#152333"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#324356" flood-opacity=".14"/></filter>
+</defs>
+<rect width="640" height="400" fill="#fff"/>
+<path d="M440 200h60c46 0 20-89 55-89h14" fill="none" stroke="#263344" stroke-width="14"/><rect x="565" y="101" width="34" height="20" rx="8" fill="url(#metal)"/><g filter="url(#shadow)"><rect x="111" y="144" width="345" height="140" rx="28" fill="url(#metal)"/><rect x="126" y="155" width="312" height="82" rx="21" fill="#d2dbe4"/><rect x="146" y="249" width="49" height="17" rx="4" fill="#1b2a38"/><rect x="208" y="249" width="49" height="17" rx="4" fill="#1b2a38"/><path d="M276 249h55l-6 17h-43z" fill="#1b2a38"/><rect x="350" y="249" width="39" height="17" rx="8" fill="#1b2a38"/><circle cx="408" cy="258" r="5" fill="#5caa8d"/></g>
+</svg>

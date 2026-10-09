@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="Portable SSD">
+<title>Portable SSD demo illustration</title>
+<defs>
+<linearGradient id="metal" x2=".8" y2="1"><stop stop-color="#ecf1f5"/><stop offset=".45" stop-color="#bdcad6"/><stop offset="1" stop-color="#8da0b3"/></linearGradient>
+<linearGradient id="dark" x2=".8" y2="1"><stop stop-color="#53667c"/><stop offset=".5" stop-color="#28394c"/><stop offset="1" stop-color="#152333"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#324356" flood-opacity=".14"/></filter>
+</defs>
+<rect width="640" height="400" fill="#fff"/>
+<path d="M404 269h57c38 0 35-88 62-88h33" fill="none" stroke="#33465b" stroke-width="12"/><rect x="550" y="173" width="36" height="16" rx="6" fill="url(#metal)"/><g transform="rotate(-12 293 205)" filter="url(#shadow)"><rect x="191" y="73" width="214" height="264" rx="31" fill="url(#dark)"/><rect x="207" y="87" width="182" height="232" rx="23" fill="#43576c"/><path d="M223 110h149M223 125h149M223 140h149M223 155h149M223 170h149M223 185h149M223 200h149M223 215h149" stroke="#63798e" stroke-width="3"/><rect x="227" y="254" width="69" height="9" rx="4" fill="#a1b2c0"/><circle cx="358" cy="290" r="5" fill="#69b599"/></g>
+</svg>

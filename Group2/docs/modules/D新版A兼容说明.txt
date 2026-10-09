@@ -1,0 +1,36 @@
+﻿D 与新版 A 的兼容说明
+
+本包只包含 D 的 11 个 Java 文件和 D 的交接、验证文档。
+本次没有修改 A、B、C 的模块源码。
+
+适配结论
+A 的商品页面由 React 更新为 Angular，但 D 使用的后端约定未变化：
+包名仍是 sg.edu.nus.iss.shoppingcart；Java 17；Spring Boot 4.1.1。
+Product 的 getId、getName、getPrice、active 状态及 products 表映射不变。
+ProductService.findProductById(Long) 仍返回 Optional<Product>，只查询可售商品。
+User 仍映射 app_users；UserRepository.findById 以及用户 ID 类型仍是 Long。
+数据库仍是 shopping_cart，D 的 orders 和 order_items 映射不受前端更换影响。
+因此 D 的 11 个 Java 文件无需修改，已逐个确认与收到的 CA_D.zip 内容相同。
+
+合并要求
+本包作为 D 模块交给 F 合并，不是独立启动工程。
+A 单独的工程还没有 B/C；其中没有 CartService 和结账页面。
+F 应把 A/B/C/D 一起整合；不能只把 D 复制进纯 A 工程就直接运行。
+身份由 B 的 Session loginUserId（Long）提供；购物车接口和结账页面由 C 提供。
+D 仍提供 GET/POST /checkout 和 GET /checkout/success?key=标识。
+前端导航、加购入口和 Angular 构建由 A/C/F 对接；D 不负责修改这些文件。
+其他接口约定请看交接说明.txt。
+
+验证
+在工作区隔离副本中，用新版 A 后端与原 B/C/D 联调：
+12 项 C/D 结账测试、5 项登录测试、4 项新版 A 初始化测试全部通过。
+使用 H2 MySQL 模式内存数据库，不写入本机 MySQL。
+测试副本的 Mockito 设置支持类模拟；没有改动 A 的原测试配置。
+新版 A 源码中的 Product、User、ProductService 与验证副本一致。
+验证报告在“新版A兼容验证”目录；它不是全组最终验收或模拟支付实现。
+
+已撤销的误操作
+此前把 B/C/D 和导航接入桌面 A 工程的操作已经撤销。
+A 被修改的原文件按备份哈希恢复，新增文件移除。
+重新生成原版 A 的编译产物，确认没有购物车及结账类残留。
+此前的 A 接入补丁已撤回，后续使用这份 D 包进行交接。

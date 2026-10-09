@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${errorTitle})}"></head>
+<body>
+
+<header th:replace="~{fragments :: navbar}"></header>
+
+<main class="container">
+    <div class="card error-card">
+        <h1 th:text="${errorTitle}">Action not allowed</h1>
+        <!--
+          业务规则被拒绝时的提示，比如：
+          "这个商品出现在历史订单中，不能删除，请改为下架。"
+        -->
+        <p class="muted" th:text="${errorMessage}">This action is not allowed.</p>
+        <div class="form-actions">
+            <a th:href="@{/admin/products}" class="btn">Back to product list</a>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Admin - Products')}"></head>
+<body>
+
+<header th:replace="~{fragments :: navbar}"></header>
+
+<main class="container">
+
+    <div class="page-header">
+        <div>
+            <h1>Admin &mdash; Products</h1>
+            <p class="muted small">Manage pricing and visibility.</p>
+        </div>
+        <a th:href="@{/admin/products/new}" class="btn">Add new product</a>
+    </div>
+
+    <div th:replace="~{fragments :: alerts}"></div>
+
+    <div class="stat-grid">
+        <div class="stat-box">
+            <div class="stat-value" th:text="${totalProducts}">0</div>
+            <div class="stat-label">Products in database</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value" th:text="${inactiveProducts}">0</div>
+            <div class="stat-label">Currently hidden</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th class="col-id">ID</th>
+                    <th>Name</th>
+                    <th class="col-num">Price</th>
+                    <th>Status</th>
+                    <th class="col-actions">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${products}">
+                    <td class="muted" th:text="${p.id}">1</td>
+                    <td th:text="${p.name}">Product</td>
+                    <td class="col-num" th:text="'S$' + ${p.price}">S$0.00</td>
+                    <td>
+                        <span class="badge badge-in" th:if="${p.active}">Visible</span>
+                        <span class="badge badge-out" th:unless="${p.active}">Hidden</span>
+                    </td>
+                    <td>
+                        <div class="action-group">
+                            <a th:href="@{/admin/products/{id}/edit(id=${p.id})}"
+                               class="btn btn-sm btn-outline">Edit</a>
+
+                            <!--
+                              上/下架是 POST 而非 GET：
+                              改状态会写数据库，用 GET 的话刷新页面、
+                              浏览器预取或爬虫误触都可能意外执行。
+                            -->
+                            <form th:action="@{/admin/products/{id}/toggle(id=${p.id})}"
+                                  method="post" class="inline-form">
+                                <button type="submit" class="btn btn-sm btn-secondary"
+                                        th:text="${p.active} ? 'Hide' : 'Show'">Hide</button>
+                            </form>
+
+                            <form th:action="@{/admin/products/{id}/delete(id=${p.id})}"
+                                  method="post" class="inline-form"
+                                  onsubmit="return confirm('Delete this product? Products that appear in existing orders cannot be deleted - use Hide instead.');">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="pagination" th:if="${totalPages > 1}">
+        <a class="page-link"
+           th:classappend="${currentPage <= 1} ? 'disabled'"
+           th:href="@{/admin/products(page=${currentPage - 1})}">Previous</a>
+        <a class="page-link" th:each="i : ${#numbers.sequence(1, totalPages)}"
+           th:classappend="${i == currentPage} ? 'active'"
+           th:href="@{/admin/products(page=${i})}" th:text="${i}">1</a>
+        <a class="page-link"
+           th:classappend="${currentPage >= totalPages} ? 'disabled'"
+           th:href="@{/admin/products(page=${currentPage + 1})}">Next</a>
+    </div>
+
+    <p class="muted small">
+        Hidden products are no longer sold, but existing orders still display correctly
+        because each order item keeps a snapshot of the name and price at purchase time.
+    </p>
+
+</main>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

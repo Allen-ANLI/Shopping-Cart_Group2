@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{auth/fragments :: head('Access denied')}"></head>
+<body>
+<header th:replace="~{auth/fragments :: navbar}"></header>
+<main class="container narrow card">
+    <p class="eyebrow">403 · ACCESS DENIED</p>
+    <h1>Administrator access is required</h1>
+    <p class="muted">Your account does not have permission to manage products.</p>
+    <a class="btn primary" th:href="@{/products}">Back to products</a>
+</main>
+<footer th:replace="~{auth/fragments :: footer}"></footer>
+</body>
+</html>

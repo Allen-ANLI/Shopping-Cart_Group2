@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${errorTitle})}"></head>
+<body>
+
+<header th:replace="~{fragments :: navbar}"></header>
+
+<main class="container">
+    <div class="card error-card">
+        <h1 th:text="${errorTitle}">Error</h1>
+        <!--
+          越权访问他人订单与订单不存在都走这个页面，提示文案完全一致。
+          这样攻击者无法通过报错差异推断某个订单 ID 是否存在。
+        -->
+        <p class="muted" th:text="${errorMessage}">Something went wrong.</p>
+        <div class="form-actions">
+            <a th:href="@{/orders}" class="btn">Back to order history</a>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

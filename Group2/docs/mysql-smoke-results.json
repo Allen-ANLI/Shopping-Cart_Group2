@@ -1,0 +1,108 @@
+{
+  "database": "MySQL 8.0.46",
+  "checks": [
+    {
+      "check": "Angular production page and bundle served",
+      "status": "PASS"
+    },
+    {
+      "check": "REST products pagination from MySQL",
+      "status": "PASS"
+    },
+    {
+      "check": "Anonymous cart API rejected",
+      "status": "PASS"
+    },
+    {
+      "check": "Incorrect password rejected",
+      "status": "PASS"
+    },
+    {
+      "check": "Valid database login",
+      "status": "PASS"
+    },
+    {
+      "check": "Add product and quantity stored",
+      "status": "PASS"
+    },
+    {
+      "check": "Invalid quantity rejected without changing cart",
+      "status": "PASS"
+    },
+    {
+      "check": "Checkout and receipt displayed",
+      "status": "PASS"
+    },
+    {
+      "check": "Transaction persisted repriced order and snapshot",
+      "status": "PASS"
+    },
+    {
+      "check": "Successful checkout clears cart",
+      "status": "PASS"
+    },
+    {
+      "check": "Duplicate checkout creates one order and keeps new cart",
+      "status": "PASS"
+    },
+    {
+      "check": "Purchase history and detail render",
+      "status": "PASS"
+    },
+    {
+      "check": "Different user has isolated cart",
+      "status": "PASS"
+    },
+    {
+      "check": "Other user cannot read order",
+      "status": "PASS"
+    },
+    {
+      "check": "Normal user denied admin access",
+      "status": "PASS"
+    },
+    {
+      "check": "Registration cannot assign admin role",
+      "status": "PASS"
+    },
+    {
+      "check": "Admin product list and form render",
+      "status": "PASS"
+    },
+    {
+      "check": "Admin creates product visible through REST",
+      "status": "PASS"
+    },
+    {
+      "check": "Admin invalid input rejected server-side",
+      "status": "PASS"
+    },
+    {
+      "check": "Deactivated product hidden from REST",
+      "status": "PASS"
+    },
+    {
+      "check": "Deactivated product cannot be added",
+      "status": "PASS"
+    },
+    {
+      "check": "Historical price snapshot survives edit and deactivation",
+      "status": "PASS"
+    },
+    {
+      "check": "Referenced product cannot be physically deleted",
+      "status": "PASS"
+    },
+    {
+      "check": "Logout invalidates API access",
+      "status": "PASS"
+    },
+    {
+      "check": "Login after logout starts empty cart",
+      "status": "PASS"
+    }
+  ],
+  "passed": 25,
+  "orderId": 1,
+  "countsBeforeRestart": "13\t3\t1"
+}

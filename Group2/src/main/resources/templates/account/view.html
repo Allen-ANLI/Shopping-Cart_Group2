@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{auth/fragments :: head('My account')}"></head>
+<body>
+<header th:replace="~{auth/fragments :: navbar}"></header>
+<main class="container account-layout">
+    <section class="intro">
+        <p class="eyebrow">MY ACCOUNT</p>
+        <h1 th:text="${account.displayName}">My account</h1>
+        <dl class="summary">
+            <dt>Username</dt><dd th:text="${account.username}"></dd>
+            <dt>Role</dt><dd th:text="${account.role}"></dd>
+        </dl>
+        <p class="muted">Your username and role cannot be changed here.</p>
+        <a th:href="@{/orders}">View purchase history →</a>
+    </section>
+    <section class="card">
+        <h2>Personal details</h2>
+        <div th:replace="~{auth/fragments :: alerts}"></div>
+        <form th:action="@{/account/profile}" th:object="${profileForm}" method="post">
+            <div class="alert error" role="alert" th:if="${#fields.hasAnyErrors()}">
+                <p th:each="message : ${#fields.allErrors()}" th:text="${message}"></p>
+            </div>
+            <label for="displayName">Display name</label>
+            <input id="displayName" th:field="*{displayName}" maxlength="100" autocomplete="name" required>
+            <label for="email">Email</label>
+            <input id="email" type="email" th:field="*{email}" maxlength="255" autocomplete="email" required>
+            <button class="btn primary" type="submit">Save profile</button>
+        </form>
+    </section>
+</main>
+<footer th:replace="~{auth/fragments :: footer}"></footer>
+</body>
+</html>

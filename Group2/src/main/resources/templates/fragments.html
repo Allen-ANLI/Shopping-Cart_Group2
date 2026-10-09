@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' | CA Shopping Cart'">CA Shopping Cart</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/auth-assets/navigation.css}">
+    <link rel="icon" th:href="@{/products/favicon.svg}" type="image/svg+xml">
+</head>
+<body>
+
+<!--
+  E 模块的公共导航。
+  这里刻意保持极简：E 只关心"订单历史"和"后台"两个入口，
+  商品浏览、购物车、结账的导航由 F 维护统一版本后替换。
+  合并时建议直接删掉本文件，用项目统一导航。
+-->
+<header th:fragment="navbar" class="navbar">
+    <div class="container nav-inner auth-nav">
+        <a th:href="@{/products}" class="brand">CA Shopping Cart</a>
+        <nav class="nav-links auth-links">
+            <a th:href="@{/products}">Products</a>
+            <a th:href="@{/cart/products}">Add products</a>
+            <a th:href="@{/cart}">Cart</a>
+            <a th:href="@{/orders}">Order history</a>
+            <a th:if="${isLoggedIn}" th:href="@{/account}">Account</a>
+            <a th:if="${isAdmin}" th:href="@{/admin/products}">Admin</a>
+            <a th:unless="${isLoggedIn}" th:href="@{/login}">Log in</a>
+            <form th:if="${isLoggedIn}" th:action="@{/logout}" method="post">
+                <button type="submit">Log out</button>
+            </form>
+        </nav>
+    </div>
+</header>
+
+<!-- 操作结果提示横幅 -->
+<div th:fragment="alerts" class="container">
+    <div class="alert alert-success" th:if="${param.created}">
+        Product created.
+    </div>
+    <div class="alert alert-success" th:if="${param.updated}">
+        Product updated.
+    </div>
+    <div class="alert alert-success" th:if="${param.toggled}">
+        Product visibility changed.
+    </div>
+    <div class="alert alert-success" th:if="${param.deleted}">
+        Product deleted.
+    </div>
+</div>
+
+<footer th:fragment="footer" class="footer">
+    <div class="container">
+        <p class="muted small">
+            NUS-ISS C26 &middot; Module E &mdash; Purchase History &amp; Admin Product Management
+            &middot; 蔡千一
+        </p>
+    </div>
+</footer>
+
+</body>
+</html>

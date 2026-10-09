@@ -1,0 +1,35 @@
+package sg.edu.nus.iss.shoppingcart.dto;
+
+import sg.edu.nus.iss.shoppingcart.entity.Product;
+import java.math.BigDecimal;
+
+/**
+ * 一次请求的购物车展示快照；删除或下架的商品仍能从购物车移除。
+ * 本对象不会存入 Session。
+ * @author Letian Xie
+ */
+public final class CartLine {
+    private final Long productId;
+    private final int quantity;
+    private final String productName;
+    private final BigDecimal unitPrice;
+    private final String problem;
+
+    public CartLine(Long productId, int quantity, Product product) {
+        this.productId = productId;
+        this.quantity = quantity;
+        this.productName = product == null ? "Unavailable product #" + productId : product.getName();
+        this.unitPrice = product == null ? BigDecimal.ZERO : product.getPrice();
+        this.problem = product == null ? "This product has been removed. Please remove it from your cart."
+                : !product.isActive() ? "This product is no longer for sale. Please remove it."
+                    : null;
+    }
+
+    public Long getProductId() { return productId; }
+    public int getQuantity() { return quantity; }
+    public String getProductName() { return productName; }
+    public BigDecimal getUnitPrice() { return unitPrice; }
+    public BigDecimal getSubtotal() { return unitPrice.multiply(BigDecimal.valueOf(quantity)); }
+    public String getProblem() { return problem; }
+    public boolean isAvailable() { return problem == null; }
+}
