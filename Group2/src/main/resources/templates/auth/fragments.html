@@ -10,11 +10,10 @@
 <body>
 <header th:fragment="navbar" class="navbar">
     <nav class="container nav-inner" aria-label="Main navigation">
-        <a class="brand" th:href="@{/products}">ShopCart CA</a>
+        <a class="brand" th:href="@{/products}">Shopping Cart</a>
         <div class="nav-links">
             <a th:href="@{/products}">Products</a>
-            <a th:href="@{/cart/products}">Add products</a>
-            <a th:href="@{/cart}">Cart</a>
+            <a th:href="@{/cart}" th:text="'Cart (' + ${cartQuantity ?: 0} + ')'">Cart (0)</a>
             <a th:if="${isLoggedIn}" th:href="@{/orders}">Orders</a>
             <a th:if="${isLoggedIn}" th:href="@{/account}">Account</a>
             <a th:if="${isAdmin}" th:href="@{/admin/products}">Admin</a>

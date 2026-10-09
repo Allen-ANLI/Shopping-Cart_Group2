@@ -427,3 +427,13 @@ tr:last-child td { border-bottom: none; }
     .add-product-card { flex-direction: column; align-items: flex-start; gap: 16px; }
     .add-product-image { align-self: center; }
 }
+
+/* Quantity controls and reversible clear confirmation. */
+.qty-form { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; min-width: 260px; }
+.qty-form input { width: 62px; }
+.qty-step { min-width: 36px; min-height: 36px; border: 1px solid #bbb; border-radius: 6px; background: white; font: inherit; cursor: pointer; }
+.qty-step:disabled { opacity: .45; cursor: not-allowed; }
+.qty-step:focus-visible { outline: 3px solid #a33200; outline-offset: 3px; }
+.confirmation-page { max-width: 650px; padding-block: 35px; }
+.confirmation-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.confirmation-actions form { margin: 0; }

@@ -32,11 +32,23 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Page<Product> findProductPage(int page, int size) {
-        Sort sort = Sort.by("id").ascending();
+        return findProductPage(page, size, "", "featured");
+    }
 
+    /** Search is applied before pagination; ID breaks equal-price ties. */
+    @Transactional(readOnly = true)
+    public Page<Product> findProductPage(int page, int size, String query, String order) {
+        String keyword = query == null ? "" : query.strip();
+        if (keyword.length() > 100) { throw new IllegalArgumentException("Search is too long"); }
+        Sort sort = switch (order) {
+            case "featured" -> Sort.by("id").ascending();
+            case "price-asc" -> Sort.by("price").ascending().and(Sort.by("id").ascending());
+            case "price-desc" -> Sort.by("price").descending().and(Sort.by("id").ascending());
+            default -> throw new IllegalArgumentException("Unknown product sort");
+        };
         Pageable pageable = PageRequest.of(page, size, sort);
-
-        return productRepository.findByActiveTrue(pageable);
+        return keyword.isEmpty() ? productRepository.findByActiveTrue(pageable)
+                : productRepository.findByActiveTrueAndNameContainingIgnoreCase(keyword, pageable);
     }
 
     @Transactional(readOnly = true)

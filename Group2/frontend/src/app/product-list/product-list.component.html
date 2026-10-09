@@ -4,15 +4,6 @@
 -->
 <main id="main-content" class="store-container">
   <section class="store-intro" aria-label="Explore the store">
-    <aside class="category-panel">
-      <h2><app-icon name="grid" />Your everyday, sorted</h2>
-      <ul>
-        <li><app-icon name="monitor" /><span>Computer accessories<small>A better desk setup</small></span></li>
-        <li><app-icon name="keyboard" /><span>Typing essentials<small>Make every key count</small></span></li>
-        <li><app-icon name="mouse" /><span>Desk companions<small>For work and study</small></span></li>
-      </ul>
-      <a [href]="catalogUrl">Explore all products <app-icon name="arrow" /></a>
-    </aside>
     <div class="feature-banner">
       <div class="feature-copy">
         <span class="eyebrow">THE EVERYDAY EDIT</span>
@@ -27,31 +18,30 @@
         <span class="feature-stamp">WORK.<br>STUDY.<br>EVERYDAY.</span>
       </div>
     </div>
-    <aside class="shopping-guide" id="shopping-guide">
-      <span class="guide-icon"><app-icon name="bag" /></span>
-      <h2>A good place<br>to start.</h2>
-      <p>Explore the collection, then take a closer look at your favourites.</p>
-      <a [href]="catalogUrl">Browse the collection <app-icon name="arrow" /></a>
-      <div class="guide-currency"><span>Shopping made simple</span><strong>All prices in SGD</strong></div>
-    </aside>
   </section>
   <section class="catalog-section" id="catalog" aria-labelledby="catalog-heading">
     <div class="catalog-heading">
       <div><span class="section-eyebrow">PICK YOUR EVERYDAY</span>
         <h2 id="catalog-heading"><app-icon name="heart" />Just for your desk</h2></div>
-      <a class="guide-link" [href]="guideUrl">A little shopping inspiration <app-icon name="arrow" /></a>
     </div>
+    @if (query()) { <p class="search-summary">Results for <strong>{{ query() }}</strong> <a [href]="listUrl">Reset search</a></p> }
     <div class="catalog-toolbar">
       <span class="collection-label"><span class="status-dot"></span>All products</span>
       <p aria-live="polite">
         @if (loading()) { Finding your essentials… }
         @else if (error()) { Collection unavailable }
-        @else { {{ totalElements() }} products in the collection }
+        @else { {{ totalElements() }} {{ query() ? 'matching products' : 'products in the collection' }} }
       </p>
       <label class="page-size">Per page
         <select #pageSize [value]="size()" (change)="changeSize(+pageSize.value)"
           [disabled]="loading()" aria-label="Products per page">
           <option value="1">1</option><option value="6">6</option><option value="12">12</option>
+        </select>
+      </label>
+      <label class="sort-control">Sort
+        <select #sortOrder [value]="sort()" (change)="changeSort(sortOrder.value)" aria-label="Sort products">
+          <option value="featured">Featured</option><option value="price-asc">Price: low to high</option>
+          <option value="price-desc">Price: high to low</option>
         </select>
       </label>
     </div>
@@ -63,8 +53,8 @@
         <h3>We couldn't load the collection.</h3><p>{{ error() }}</p>
         <button type="button" class="button-primary" (click)="retry()">Try again</button></div>
     } @else if (products().length === 0) {
-      <div class="state-panel"><app-icon name="bag" /><h3>No products available.</h3>
-        <p>Check back soon for more everyday essentials.</p></div>
+      <div class="state-panel"><app-icon name="bag" /><h3>{{ query() ? 'No matching products.' : 'No products available.' }}</h3>
+        <p>{{ query() ? 'Try a different product name or reset your search.' : 'Check back soon for more everyday essentials.' }}</p><a class="button-secondary" [href]="listUrl">Reset search</a></div>
     } @else {
       <ul class="product-grid">
         @for (product of products(); track product.id) {

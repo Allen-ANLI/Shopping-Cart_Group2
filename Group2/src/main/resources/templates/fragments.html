@@ -18,12 +18,11 @@
 -->
 <header th:fragment="navbar" class="navbar">
     <div class="container nav-inner auth-nav">
-        <a th:href="@{/products}" class="brand">CA Shopping Cart</a>
+        <a th:href="@{/products}" class="brand">Shopping Cart</a>
         <nav class="nav-links auth-links">
             <a th:href="@{/products}">Products</a>
-            <a th:href="@{/cart/products}">Add products</a>
-            <a th:href="@{/cart}">Cart</a>
-            <a th:href="@{/orders}">Order history</a>
+            <a th:href="@{/cart}" th:text="'Cart (' + ${cartQuantity ?: 0} + ')'">Cart (0)</a>
+            <a th:href="@{/orders}">Orders</a>
             <a th:if="${isLoggedIn}" th:href="@{/account}">Account</a>
             <a th:if="${isAdmin}" th:href="@{/admin/products}">Admin</a>
             <a th:unless="${isLoggedIn}" th:href="@{/login}">Log in</a>

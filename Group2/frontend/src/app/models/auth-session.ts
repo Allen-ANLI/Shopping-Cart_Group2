@@ -11,6 +11,7 @@ export interface AuthenticatedUser {
 }
 
 export interface AuthSessionState {
+  cartQuantity?: number;
   loggedIn: boolean;
   user: AuthenticatedUser | null;
 }

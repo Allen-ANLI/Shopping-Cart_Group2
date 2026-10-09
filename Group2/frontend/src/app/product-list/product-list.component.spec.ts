@@ -94,4 +94,26 @@ describe('Product list HTTP and UI behaviour', () => {
     const pending = request(); fixture.destroy();
     expect(pending.cancelled).toBe(true);
   });
+  it('applies a submitted search URL to the full paged query', () => {
+    const pending = request(); fixture.destroy(); expect(pending.cancelled).toBe(true);
+    history.replaceState(null, '', '/products?q=Keyboard');
+    fixture = TestBed.createComponent(ProductListComponent); element = fixture.nativeElement as HTMLElement; render();
+    http.expectOne('/api/products?page=0&size=6&q=Keyboard').flush(productPage([keyboard],0,6,1)); render();
+    expect(element.querySelectorAll('.product-card').length).toBe(1);
+    expect(window.location.search).toContain('q=Keyboard');
+  });
+  it('changing sort returns to page zero and cancels the old request', () => {
+    const old = request();
+    const select = element.querySelector<HTMLSelectElement>('[aria-label="Sort products"]')!;
+    expect(select).not.toBeNull(); select.value = 'price-asc';
+    select.dispatchEvent(new Event('change')); render();
+    expect(old.cancelled).toBe(true);
+    http.expectOne('/api/products?page=0&size=6&sort=price-asc').flush(productPage([mouse,keyboard])); render();
+    expect(fixture.componentInstance.page()).toBe(0);
+  });
+  it('offers a reset search action for an empty result', () => {
+    request().flush(productPage([],0,6,0)); render();
+    expect(element.querySelector('a[href="/products"]')?.textContent).toContain('Reset search');
+  });
+
 });

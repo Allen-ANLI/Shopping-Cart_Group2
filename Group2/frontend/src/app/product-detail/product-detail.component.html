@@ -33,13 +33,9 @@
           <p>{{ item.description || 'No description is available for this product.' }}</p>
         </section>
         <app-add-to-cart [productId]="item.id" />
-        <a class="button-primary detail-back" [href]="listUrl">Back to products <app-icon name="arrow" /></a>
+        <a class="button-secondary detail-back" [href]="listUrl">Back to products <app-icon name="arrow" /></a>
         <p class="detail-note">Find the little things that fit your everyday.</p>
       </div>
     </article>
   }
-  <section class="detail-bottom-note" id="catalog">
-    <app-icon name="grid" /><div><h2>There's more to explore.</h2><p>Take another look at the everyday collection.</p></div>
-    <a [href]="listUrl">Explore all products <app-icon name="arrow" /></a>
-  </section>
 </main>

@@ -96,4 +96,11 @@ describe('B Angular account navigation', () => {
     expect(element.textContent).toContain('<img src=x onerror=alert(1)>');
     expect(element.querySelector('img')).toBeNull();
   });
+  it('shows the server cart quantity and removes the ambiguous add-products entry', () => {
+    request().flush({ ...session(), cartQuantity: 4 }); render();
+    expect(element.querySelector('a[href="/cart"]')?.textContent).toContain('Cart (4)');
+    expect(element.querySelector('a[href="/cart/products"]')).toBeNull();
+    expect(element.querySelector('a[href="/products"]')).not.toBeNull();
+  });
+
 });

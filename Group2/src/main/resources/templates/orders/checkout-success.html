@@ -27,7 +27,7 @@
         <aside class="card cart-summary">
             <h2>Order total</h2>
             <p class="summary-total" th:text="'Total: S$' + ${receipt.totalAmount}">Total</p>
-            <a th:href="@{/cart}" class="btn btn-block">View cart</a>
+            <a th:href="@{/orders/{id}(id=${receipt.id})}" class="btn btn-block">View order</a>
         </aside>
     </div>
 </main>

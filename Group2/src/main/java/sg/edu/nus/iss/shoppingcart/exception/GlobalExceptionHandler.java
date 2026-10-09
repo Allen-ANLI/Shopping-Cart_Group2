@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.ui.Model;
+import org.springframework.ui.ExtendedModelMap;
+import sg.edu.nus.iss.shoppingcart.controller.AuthModelAdvice;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.ModelAndView;
@@ -34,9 +36,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  *
  * @author 蔡千一（Module E）
  * @author OpenAI Codex (HTTP error handling review)
+ * @author 王重一 UI 导航与操作优化
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final AuthModelAdvice identity;
+    public GlobalExceptionHandler(AuthModelAdvice identity) {
+        this.identity = identity;
+    }
 
     /** 日志记录器。 */
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
@@ -62,6 +70,9 @@ public class GlobalExceptionHandler {
         }
         ModelAndView view = new ModelAndView("error/not-found");
         view.setStatus(status);
+        Model navigation = new ExtendedModelMap();
+        identity.restore(request, navigation);
+        view.addAllObjects(navigation.asMap());
         view.addObject("errorTitle", title);
         view.addObject("errorMessage", message);
         return view;
@@ -76,7 +87,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleNotFound(ResourceNotFoundException ex, Model model) {
+    public String handleNotFound(ResourceNotFoundException ex, Model model, HttpServletRequest request) {
+        identity.restore(request, model);
         model.addAttribute("errorMessage", ex.getUserMessage());
         model.addAttribute("errorTitle", "Not found");
         return "error/not-found";
@@ -94,7 +106,8 @@ public class GlobalExceptionHandler {
      * @return 提示页
      */
     @ExceptionHandler(BusinessException.class)
-    public String handleBusiness(BusinessException ex, Model model) {
+    public String handleBusiness(BusinessException ex, Model model, HttpServletRequest request) {
+        identity.restore(request, model);
         model.addAttribute("errorMessage", ex.getUserMessage());
         model.addAttribute("errorTitle", "Action not allowed");
         return "error/business";
@@ -115,18 +128,16 @@ public class GlobalExceptionHandler {
      * </ul>
      *
      * @param ex    异常
-     * @param model 视图模型
-     * @return 400 错误页
+     * @param request 当前请求，用于区分 API 和页面
+     * @return API JSON 或 400 错误页
      */
     @ExceptionHandler({
             IllegalArgumentException.class,
             org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleIllegalArgument(Exception ex, Model model) {
-        model.addAttribute("errorMessage", "The request was not valid.");
-        model.addAttribute("errorTitle", "Bad request");
-        return "error/not-found";
+    public Object handleIllegalArgument(Exception ex, HttpServletRequest request) {
+        return requestError(request, HttpStatus.BAD_REQUEST, "Bad request", "The request was not valid.");
     }
 
     /**
@@ -141,7 +152,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleUnexpected(Exception ex, Model model) {
+    public String handleUnexpected(Exception ex, Model model, HttpServletRequest request) {
+        identity.restore(request, model);
         log.error("Unexpected error while handling request", ex);
         model.addAttribute("errorMessage",
                 "Something went wrong on our side. Please try again.");

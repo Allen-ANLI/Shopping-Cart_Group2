@@ -19,7 +19,12 @@ export class ProductDetailComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) productId!: string;
   private readonly productService = inject(ProductService);
   private request?: Subscription;
-  readonly listUrl = window.location.pathname;
+  private readonly listParameters = new URLSearchParams(window.location.search);
+  readonly listUrl = (() => {
+    this.listParameters.delete('id');
+    const query = this.listParameters.toString();
+    return '/products' + (query ? '?' + query : '');
+  })();
   readonly product = signal<Product | null>(null);
   readonly loading = signal(true);
   readonly error = signal('');

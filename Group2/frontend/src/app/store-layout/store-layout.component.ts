@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { CatalogNavigationService } from '../services/catalog-navigation.service';
 import { IconComponent } from '../icon/icon.component';
 import { AuthNavigationComponent } from '../auth-navigation/auth-navigation.component';
 
@@ -12,7 +13,8 @@ import { AuthNavigationComponent } from '../auth-navigation/auth-navigation.comp
   templateUrl: './store-layout.component.html', styleUrl: './store-layout.component.css',
 })
 export class StoreLayoutComponent {
-  readonly listUrl = window.location.pathname;
-  readonly catalogUrl = `${this.listUrl}#catalog`;
-  readonly skipUrl = `${this.listUrl}${window.location.search}#main-content`;
+  private readonly navigation = inject(CatalogNavigationService);
+  readonly listUrl = '/products';
+  readonly query = (new URLSearchParams(window.location.search).get('q') ?? '').slice(0, 100);
+  get skipUrl(): string { return `${this.listUrl}${this.navigation.search()}#main-content`; }
 }

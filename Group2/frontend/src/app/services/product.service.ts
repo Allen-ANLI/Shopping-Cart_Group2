@@ -11,8 +11,10 @@ import { Product, ProductPage } from '../models/product';
 export class ProductService {
   private readonly http = inject(HttpClient);
 
-  getPage(page: number, size: number): Observable<ProductPage> {
-    const params = new HttpParams().set('page', page).set('size', size);
+  getPage(page: number, size: number, query = '', sort = 'featured'): Observable<ProductPage> {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (query) params = params.set('q', query);
+    if (sort !== 'featured') params = params.set('sort', sort);
     return this.http.get<ProductPage>('/api/products', { params });
   }
 

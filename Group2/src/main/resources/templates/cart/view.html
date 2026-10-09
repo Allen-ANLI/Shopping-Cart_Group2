@@ -35,9 +35,13 @@
                             <form th:action="@{/cart/update}" method="post" class="qty-form">
                                 <input type="hidden" name="cartFormToken" th:value="${cartFormToken}">
                                 <input type="hidden" name="productId" th:value="${item.productId}">
+                                <button type="button" hidden data-quantity-step="-1" class="qty-step"
+                                        th:attr="aria-label='Decrease quantity for ' + ${item.productName}">−</button>
                                 <input type="number" name="quantity" min="0" max="99" required
                                        th:value="${item.quantity}" class="form-control" aria-label="Quantity">
-                                <button type="submit" class="btn btn-sm btn-outline">Update</button>
+                                <button type="button" hidden data-quantity-step="1" class="qty-step"
+                                        th:attr="aria-label='Increase quantity for ' + ${item.productName}">+</button>
+                                <button type="submit" class="btn btn-sm btn-outline">Update quantity</button>
                             </form>
                         </td>
                         <td th:text="'S$' + ${item.subtotal}">S$0.00</td>
@@ -52,11 +56,8 @@
                     </tbody>
                 </table>
             </div>
-            <p class="form-hint">Set a quantity to 0 to remove an item. Maximum 99 per product.</p>
-            <form th:action="@{/cart/clear}" method="post">
-                <input type="hidden" name="cartFormToken" th:value="${cartFormToken}">
-                <button type="submit" class="btn btn-sm btn-secondary">Clear cart</button>
-            </form>
+            <p class="form-hint">Use Update quantity to apply your changes. Set 0 to remove an item. Maximum 99 per product.</p>
+            <a th:href="@{/cart/clear}" class="btn btn-sm btn-secondary">Clear cart</a>
         </section>
         <aside class="card cart-summary" aria-label="Order summary">
             <h2>Order summary</h2>
@@ -72,5 +73,6 @@
     </div>
 </main>
 <footer th:replace="~{cart/fragments :: footer}"></footer>
+<script th:src="@{/cart-assets/cart.js}" defer></script>
 </body>
 </html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{cart/fragments :: head('Clear cart')}"></head>
+<body>
+<header th:replace="~{cart/fragments :: navbar}"></header>
+<main class="container confirmation-page">
+  <section class="card">
+    <h1>Clear your cart?</h1>
+    <p th:text="'This will remove all ' + ${totalQuantity} + ' item(s) from your cart.'"></p>
+    <p>Your saved orders will stay in your order history.</p>
+    <div class="confirmation-actions">
+      <a th:href="@{/cart}" class="btn btn-secondary">Cancel</a>
+      <form th:action="@{/cart/clear}" method="post">
+        <input type="hidden" name="cartFormToken" th:value="${cartFormToken}">
+        <button type="submit" class="btn btn-danger" th:disabled="${totalQuantity == 0}">Clear cart</button>
+      </form>
+    </div>
+  </section>
+</main>
+<footer th:replace="~{cart/fragments :: footer}"></footer>
+</body></html>

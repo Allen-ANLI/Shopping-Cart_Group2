@@ -59,7 +59,8 @@ npm run dev
 | `src/app/product-detail/product-detail.component.ts`、`.html`、`.css` | 根据输入 ID 查询单个商品；展示图片、价格、描述、404、错误重试和返回入口。 |
 | `src/app/icon/icon.component.ts`、`.html`、`.css` | 根据图标名称绘制内联 SVG；图标属于装饰，不进入屏幕阅读器描述。 |
 | `src/app/models/product.ts` | 定义 `Product` 和 `ProductPage` 接口，描述现有 JSON 字段及类型。 |
-| `src/app/services/product.service.ts` | 统一发送分页和详情 GET 请求，组件只负责状态与显示。 |
+| `src/app/services/product.service.ts` | 发送商品名称搜索、价格排序、分页和详情 GET 请求。 |
+| `src/app/services/catalog-navigation.service.ts` | 用共享 signals 同步当前商品查询参数，让页头和横幅的页内链接保留浏览状态。 |
 | `src/styles.css` | 共享的橙色主题、布局、断点、焦点和动画偏好样式。 |
 | `src/app/**/*.spec.ts` | 根页面地址、列表和详情的自动化行为测试。 |
 | `src/app/testing/product-fixtures.ts` | 只供测试使用的完整商品与分页示例，替代真实数据库响应。 |
@@ -131,7 +132,7 @@ signals 是 Angular 提供的响应式状态容器；模板读取状态后，状
 
 生产 `base href` 为 `/products/`，用于浏览器解析 `main-*.js`、`styles-*.css` 和图标。页面链接明确由当前 `window.location.pathname` 生成：正式列表 `/products`、详情 `/products?id=1`；开发列表 `/`、详情 `/?id=1`。因此页面链接不会被基础路径隐式改为 `/products/?id=1`。
 
-返回链接去掉 `id` 并重新加载列表，所以恢复第一页和默认每页 6 条。跳过导航链接会保留当前查询参数，确保详情页的 Skip to content 仍指向当前详情正文。
+返回链接只去掉 `id`，保留搜索词、排序、页码和每页数量；直接刷新也读取这些参数。无参数进入列表时使用第一页和每页 6 条。跳过导航链接会保留当前查询参数，确保详情页的 Skip to content 仍指向当前详情正文。
 
 商品图片与接口地址以 `/` 开头，使用 `/images/...` 和 `/api/...`；它们从站点根路径读取，与生产基础路径独立。
 
@@ -177,3 +178,14 @@ signals 是 Angular 提供的响应式状态容器；模板读取状态后，状
 `src/test/java/sg/edu/nus/iss/shoppingcart/config/DataInitializerTests.java` 使用模拟仓库验证空表生成 12 条、已有商品保留、重复启动不重复添加及已有用户保留。测试不会连接真实 MySQL；测试资源中的 Mockito 配置选择接口代理实现。
 
 2026-10-06 实际验证：4 项初始化单元测试通过；当前数据库补入后为 12 条；补充 SQL 顺序重复执行后商品 JSON 不变，原有 Keyboard 和 Mouse 字段保持不变；默认两页各 6 条、每页 12 条、Headphones 详情与直接刷新、返回默认分页均正常。默认桌面宽度及 375×812 手机视口下未发现整体横向溢出，10 个新增商品图示全部加载成功。
+
+
+## 2026-10-09：商城操作优化
+
+共享页头提供真实商品名称搜索，搜索覆盖全部上架商品，再进行分页。商品工具栏支持 Featured（ID 升序）、Price: low to high、Price: high to low；价格相同时按 ID 升序。更改排序或每页数量回到第一页。查询参数 `q`、`sort`、`page`、`size` 保留在地址栏及详情返回链接中。搜索无结果可 Reset search；请求失败仍可 Try again。
+
+分页接口示例：`/api/products?page=0&size=6&q=Keyboard&sort=price-asc`。`q` 最长 100 字符，按名称忽略大小写匹配；`sort` 只允许 `featured`、`price-asc`、`price-desc`。原 `/api/products` 数组接口以及 `/api/products/{id}` 保留，旧调用不传新增参数仍按原方式工作。
+
+移除未实现的分类筛选、模糊的 Add products 全局入口及重复促销按钮。账户导航显示 Products、Cart（商品总数量），登录后显示 Orders 和 Account；Admin 仍仅对管理员显示。详情以 Add to cart 为主要操作，Back to products 使用次要样式。
+
+严格类型和模板检查通过，5 个文件共 49 项前端测试通过，生产构建和部署通过。浏览器验证范围及后端联动见 [UI 优化说明](../docs/UI优化说明.md)。以上新增搜索、排序、导航状态测试使用模拟响应；真实界面使用独立 H2 演示库，不连接成员的正式 MySQL。

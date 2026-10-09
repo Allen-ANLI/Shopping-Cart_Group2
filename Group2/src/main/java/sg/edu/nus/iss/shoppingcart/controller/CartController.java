@@ -21,6 +21,7 @@ import java.util.List;
 /**
  * Session 购物车页面与写操作。
  * @author Letian Xie
+ * @author 王重一 UI 导航与操作优化
  */
 @Controller
 public class CartController {
@@ -62,6 +63,14 @@ public class CartController {
                              HttpSession session, RedirectAttributes flash) {
         return change(session, cartFormToken, result, flash,
                 () -> cartService.removeItem(session, form.getProductId()), "Product removed");
+    }
+
+    /** A GET confirmation never changes the cart. */
+    @GetMapping("/cart/clear")
+    public String confirmClear(HttpSession session, Model model) {
+        var items = cartService.getCartItems(session);
+        model.addAttribute("totalQuantity", cartService.countTotalQuantity(items));
+        return "cart/clear";
     }
 
     @PostMapping("/cart/clear")

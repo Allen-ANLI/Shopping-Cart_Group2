@@ -9,6 +9,8 @@ import sg.edu.nus.iss.shoppingcart.entity.Product;
 import sg.edu.nus.iss.shoppingcart.service.ProductService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestParam;
 import sg.edu.nus.iss.shoppingcart.dto.ProductPageResponse;
@@ -40,10 +42,15 @@ public class ProductRestController {
             @Min(0) int page,
 
             @RequestParam(name = "size", defaultValue = "6")
-            @Min(1) @Max(100) int size) {
+            @Min(1) @Max(100) int size,
+            @RequestParam(name = "q", defaultValue = "") @Size(max = 100) String query,
+            @RequestParam(name = "sort", defaultValue = "featured")
+            @Pattern(regexp = "featured|price-asc|price-desc") String sort) {
 
         Page<Product> result =
-                productService.findProductPage(page, size);
+                query.isBlank() && sort.equals("featured")
+                        ? productService.findProductPage(page, size)
+                        : productService.findProductPage(page, size, query, sort);
 
         return new ProductPageResponse(result);
     }
