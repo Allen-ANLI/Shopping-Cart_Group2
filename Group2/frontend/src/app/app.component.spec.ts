@@ -23,6 +23,7 @@ describe('Existing product addresses', () => {
     history.replaceState(null, '', '/products');
     const fixture = TestBed.createComponent(AppComponent); fixture.detectChanges();
     http.expectOne('/api/auth/session').flush({ loggedIn: false, user: null });
+    http.expectOne('/api/cart/state').flush({}, { status: 401, statusText: 'Unauthorized' });
     http.expectOne('/api/products?page=0&size=6').flush(productPage([keyboard])); fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('app-product-list')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('app-product-detail')).toBeNull();
@@ -47,6 +48,7 @@ describe('Existing product addresses', () => {
     history.replaceState(null, '', '/products');
     const fixture = TestBed.createComponent(AppComponent); fixture.detectChanges();
     http.expectOne('/api/auth/session').flush({ loggedIn: false, user: null });
+    http.expectOne('/api/cart/state').flush({}, { status: 401, statusText: 'Unauthorized' });
     http.expectOne('/api/products?page=0&size=6').flush(productPage([keyboard])); fixture.detectChanges();
     (fixture.nativeElement.querySelector('select[aria-label="Sort products"]') as HTMLSelectElement).value = 'price-asc';
     fixture.nativeElement.querySelector('select[aria-label="Sort products"]').dispatchEvent(new Event('change'));
@@ -55,6 +57,20 @@ describe('Existing product addresses', () => {
     expect(window.location.search).toBe('?sort=price-asc');
     expect(fixture.nativeElement.querySelector('.skip-link').getAttribute('href')).toBe('/products?sort=price-asc#main-content');
     expect(fixture.nativeElement.querySelector('.banner-link').getAttribute('href')).toBe('/products?sort=price-asc#catalog');
+    fixture.destroy();
+  });
+  it('updates the navigation cart count after quick add and an external cart change', () => {
+    history.replaceState(null, '', '/products');
+    const fixture = TestBed.createComponent(AppComponent); fixture.detectChanges();
+    http.expectOne('/api/auth/session').flush({ loggedIn: false, user: null, cartQuantity: 0 });
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: {}, totalQuantity: 0 });
+    http.expectOne('/api/products?page=0&size=6').flush(productPage([keyboard])); fixture.detectChanges();
+    fixture.nativeElement.querySelector('[aria-label="Add Keyboard to cart"]').click();
+    http.expectOne('/api/cart/adjust').flush({ cartFormToken: 'token', quantities: { 1: 1 }, totalQuantity: 1 }); fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('a[href="/cart"]').textContent).toContain('Cart (1)');
+    window.dispatchEvent(new Event('focus'));
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: { 1: 5 }, totalQuantity: 5 }); fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('a[href="/cart"]').textContent).toContain('Cart (5)');
     fixture.destroy();
   });
 });

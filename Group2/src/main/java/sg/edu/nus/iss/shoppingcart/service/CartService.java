@@ -1,6 +1,7 @@
 package sg.edu.nus.iss.shoppingcart.service;
 
 import sg.edu.nus.iss.shoppingcart.dto.CartLine;
+import sg.edu.nus.iss.shoppingcart.dto.CartState;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import sg.edu.nus.iss.shoppingcart.exception.BusinessException;
@@ -88,6 +89,35 @@ public class CartService {
 
     public long revision(HttpSession session) {
         synchronized (session) { return state(session).getRevision(); }
+    }
+
+    public CartState snapshot(HttpSession session) {
+        synchronized (session) {
+            Map<Long, Integer> quantities = state(session).getQuantities();
+            return new CartState(formToken(session), quantities,
+                    quantities.values().stream().mapToInt(Integer::intValue).sum());
+        }
+    }
+
+    /** Apply +/-1 to the latest server quantity under the same lock as other cart writers. */
+    public CartState adjustItem(HttpSession session, Long productId, int delta, String token) {
+        synchronized (session) {
+            validateFormToken(session, token);
+            if (productId == null || productId <= 0 || (delta != 1 && delta != -1)) {
+                throw new BusinessException("Please select a valid product and add or remove one item.");
+            }
+            SessionCart current = state(session);
+            int quantity = current.getQuantities().getOrDefault(productId, 0);
+            if (delta == 1) {
+                addItem(session, productId, 1);
+            } else if (quantity > 0) {
+                // Decreasing remains possible even if an administrator has taken the product off sale.
+                if (quantity == 1) current.remove(productId);
+                else current.put(productId, quantity - 1);
+                session.setAttribute(CART_ATTRIBUTE, current);
+            }
+            return snapshot(session);
+        }
     }
 
     public void addItem(HttpSession session, Long productId, int quantity) {

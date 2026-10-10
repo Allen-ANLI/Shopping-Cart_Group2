@@ -6,7 +6,7 @@
 <nav class="account-navigation" aria-label="Account navigation">
   <div class="account-links">
     <a href="/products">Products</a>
-    <a href="/cart">Cart ({{ state().cartQuantity ?? 0 }})</a>
+    <a href="/cart">Cart ({{ cartQuantity() }})</a>
     @if (state().loggedIn && state().user) {
       <a href="/orders">Orders</a>
       <a href="/account">Account</a>

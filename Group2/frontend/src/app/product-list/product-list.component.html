@@ -63,19 +63,33 @@
               @if (product.imageUrl) { <img [src]="product.imageUrl" [alt]="product.name"> }
               @else { <app-icon name="bag" /> }
               <span class="product-availability"><span class="status-dot"></span>Available</span>
-              <span class="photo-arrow"><app-icon name="arrow" /></span>
             </a>
             <div class="product-card-body">
               <span class="product-category">EVERYDAY ESSENTIALS</span>
               <h3><a [href]="productUrl(product.id)">{{ product.name }}</a></h3>
               <div class="product-card-bottom">
                 <p class="product-price"><span>SGD</span> {{ product.price.toFixed(2) }}</p>
-                <a class="product-details-link" [href]="productUrl(product.id)">View details <app-icon name="arrow" /></a>
+                <div class="quick-cart" [attr.aria-label]="product.name + ' cart controls'" [attr.aria-busy]="cart.busy()">
+                  @if (cart.loggedIn() === false) {
+                    <a class="cart-step" [href]="'/cart/products?productId=' + product.id" [attr.aria-label]="'Log in to add ' + product.name + ' to cart'" title="Log in to add to cart"><app-icon name="plus" /></a>
+                  } @else {
+                    @if (cart.quantity(product.id) > 0) {
+                      <button type="button" class="cart-step" [disabled]="cart.busy()"
+                        [attr.aria-label]="'Remove one ' + product.name + ' from cart'" title="Remove one from cart" (click)="cart.adjust(product.id, -1)"><app-icon name="minus" /></button>
+                      <span class="cart-quantity" aria-live="polite" [attr.aria-label]="cart.quantity(product.id) + ' in cart'">{{ cart.quantity(product.id) }}</span>
+                    }
+                    <button type="button" class="cart-step" [disabled]="cart.busy() || cart.quantity(product.id) >= 99"
+                      [attr.aria-label]="'Add ' + product.name + ' to cart'" title="Add to cart" (click)="cart.adjust(product.id, 1)"><app-icon name="plus" /></button>
+                  }
+                </div>
               </div>
             </div>
           </li>
         }
       </ul>
+      @if (cart.error()) {
+        <p class="cart-feedback" role="alert">{{ cart.error() }} <button type="button" (click)="cart.refresh(true)">Retry cart</button></p>
+      }
       <nav class="pagination" aria-label="Product pages">
         <p>Page <strong>{{ page() + 1 }}</strong> of {{ totalPages() }}</p>
         <div>

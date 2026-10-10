@@ -3,3 +3,12 @@
  * @author 王重一
  */
 :host { display: block; }
+.quick-cart { display: inline-flex; align-items: center; gap: 2px; margin-left: auto; border-radius: 24px; background: var(--soft-orange); color: var(--orange); }
+.cart-step { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 36px; width: 36px; height: 36px; box-sizing: border-box; border: 0; border-radius: 50%; padding: 0; background: transparent; color: inherit; cursor: pointer; text-decoration: none; }
+.cart-step app-icon { display: flex; width: 18px; height: 18px; pointer-events: none; }
+.cart-step:hover:not(:disabled) { background: var(--orange); color: white; }
+.cart-step:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+.cart-step:disabled { opacity: .45; cursor: default; }
+.cart-quantity { min-width: 22px; text-align: center; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.cart-feedback { font-size: 13px; color: #a33116; }
+.cart-feedback button { margin-left: 8px; background: transparent; border: 0; color: inherit; text-decoration: underline; cursor: pointer; }

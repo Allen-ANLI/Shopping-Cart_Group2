@@ -4,6 +4,7 @@ import { CatalogNavigationService } from '../services/catalog-navigation.service
 import { Product } from '../models/product';
 import { ProductService } from '../services/product.service';
 import { IconComponent } from '../icon/icon.component';
+import { CartStateService } from '../services/cart-state.service';
 
 /**
  * 加载并展示分页商品列表，管理页大小、加载、空结果、失败重试和请求取消。
@@ -14,6 +15,7 @@ import { IconComponent } from '../icon/icon.component';
   templateUrl: './product-list.component.html', styleUrl: './product-list.component.css',
 })
 export class ProductListComponent implements OnInit, OnDestroy {
+  readonly cart = inject(CartStateService);
   private readonly productService = inject(ProductService);
   private readonly navigation = inject(CatalogNavigationService);
   private request?: Subscription;
@@ -31,8 +33,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
   readonly loading = signal(true);
   readonly error = signal('');
 
-  ngOnInit(): void { this.load(); }
-  ngOnDestroy(): void { this.request?.unsubscribe(); }
+  ngOnInit(): void { this.cart.start(); this.load(); }
+  ngOnDestroy(): void { this.request?.unsubscribe(); this.cart.stop(); }
 
   productUrl(id: number): string {
     const params = this.parameters(); params.set('id', String(id));

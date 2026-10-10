@@ -9,6 +9,8 @@ const iconPaths = {
   mouse: ['M12 2a6 6 0 0 1 6 6v8a6 6 0 0 1-12 0V8a6 6 0 0 1 6-6Z', 'M12 2v7'],
   grid: ['M3 3h7v7H3ZM14 3h7v7h-7ZM3 14h7v7H3ZM14 14h7v7h-7Z'],
   check: ['m5 12 4 4L19 6'],
+  plus: ['M5 12h14', 'M12 5v14'],
+  minus: ['M5 12h14'],
 } as const;
 
 /**

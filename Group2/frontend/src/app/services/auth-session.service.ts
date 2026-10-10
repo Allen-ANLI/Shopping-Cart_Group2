@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AuthSessionState } from '../models/auth-session';
 
@@ -8,6 +8,7 @@ import { AuthSessionState } from '../models/auth-session';
  */
 @Injectable({ providedIn: 'root' })
 export class AuthSessionService {
+  readonly cartQuantity = signal<number | null>(null);
   private readonly http = inject(HttpClient);
 
   getSession() {

@@ -23,6 +23,8 @@ describe('Product list HTTP and UI behaviour', () => {
     render();
   };
   beforeEach(async () => {
+    vi.useFakeTimers();
+    vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible');
     history.replaceState(null, '', '/products');
     await TestBed.configureTestingModule({
       imports: [ProductListComponent], providers: [provideHttpClient(), provideHttpClientTesting()],
@@ -32,7 +34,12 @@ describe('Product list HTTP and UI behaviour', () => {
     element = fixture.nativeElement as HTMLElement;
     render();
   });
-  afterEach(() => { fixture.destroy(); http.verify(); history.replaceState(null, '', '/'); });
+  afterEach(() => {
+    fixture.destroy();
+    // Existing pagination tests are independent of cart state.
+    http.match('/api/cart/state').forEach(pending => expect(pending.cancelled).toBe(true)); http.verify();
+    vi.useRealTimers(); vi.restoreAllMocks(); history.replaceState(null, '', '/');
+  });
 
   it('requests default page and renders only summary, image and two-decimal price', () => {
     expect(element.textContent).toContain('Loading products...');
@@ -116,4 +123,114 @@ describe('Product list HTTP and UI behaviour', () => {
     expect(element.querySelector('a[href="/products"]')?.textContent).toContain('Reset search');
   });
 
+  it('replaces decorative arrows and details text with an interactive cart stepper', () => {
+    request().flush(productPage([mouse])); render();
+    expect(element.querySelector('.photo-arrow')).toBeNull();
+    expect(element.textContent).not.toContain('View details');
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: {}, totalQuantity: 0 }); render();
+    const add = element.querySelector<HTMLButtonElement>('[aria-label="Add Mouse to cart"]')!;
+    expect(add).not.toBeNull(); add.click(); render();
+    const change = http.expectOne('/api/cart/adjust');
+    expect(change.request.body.get('delta')).toBe('1');
+    change.flush({ cartFormToken: 'token', quantities: { 2: 1 }, totalQuantity: 1 }); render();
+    expect(element.querySelector('.cart-quantity')?.textContent?.trim()).toBe('1');
+    element.querySelector<HTMLButtonElement>('[aria-label="Remove one Mouse from cart"]')!.click();
+    http.expectOne('/api/cart/adjust').flush({ cartFormToken: 'token', quantities: {}, totalQuantity: 0 }); render();
+    expect(element.querySelector('.cart-quantity')).toBeNull();
+    expect(element.querySelectorAll('.quick-cart button').length).toBe(1);
+  });
+
+  it('refreshes quantities changed on another page when returning to the catalog', () => {
+    request().flush(productPage([mouse])); render();
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: { 2: 3 }, totalQuantity: 3 }); render();
+    expect(element.querySelector('.cart-quantity')?.textContent?.trim()).toBe('3');
+    window.dispatchEvent(new Event('focus'));
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: { 2: 6 }, totalQuantity: 6 }); render();
+    expect(element.querySelector('.cart-quantity')?.textContent?.trim()).toBe('6');
+    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: {}, totalQuantity: 0 }); render();
+    expect(element.querySelector('.cart-quantity')).toBeNull();
+  });
+
+  it('polls the server, cancels stale snapshots and blocks duplicate writes', () => {
+    request().flush(productPage([mouse])); render();
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: { 2: 1 }, totalQuantity: 1 }); render();
+    vi.advanceTimersByTime(2000);
+    const stale = http.expectOne('/api/cart/state');
+    const add = element.querySelector<HTMLButtonElement>('[aria-label="Add Mouse to cart"]')!;
+    add.click(); add.click(); render();
+    expect(stale.cancelled).toBe(true);
+    const mutation = http.expectOne('/api/cart/adjust');
+    expect(add.disabled).toBe(true);
+    vi.advanceTimersByTime(4000); http.expectNone('/api/cart/state');
+    mutation.flush({ cartFormToken: 'token', quantities: { 2: 2 }, totalQuantity: 2 }); render();
+    expect(element.querySelector('.cart-quantity')?.textContent?.trim()).toBe('2');
+    vi.advanceTimersByTime(2000);
+    const pending = http.expectOne('/api/cart/state'); fixture.destroy();
+    expect(pending.cancelled).toBe(true);
+    vi.advanceTimersByTime(4000); http.expectNone('/api/cart/state');
+  });
+
+  it('recovers server quantities after a rejected update and shows the error', () => {
+    request().flush(productPage([mouse])); render();
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: { 2: 1 }, totalQuantity: 1 }); render();
+    element.querySelector<HTMLButtonElement>('[aria-label="Add Mouse to cart"]')!.click();
+    http.expectOne('/api/cart/adjust').flush({ message: 'Product unavailable' }, { status: 400, statusText: 'Bad Request' });
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: { 2: 4 }, totalQuantity: 4 }); render();
+    expect(element.querySelector('.cart-feedback')?.textContent).toContain('Product unavailable');
+    expect(element.querySelector('.cart-quantity')?.textContent?.trim()).toBe('4');
+  });
+
+  it('keeps add clickable after cart loading fails and prepares the cart before adding', () => {
+    request().flush(productPage([mouse])); render();
+    http.expectOne('/api/cart/state').flush({}, { status: 503, statusText: 'Service Unavailable' }); render();
+    const add = element.querySelector<HTMLButtonElement>('[aria-label="Add Mouse to cart"]')!;
+    expect(add.disabled).toBe(false);
+    add.click(); render();
+    const prepare = http.expectOne('/api/cart/state');
+    expect(add.disabled).toBe(true);
+    prepare.flush({ cartFormToken: 'recovered-token', quantities: { 2: 2 }, totalQuantity: 2 });
+    const mutation = http.expectOne('/api/cart/adjust');
+    expect(mutation.request.body.get('cartFormToken')).toBe('recovered-token');
+    expect(mutation.request.body.get('delta')).toBe('1');
+    mutation.flush({ cartFormToken: 'recovered-token', quantities: { 2: 3 }, totalQuantity: 3 }); render();
+    expect(element.querySelector('.cart-quantity')?.textContent?.trim()).toBe('3');
+  });
+
+  it('allows adding before the initial cart snapshot finishes without duplicate writes', () => {
+    request().flush(productPage([mouse])); render();
+    const original = http.expectOne('/api/cart/state');
+    const add = element.querySelector<HTMLButtonElement>('[aria-label="Add Mouse to cart"]')!;
+    expect(add.disabled).toBe(false);
+    add.click(); add.click(); render();
+    expect(original.cancelled).toBe(true);
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: {}, totalQuantity: 0 });
+    http.expectOne('/api/cart/adjust').flush({ cartFormToken: 'token', quantities: { 2: 1 }, totalQuantity: 1 }); render();
+    expect(element.querySelector('.cart-quantity')?.textContent?.trim()).toBe('1');
+  });
+
+  it('reenables add after a stalled update and reconciles instead of replaying the write', () => {
+    request().flush(productPage([mouse])); render();
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: {}, totalQuantity: 0 }); render();
+    const add = element.querySelector<HTMLButtonElement>('[aria-label="Add Mouse to cart"]')!;
+    add.click(); render();
+    const pending = http.expectOne('/api/cart/adjust');
+    expect(add.disabled).toBe(true);
+    vi.advanceTimersByTime(10000); render();
+    expect(pending.cancelled).toBe(true);
+    expect(add.disabled).toBe(false);
+    http.expectNone('/api/cart/adjust');
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: { 2: 1 }, totalQuantity: 1 }); render();
+    expect(element.querySelector('.cart-quantity')?.textContent?.trim()).toBe('1');
+  });
+
+  it('turns expired authentication into a login action and hides old quantities', () => {
+    request().flush(productPage([mouse])); render();
+    http.expectOne('/api/cart/state').flush({ cartFormToken: 'token', quantities: { 2: 99 }, totalQuantity: 99 }); render();
+    expect(element.querySelector<HTMLButtonElement>('[aria-label="Add Mouse to cart"]')!.disabled).toBe(true);
+    window.dispatchEvent(new Event('focus'));
+    http.expectOne('/api/cart/state').flush({}, { status: 401, statusText: 'Unauthorized' }); render();
+    expect(element.querySelector('.cart-quantity')).toBeNull();
+    expect(element.querySelector('.quick-cart a')?.getAttribute('href')).toBe('/cart/products?productId=2');
+  });
 });

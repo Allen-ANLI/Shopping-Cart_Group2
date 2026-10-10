@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthSessionState } from '../models/auth-session';
 import { AuthSessionService } from '../services/auth-session.service';
@@ -16,6 +16,7 @@ export class AuthNavigationComponent implements OnInit, OnDestroy {
   private readonly auth = inject(AuthSessionService);
   private pending?: Subscription;
   readonly state = signal<AuthSessionState>({ loggedIn: false, user: null });
+  readonly cartQuantity = computed(() => this.auth.cartQuantity() ?? this.state().cartQuantity ?? 0);
   readonly loading = signal(true);
   readonly unavailable = signal(false);
 
