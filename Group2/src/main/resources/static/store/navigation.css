@@ -12,7 +12,11 @@
 .nexus-header a[aria-current=page],.nexus-header .nexus-links a.active{color:#315b47;font-weight:700;box-shadow:inset 0 -3px #648953}
 .nexus-header a:hover{color:#315b47}.nexus-header .nexus-identity{gap:18px}.nexus-header .nexus-identity form{margin:0;padding:0;display:block}
 .nexus-header .nexus-identity button{background:transparent;border:0;padding:10px 0;color:#718077;font:inherit;cursor:pointer;width:auto;margin:0}
-.nexus-header .nexus-identity .register-link{border-radius:7px;background:#edf2eb;color:#315b47;padding:8px 14px}.nexus-header .account-name{font-weight:600;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nexus-header .account-status{color:#718077}
+.nexus-header .account-name{font-weight:600;white-space:nowrap}.nexus-header .account-status{color:#718077}
+.nexus-header .nexus-identity .auth-link{position:relative;background:transparent;border-radius:0;box-shadow:none;transition:color .18s ease}
+.nexus-header .auth-link::after{content:"";position:absolute;left:0;right:0;bottom:8px;height:2px;background:#648953;transform:scaleX(0);transform-origin:left;transition:transform .18s ease}
+.nexus-header .auth-link:hover::after,.nexus-header .auth-link:focus-visible::after,.nexus-header .auth-link[aria-current=page]::after{transform:scaleX(1)}
+@media(prefers-reduced-motion:reduce){.nexus-header .nexus-identity .auth-link,.nexus-header .auth-link::after{transition:none}}
 .nexus-header .nexus-cart-count{background:#315b47;color:white;font-size:10px;padding:2px 6px;border-radius:30px;margin-left:3px}
 .nexus-footer{display:flex;align-items:center;justify-content:space-between;gap:24px;border-top:1px solid #e3e6df;padding-block:29px 34px;margin-top:65px;font-size:11px;color:#718077}.nexus-footer a{color:#315b47;font-size:20px;font-weight:650;letter-spacing:-.6px}.nexus-footer p{margin:5px 0 0}
 .nexus-skip{position:absolute;top:-90px;left:20px;padding:12px;background:white;z-index:100}.nexus-skip:focus{top:8px}.nexus-header :focus-visible{outline:3px solid #8da990;outline-offset:3px}

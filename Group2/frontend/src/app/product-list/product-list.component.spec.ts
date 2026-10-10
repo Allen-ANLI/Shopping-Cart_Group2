@@ -21,7 +21,6 @@ describe('Product catalogue filters, navigation and independent card actions', (
     HTMLElement.prototype.scrollIntoView = vi.fn();
     await TestBed.configureTestingModule({ imports: [ProductListComponent], providers: [provideHttpClient(), provideHttpClientTesting()] }).compileComponents();
     fixture = TestBed.createComponent(ProductListComponent); http = TestBed.inject(HttpTestingController); element = fixture.nativeElement; render();
-    http.expectOne('/api/categories').flush([{ slug: 'typing', name: 'Typing', nameZh: '键盘与输入', count: 12 }]); render();
     http.expectOne('/api/deals').flush({date: '2026-10-10', products: [{...keyboard, discountPercent: 50, effectivePrice: 25}]}); render();
   });
   afterEach(() => { fixture.destroy(); http.verify(); history.replaceState(null, '', '/'); document.cookie = 'store_lang=en; Path=/'; });
@@ -87,7 +86,7 @@ describe('Product catalogue filters, navigation and independent card actions', (
       fixture.destroy(); vi.advanceTimersByTime(6000); expect(component.campaign()).toBe(0);
     } finally { vi.useRealTimers(); }
   });
-  it('links the third banner to the current highest-discount product and refreshes on return', () => {
+  it('links the third banner to the current highest-discount product and refreshes on return', async () => {
     request().flush(productPage([keyboard], 0, 12));
     fixture.componentInstance.showCampaign(2); render();
     expect(element.querySelectorAll('.campaign-controls button')).toHaveLength(3);
@@ -96,10 +95,14 @@ describe('Product catalogue filters, navigation and independent card actions', (
     expect(element.querySelector('.campaign h1')?.textContent).toContain('50%');
     expect(element.querySelector('.campaign-deal-price strong')?.textContent).toContain('25.00');
     document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve();
+    request().flush(productPage([keyboard], 0, 12));
     http.expectOne('/api/deals').flush({date: '2026-10-11', products: [{...mouse, discountPercent: 60, effectivePrice: 12}]}); render();
     expect(element.querySelector('.campaign-featured-link')?.getAttribute('href')).toBe('/products?id=' + mouse.id);
     expect(element.querySelector('.campaign h1')?.textContent).toContain('60%');
     document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve();
+    request().flush(productPage([keyboard], 0, 12));
     http.expectOne('/api/deals').flush({date: '2026-10-11', products: []}); render();
     expect(element.querySelector('.campaign-featured-link')).toBeNull();
     expect(element.querySelector('.campaign .button-primary')?.getAttribute('href')).toBe('/deals');
@@ -176,6 +179,62 @@ describe('Product catalogue filters, navigation and independent card actions', (
     request('page=1&size=6&category=audio&q=speaker&sort=price-asc').flush(productPage([mouse], 1, 6, 12)); render();
     expect(fixture.componentInstance.category()).toBe('audio'); expect(fixture.componentInstance.page()).toBe(1);
     expect(element.querySelector<HTMLInputElement>('input[name="q"]')!.value).toBe('speaker');
+  });
+  it('refreshes ratings, stock and sales on return without dropping filters or hiding the current cards', async () => {
+    request().flush(productPage([keyboard], 0, 12)); render();
+    history.replaceState(null, '', '/products?category=typing&q=key&sort=rating&page=1&size=6#catalog');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    request('page=1&size=6&category=typing&q=key&sort=rating').flush(productPage([keyboard], 1, 6, 12)); render();
+    const previousUrl = window.location.href;
+    const previousCard = element.querySelector('.product-card');
+    const scroll = vi.spyOn(HTMLElement.prototype, 'scrollIntoView');
+    scroll.mockClear();
+    window.dispatchEvent(new PageTransitionEvent('pageshow', {persisted:true}));
+    document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve(); render();
+    expect(fixture.componentInstance.loading()).toBe(false);
+    expect(element.querySelector('.product-card')).toBe(previousCard);
+    expect(element.textContent).not.toContain('Loading products...');
+    const pending = request('page=1&size=6&category=typing&q=key&sort=rating');
+    document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve();
+    http.expectNone(r => r.url === '/api/products');
+    pending.flush(productPage([{...keyboard, averageRating:4.8, totalReviews:24, salesCount:120, stockQuantity:0}], 1, 6, 12));
+    http.expectOne('/api/deals').flush({date:'2026-10-11',products:[]}); render();
+    expect(element.querySelector('.product-rating')?.textContent).toContain('4.8');
+    expect(element.querySelector('.product-sales')?.textContent).toContain('120 sold');
+    expect(element.querySelector('.product-sales')?.textContent).toContain('Out of stock');
+    expect(window.location.href).toBe(previousUrl);
+    expect(fixture.componentInstance.page()).toBe(1);
+    expect(scroll).not.toHaveBeenCalled();
+  });
+  it('keeps usable product data when a background refresh fails and ignores queued work after destruction', async () => {
+    request().flush(productPage([keyboard], 0, 12)); render();
+    document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve();
+    request().error(new ProgressEvent('error'));
+    http.expectOne('/api/deals').error(new ProgressEvent('error')); render();
+    expect(element.querySelector('.product-card')?.textContent).toContain('Keyboard');
+    expect(element.querySelector('[role="alert"]')).toBeNull();
+    document.dispatchEvent(new Event('visibilitychange'));
+    fixture.destroy();
+    await Promise.resolve();
+    http.expectNone(r => r.url === '/api/products' || r.url === '/api/deals');
+  });
+  it('replaces an obsolete page bookmark without adding a back-button loop', () => {
+    request().flush(productPage([keyboard], 0, 12)); render();
+    history.replaceState(null, '', '/products?page=99');
+    const push = vi.spyOn(history, 'pushState');
+    const replace = vi.spyOn(history, 'replaceState');
+    try {
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      request('page=99&size=12').flush(productPage([], 99, 12, 24));
+      request('page=1&size=12').flush(productPage([mouse], 1, 12, 24)); render();
+      expect(fixture.componentInstance.page()).toBe(1);
+      expect(window.location.search).toBe('?page=1');
+      expect(push).not.toHaveBeenCalled();
+      expect(replace).toHaveBeenCalledOnce();
+    } finally { push.mockRestore(); replace.mockRestore(); }
   });
   it('provides recovery from empty results and clears all filters', () => {
     request().flush(productPage([], 0, 12, 0)); render();

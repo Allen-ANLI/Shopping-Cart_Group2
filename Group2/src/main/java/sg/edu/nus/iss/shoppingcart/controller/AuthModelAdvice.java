@@ -2,8 +2,6 @@ package sg.edu.nus.iss.shoppingcart.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,13 +18,11 @@ import sg.edu.nus.iss.shoppingcart.service.CartService;
 @ControllerAdvice
 public class AuthModelAdvice {
     private final AuthService authService;
-    private final Environment environment;
     private final CartService cartService;
     private final AvatarService avatars;
-    public AuthModelAdvice(AuthService authService, Environment environment, CartService cartService,
+    public AuthModelAdvice(AuthService authService, CartService cartService,
                            AvatarService avatars) {
         this.authService = authService;
-        this.environment = environment;
         this.cartService = cartService;
         this.avatars = avatars;
     }
@@ -49,6 +45,5 @@ public class AuthModelAdvice {
         model.addAttribute("isLoggedIn", user != null);
         model.addAttribute("isAdmin", user != null && user.isAdmin());
         model.addAttribute("navCartQuantity", user == null ? 0 : cartService.quantities(request.getSession()).values().stream().mapToInt(Integer::intValue).sum());
-        model.addAttribute("showDemoAccounts", environment.acceptsProfiles(Profiles.of("b-demo")));
     }
 }

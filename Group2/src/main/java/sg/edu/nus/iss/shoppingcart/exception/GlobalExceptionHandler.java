@@ -5,11 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.web.util.DisconnectedClientHelper;
 
 import java.util.Map;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -40,6 +42,8 @@ public class GlobalExceptionHandler {
 
     /** 日志记录器。 */
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final DisconnectedClientHelper disconnectedClients =
+            new DisconnectedClientHelper(GlobalExceptionHandler.class.getName() + ".DisconnectedClient");
 
     @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
     public Object handleStatus(org.springframework.web.server.ResponseStatusException ex, HttpServletRequest request) {
@@ -142,17 +146,20 @@ public class GlobalExceptionHandler {
      * <p>记录完整堆栈到日志，但只给用户一句笼统的话——
      * 异常细节可能包含 SQL 或表结构，不该出现在页面上。</p>
      *
-     * @param ex    异常
-     * @param model 视图模型
-     * @return 500 错误页
+     * <p>A disconnected client cannot receive another response. Likewise, once a
+     * download is committed, rendering an HTML error would corrupt its output.
+     * Other failures still receive the normal error log and a 500 response.</p>
      */
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleUnexpected(Exception ex, Model model) {
+    public Object handleUnexpected(Exception ex, HttpServletRequest request, HttpServletResponse response) {
+        if (disconnectedClients.checkAndLogClientDisconnectedException(ex)) {
+            return new ModelAndView();
+        }
         log.error("Unexpected error while handling request", ex);
-        model.addAttribute("errorMessage",
+        if (response.isCommitted()) {
+            return new ModelAndView();
+        }
+        return requestError(request, HttpStatus.INTERNAL_SERVER_ERROR, "Server error",
                 "Something went wrong on our side. Please try again.");
-        model.addAttribute("errorTitle", "Server error");
-        return "error/not-found";
     }
 }

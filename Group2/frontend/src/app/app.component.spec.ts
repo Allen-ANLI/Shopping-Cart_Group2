@@ -16,7 +16,7 @@ describe('Storefront routes and shared bilingual navigation', () => {
   it('opens the list and presents real home, cart, orders and account destinations', () => {
     history.replaceState(null, '', '/products');
     const fixture = TestBed.createComponent(AppComponent); fixture.detectChanges();
-    http.expectOne('/api/auth/session').flush({ loggedIn: false, user: null }); http.expectOne('/api/categories').flush([]);
+    http.expectOne('/api/auth/session').flush({ loggedIn: false, user: null });
     http.expectOne('/api/deals').flush({date:'2026-10-10',products:[]});
     http.expectOne('/api/products?page=0&size=12&sort=recommended').flush(productPage([keyboard], 0, 12)); fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement;
@@ -38,7 +38,7 @@ describe('Storefront routes and shared bilingual navigation', () => {
   it('switches all storefront navigation to Chinese using the server-readable cookie', () => {
     history.replaceState(null, '', '/products');
     const fixture = TestBed.createComponent(AppComponent); fixture.detectChanges();
-    http.expectOne('/api/auth/session').flush({ loggedIn: false, user: null }); http.expectOne('/api/categories').flush([]);
+    http.expectOne('/api/auth/session').flush({ loggedIn: false, user: null });
     http.expectOne('/api/deals').flush({date:'2026-10-10',products:[]});
     http.expectOne('/api/products?page=0&size=12&sort=recommended').flush(productPage([], 0, 12, 0)); fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement; element.querySelector<HTMLButtonElement>('.nexus-language')!.click(); fixture.detectChanges();

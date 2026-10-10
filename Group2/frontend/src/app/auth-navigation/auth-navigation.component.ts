@@ -12,7 +12,6 @@ import { CartService } from '../services/cart.service';
 @Component({
   selector: 'app-auth-navigation',
   templateUrl: './auth-navigation.component.html',
-  styleUrl: './auth-navigation.component.css',
 })
 export class AuthNavigationComponent implements OnInit, OnDestroy {
   readonly dailyDeals = window.location.pathname === '/deals';

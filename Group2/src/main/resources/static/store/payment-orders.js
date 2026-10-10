@@ -1,20 +1,22 @@
 (() => {
   'use strict';
   const zh = document.documentElement.lang === 'zh';
-  const cardNumber=document.querySelector('#cardNumber');
-  if(cardNumber) cardNumber.addEventListener('input',()=>{
-    const caret=cardNumber.selectionStart;
-    const digitsBefore=cardNumber.value.slice(0,caret).replace(/\D/g,'').length;
-    const digits=cardNumber.value.replace(/\D/g,'').slice(0,19);
-    cardNumber.value=digits.replace(/(.{4})(?=.)/g,'$1 ');
-    let next=digitsBefore+Math.floor(Math.max(0,digitsBefore-1)/4);
-    cardNumber.setSelectionRange(next,next);
-  });
-  const expiry=document.querySelector('#cardExpiry');
-  if(expiry) expiry.addEventListener('input',()=>{
-    const digits=expiry.value.replace(/\D/g,'').slice(0,4);
-    expiry.value=digits.length>2 ? digits.slice(0,2)+'/'+digits.slice(2) : digits;
-  });
+  const formatNumericInput = (selector, limit, format) => {
+    const field = document.querySelector(selector);
+    if (!field) return;
+    field.addEventListener('input', () => {
+      const digitsBefore = field.value.slice(0, field.selectionStart).replace(/\D/g, '').length;
+      const digits = field.value.replace(/\D/g, '').slice(0, limit);
+      field.value = format(digits);
+      let next = 0;
+      for (let count = 0; next < field.value.length && count < digitsBefore; next++) {
+        if (/\d/.test(field.value[next])) count++;
+      }
+      field.setSelectionRange(next, next);
+    });
+  };
+  formatNumericInput('#cardNumber', 19, digits => digits.replace(/(.{4})(?=.)/g, '$1 '));
+  formatNumericInput('#cardExpiry', 4, digits => digits.length > 2 ? digits.slice(0, 2) + '/' + digits.slice(2) : digits);
   document.querySelector('[data-payment-form]')?.addEventListener('submit',event=>{
     const form=event.currentTarget;
     form.querySelector('button[type="submit"]').disabled=true;
@@ -24,8 +26,10 @@
   const stars=document.querySelector('.rating-stars');
   if(stars){
     const paint=rating=>stars.querySelectorAll('[data-star]').forEach(label=>label.classList.toggle('filled',Number(label.dataset.star)<=rating));
+    const updateHint = rating => { if (rating > 0) document.querySelector('[data-rating-hint]').textContent = rating + (zh ? ' 星' : ' / 5 stars'); };
     paint(Number(stars.dataset.rating));
-    stars.addEventListener('change',event=>{stars.dataset.rating=event.target.value;paint(Number(event.target.value));document.querySelector('[data-rating-hint]').textContent=event.target.value+(zh?' 星':' / 5 stars');});
+    updateHint(Number(stars.dataset.rating));
+    stars.addEventListener('change',event=>{stars.dataset.rating=event.target.value;paint(Number(event.target.value));updateHint(Number(event.target.value));});
     stars.querySelectorAll('[data-star]').forEach(label=>label.addEventListener('mouseenter',()=>paint(Number(label.dataset.star))));
     stars.addEventListener('mouseleave',()=>paint(Number(stars.dataset.rating)));
   }

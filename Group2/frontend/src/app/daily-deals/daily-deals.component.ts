@@ -1,8 +1,8 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { Product } from '../models/product';
 import { LanguageService } from '../services/language.service';
+import { ProductService } from '../services/product.service';
 import { AddToCartComponent } from '../add-to-cart/add-to-cart.component';
 import { IconComponent } from '../icon/icon.component';
 
@@ -10,7 +10,7 @@ import { IconComponent } from '../icon/icon.component';
   templateUrl:'./daily-deals.component.html', styleUrl:'./daily-deals.component.css'})
 export class DailyDealsComponent implements OnInit, OnDestroy {
   readonly lang = inject(LanguageService);
-  private readonly http = inject(HttpClient);
+  private readonly productService = inject(ProductService);
   readonly products = signal<Product[]>([]);
   readonly date = signal('');
   readonly loading = signal(true);
@@ -21,7 +21,7 @@ export class DailyDealsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void { this.request?.unsubscribe(); document.removeEventListener('visibilitychange', this.refresh); }
   load(): void {
     this.request?.unsubscribe(); this.loading.set(true); this.error.set(false);
-    this.request = this.http.get<{date: string; products: Product[]}>('/api/deals').subscribe({
+    this.request = this.productService.getDailyDeals().subscribe({
       next: result => { this.products.set(result.products); this.date.set(result.date); this.loading.set(false); },
       error: () => { this.error.set(true); this.loading.set(false); }
     });

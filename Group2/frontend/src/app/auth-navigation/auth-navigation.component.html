@@ -5,7 +5,7 @@
   <div class="nexus-identity account-identity" aria-live="polite">
     @if (loading()) { <span class="account-status">{{ lang.text('Checking account...', '正在查询账户…') }}</span> }
     @else if (state().loggedIn && state().user) { <a class="account-name" href="/account"><span class="nexus-avatar" aria-hidden="true">@if (state().avatarUrl && !avatarFailed()) { <img [src]="state().avatarUrl + '?v=' + avatarVersion()" alt="" (error)="avatarFailed.set(true)"> } @else { {{ state().user?.displayName?.slice(0, 1) }} }</span><span class="account-label">{{ state().user?.displayName }}</span></a><form action="/logout" method="post"><button type="submit">{{ lang.text('Log out', '退出') }}</button></form> }
-    @else { <a href="/login">{{ lang.text('Log in', '登录') }}</a><a class="register-link" href="/register">{{ lang.text('Register', '注册') }}</a> }
+    @else { <a class="auth-link" href="/login">{{ lang.text('Log in', '登录') }}</a><a class="auth-link" href="/register">{{ lang.text('Register', '注册') }}</a> }
     @if (unavailable()) { <button class="retry-status" type="button" (click)="refresh()">{{ lang.text('Retry account status', '重新查询账户') }}</button> }
   </div>
 </nav>
