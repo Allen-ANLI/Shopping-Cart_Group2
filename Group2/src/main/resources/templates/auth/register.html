@@ -1,39 +1,47 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{auth/fragments :: head('Create account')}"></head>
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{auth/fragments :: head(#{auth.register.title})}"></head>
 <body>
 <header th:replace="~{auth/fragments :: navbar}"></header>
-<main class="container auth-layout">
+<main id="main-content" class="container auth-layout register-layout">
     <section class="intro">
-        <p class="eyebrow">GET STARTED</p>
-        <h1>Create your account</h1>
-        <p class="muted">Keep your purchase history in one place.</p>
-        <p class="muted">Registration creates a customer account. Administrator access is not available through this form.</p>
-        <a th:href="@{/login}">Already have an account? Log in →</a>
+        <p class="eyebrow" th:text="#{auth.register.eyebrow}">GET STARTED</p>
+        <h1 th:text="#{auth.register.heading}">Create your account</h1>
+        <p class="muted" th:text="#{auth.register.description}">Your profile, delivery addresses and order history, all in one place.</p>
+        <p class="muted" th:text="#{auth.register.addressLater}">You can add shipping addresses in your account or at checkout.</p>
+        <a th:href="@{/login}" th:text="#{auth.register.login}">Already have an account? Log in →</a>
     </section>
     <section class="card">
-        <h2>Account details</h2>
+        <h2 th:text="#{auth.register.details}">Account details</h2>
         <div th:replace="~{auth/fragments :: alerts}"></div>
         <form th:action="@{/register}" th:object="${registerForm}" method="post">
             <div class="alert error" role="alert" th:if="${#fields.hasAnyErrors()}">
                 <p th:each="message : ${#fields.allErrors()}" th:text="${message}"></p>
             </div>
-            <label for="username">Username</label>
+            <label for="username" th:text="#{auth.username}">Username</label>
             <input id="username" th:field="*{username}" minlength="4" maxlength="20"
                    pattern="[A-Za-z0-9]+" autocomplete="username" required>
-            <p class="hint">4–20 letters and digits; usernames are case-insensitive.</p>
-            <label for="displayName">Display name</label>
-            <input id="displayName" th:field="*{displayName}" maxlength="100" autocomplete="name" required>
-            <label for="email">Email</label>
-            <input id="email" type="email" th:field="*{email}" maxlength="255" autocomplete="email" required>
-            <label for="password">Password</label>
+            <p class="hint" th:text="#{auth.username.hint}">4–20 letters and digits; usernames are case-insensitive.</p>
+            <div class="account-form-grid">
+                <div><label for="fullName" th:text="#{account.fullName}">Full name</label>
+                    <input id="fullName" th:field="*{fullName}" maxlength="120" autocomplete="name" required></div>
+                <div><label for="displayName" th:text="#{account.displayName}">Display name</label>
+                    <input id="displayName" th:field="*{displayName}" maxlength="100" autocomplete="nickname" required></div>
+                <div><label for="email" th:text="#{account.email}">Email</label>
+                    <input id="email" type="email" th:field="*{email}" maxlength="255" autocomplete="email" required></div>
+                <div><label for="phone" th:text="#{account.phone}">Phone</label>
+                    <input id="phone" type="tel" th:field="*{phone}" maxlength="30" autocomplete="tel" required></div>
+                <div><label for="birthday" th:text="#{account.birthday}">Birthday (optional)</label>
+                    <input id="birthday" type="date" th:field="*{birthday}" autocomplete="bday"></div>
+            </div>
+            <label for="password" th:text="#{auth.password}">Password</label>
             <input id="password" name="password" type="password" minlength="6" maxlength="50"
                    autocomplete="new-password" required>
-            <p class="hint">6–50 characters, at most 72 UTF-8 bytes.</p>
-            <label for="confirmPassword">Confirm password</label>
+            <p class="hint" th:text="#{auth.password.hint}">6–50 characters, at most 72 UTF-8 bytes.</p>
+            <label for="confirmPassword" th:text="#{auth.password.confirm}">Confirm password</label>
             <input id="confirmPassword" name="confirmPassword" type="password" minlength="6" maxlength="50"
                    autocomplete="new-password" required>
-            <button class="btn primary full" type="submit">Create account</button>
+            <button class="btn primary full" type="submit" th:text="#{auth.register.title}">Create account</button>
         </form>
     </section>
 </main>

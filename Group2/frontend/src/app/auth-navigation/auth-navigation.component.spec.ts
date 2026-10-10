@@ -16,9 +16,13 @@ describe('B Angular account navigation', () => {
     loggedIn: true, user: { id: 1, username: 'alice', displayName: name, email: null, role },
   });
   const request = () => http.expectOne('/api/auth/session');
-  const render = () => fixture.detectChanges();
+  const render = () => {
+    http.match('/api/cart/form').forEach(request => request.flush({ cartFormToken: 'nav-token', itemCount: 2, totalQuantity: 4 }));
+    fixture.detectChanges();
+  };
 
   beforeEach(async () => {
+    document.cookie = 'store_lang=en; Path=/';
     await TestBed.configureTestingModule({
       imports: [AuthNavigationComponent],
       providers: [provideHttpClient(), provideHttpClientTesting()],
@@ -51,6 +55,7 @@ describe('B Angular account navigation', () => {
     expect(element.querySelector('a[href="/orders"]')).not.toBeNull();
     expect(element.querySelector('a[href="/admin/products"]')).toBeNull();
     expect(element.querySelector('a[href="/login"]')).toBeNull();
+    expect(element.querySelector('.cart-count')?.textContent).toBe('4');
   });
   it('shows the administrator entry for the server-provided ADMIN role', () => {
     request().flush(session('ADMIN')); render();

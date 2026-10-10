@@ -30,6 +30,15 @@ public class OrderDetailDto {
 
     /** 明细行。 */
     private final List<OrderItemLine> items;
+    private sg.edu.nus.iss.shoppingcart.entity.ShippingSnapshot shipping;
+
+    public OrderDetailDto(Long id, LocalDateTime createdAt, BigDecimal totalAmount, List<OrderItemLine> items,
+                          sg.edu.nus.iss.shoppingcart.entity.ShippingSnapshot shipping) {
+        this(id, createdAt, totalAmount, items);
+        this.shipping = shipping;
+    }
+
+    public sg.edu.nus.iss.shoppingcart.entity.ShippingSnapshot getShipping() { return shipping; }
 
     /**
      * 构造详情对象。

@@ -1,35 +1,35 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{auth/fragments :: head('Log in')}"></head>
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{auth/fragments :: head(#{auth.login.title})}"></head>
 <body>
 <header th:replace="~{auth/fragments :: navbar}"></header>
-<main class="container auth-layout">
+<main id="main-content" class="container auth-layout">
     <section class="intro">
-        <p class="eyebrow">YOUR SHOPPING ACCOUNT</p>
-        <h1>Welcome back</h1>
-        <p class="muted">Log in to add products, place an order and view your purchase history.</p>
-        <p class="muted">You can browse products without an account.</p>
-        <a th:href="@{/products}">Browse products →</a>
+        <p class="eyebrow" th:text="#{auth.login.eyebrow}">YOUR SHOPPING ACCOUNT</p>
+        <h1 th:text="#{auth.login.heading}">Welcome back</h1>
+        <p class="muted" th:text="#{auth.login.description}">Log in to add products, place an order and view your purchase history.</p>
+        <p class="muted" th:text="#{auth.login.guest}">You can browse products without an account.</p>
+        <a th:href="@{/products}" th:text="#{auth.login.browse}">Browse products →</a>
     </section>
     <section class="card">
-        <h2>Log in</h2>
+        <h2 th:text="#{auth.login.title}">Log in</h2>
         <div th:replace="~{auth/fragments :: alerts}"></div>
         <form th:action="@{/login}" th:object="${loginForm}" method="post">
             <div class="alert error" role="alert" th:if="${#fields.hasAnyErrors()}">
                 <p th:each="message : ${#fields.allErrors()}" th:text="${message}"></p>
             </div>
-            <label for="username">Username</label>
+            <label for="username" th:text="#{auth.username}">Username</label>
             <input id="username" type="text" th:field="*{username}" maxlength="50"
                    autocomplete="username" required>
-            <label for="password">Password</label>
+            <label for="password" th:text="#{auth.password}">Password</label>
             <!-- Never echo a password through th:field/value after a failed request. -->
             <input id="password" name="password" type="password" maxlength="72"
                    autocomplete="current-password" required>
-            <button class="btn primary full" type="submit">Log in</button>
+            <button class="btn primary full" type="submit" th:text="#{auth.login.title}">Log in</button>
         </form>
-        <p class="small muted">New here? <a th:href="@{/register}">Create an account</a></p>
+        <p class="small muted"><span th:text="#{auth.login.new}">New here?</span> <a th:href="@{/register}" th:text="#{auth.register.title}">Create an account</a></p>
         <aside th:if="${showDemoAccounts}" class="demo small">
-            <strong>Isolated demo accounts</strong>
+            <strong th:text="#{auth.login.demo}">Isolated demo accounts</strong>
             <p>alice / demo123 · bob / demo123</p>
             <p>admin / admin123</p>
         </aside>

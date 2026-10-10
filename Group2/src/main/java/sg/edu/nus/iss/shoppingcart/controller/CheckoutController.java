@@ -26,12 +26,15 @@ public class CheckoutController {
     private final CartService cartService;
     private final CheckoutCoordinator coordinator;
     private final CheckoutReceiptService receipts;
+    private final sg.edu.nus.iss.shoppingcart.service.ShippingAddressService addresses;
 
     public CheckoutController(CartService cartService, CheckoutCoordinator coordinator,
-                              CheckoutReceiptService receipts) {
+                              CheckoutReceiptService receipts,
+                              sg.edu.nus.iss.shoppingcart.service.ShippingAddressService addresses) {
         this.cartService = cartService;
         this.coordinator = coordinator;
         this.receipts = receipts;
+        this.addresses = addresses;
     }
 
     @GetMapping("/checkout")
@@ -42,20 +45,30 @@ public class CheckoutController {
 
     @PostMapping("/checkout")
     public String submit(@RequestParam(required = false) String checkoutToken,
+                         @RequestParam(required = false) Long addressId,
                          HttpSession session, Model model) {
         try {
-            coordinator.submit(session, checkoutToken);
+            if (addressId == null) {
+                throw new BusinessException(org.springframework.context.i18n.LocaleContextHolder.getLocale()
+                        .getLanguage().equals("zh") ? "请选择收货地址" : "Please select a delivery address");
+            }
+            coordinator.submit(session, checkoutToken, addressId);
             return "redirect:" + UriComponentsBuilder.fromPath("/checkout/success")
                     .queryParam("key", checkoutToken).build().encode().toUriString();
         } catch (NotAuthenticatedException ex) {
             throw ex;
+        } catch (org.springframework.web.server.ResponseStatusException ex) {
+            model.addAttribute("errorMessage", ex.getReason());
         } catch (BusinessException | IllegalArgumentException ex) {
-            model.addAttribute("errorMessage", ex.getMessage() + ". Your cart has been kept.");
+            model.addAttribute("errorMessage", ex.getMessage() + (org.springframework.context.i18n.LocaleContextHolder.getLocale()
+                    .getLanguage().equals("zh") ? "。购物车已保留。" : ". Your cart has been kept."));
         } catch (RuntimeException ex) {
             log.error("Checkout failed; keeping the session cart", ex);
-            model.addAttribute("errorMessage", "We could not place your order. Your cart has been kept. Please try again.");
+            model.addAttribute("errorMessage", org.springframework.context.i18n.LocaleContextHolder.getLocale()
+                    .getLanguage().equals("zh") ? "下单失败，购物车已保留，请重试。" : "We could not place your order. Your cart has been kept. Please try again.");
         }
         populate(session, model);
+        model.addAttribute("selectedAddressId", addressId);
         return "orders/checkout";
     }
 
@@ -77,6 +90,12 @@ public class CheckoutController {
             model.addAttribute("totalQuantity", cartService.countTotalQuantity(items));
             model.addAttribute("canCheckout", cartService.canCheckout(items));
             model.addAttribute("checkoutToken", coordinator.prepare(session));
+            var shippingAddresses = addresses.listForUser(cartService.requireUserId(session));
+            model.addAttribute("addresses", shippingAddresses);
+            model.addAttribute("selectedAddressId", shippingAddresses.stream()
+                    .filter(sg.edu.nus.iss.shoppingcart.entity.ShippingAddress::isDefaultAddress)
+                    .findFirst().or(() -> shippingAddresses.stream().findFirst())
+                    .map(sg.edu.nus.iss.shoppingcart.entity.ShippingAddress::getId).orElse(null));
         }
     }
 }

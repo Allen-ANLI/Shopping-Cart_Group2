@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 
 import java.math.BigDecimal;
 
@@ -32,12 +33,12 @@ public class ProductForm {
      * 后者只拦 null，空字符串 {@code ""} 和纯空格都能通过。
      * 商品名必填的场景必须用 @NotBlank。</p>
      */
-    @NotBlank(message = "Product name is required")
-    @Size(max = 100, message = "Product name must not exceed 100 characters")
+    @NotBlank(message = "{catalog.validation.nameRequired}")
+    @Size(max = 100, message = "{catalog.validation.nameLength}")
     private String name;
 
     /** 商品描述，可留空。 */
-    @Size(max = 1000, message = "Description must not exceed 1000 characters")
+    @Size(max = 1000, message = "{catalog.validation.description}")
     private String description;
 
     /**
@@ -48,9 +49,9 @@ public class ProductForm {
      * {@code @Digits} 限制整数 4 位、小数 2 位，
      * 和数据库 {@code DECIMAL(12,2)} 对得上，避免超大数导致入库失败。</p>
      */
-    @NotNull(message = "Price is required")
-    @DecimalMin(value = "0.01", message = "Price must be greater than 0")
-    @Digits(integer = 8, fraction = 2, message = "Price must have at most 2 decimal places")
+    @NotNull(message = "{catalog.validation.priceRequired}")
+    @DecimalMin(value = "0.01", message = "{catalog.validation.pricePositive}")
+    @Digits(integer = 8, fraction = 2, message = "{catalog.validation.priceDigits}")
     private BigDecimal price;
 
     /**
@@ -62,11 +63,38 @@ public class ProductForm {
      * <p>只做长度校验，不校验URL 格式：允许留空，
      * 也允许填相对路径（项目里的静态图）或外部链接。</p>
      */
-    @Size(max = 500, message = "Image URL must not exceed 500 characters")
+    @Size(max = 500, message = "{catalog.validation.image}")
     private String imageUrl;
 
     /** 是否上架。 */
     private boolean active = true;
+
+    @Pattern(regexp = "computing|typing|workspace|audio", message = "{catalog.validation.category}")
+    @NotBlank(message = "{catalog.validation.category}")
+    private String category = "workspace";
+    @Size(max = 80, message = "{catalog.validation.brand}")
+    private String brand = "Group2 Essentials";
+    @Size(max = 100, message = "{catalog.validation.origin}")
+    private String origin = "Singapore";
+    @Size(max = 100, message = "{catalog.validation.nameZh}")
+    private String nameZh;
+    @Size(max = 1000, message = "{catalog.validation.descriptionZh}")
+    private String descriptionZh;
+    @Size(max = 100, message = "{catalog.validation.origin}")
+    private String originZh;
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+    public String getBrand() { return brand; }
+    public void setBrand(String brand) { this.brand = brand; }
+    public String getOrigin() { return origin; }
+    public void setOrigin(String origin) { this.origin = origin; }
+    public String getNameZh() { return nameZh; }
+    public void setNameZh(String nameZh) { this.nameZh = nameZh; }
+    public String getDescriptionZh() { return descriptionZh; }
+    public void setDescriptionZh(String descriptionZh) { this.descriptionZh = descriptionZh; }
+    public String getOriginZh() { return originZh; }
+    public void setOriginZh(String originZh) { this.originZh = originZh; }
 
     public Long getId() {
         return id;

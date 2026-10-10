@@ -27,21 +27,29 @@ public class CheckoutTransactionService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
+    private final ShippingAddressService addresses;
 
     public CheckoutTransactionService(
             ProductService productService,
             UserRepository userRepository,
             OrderRepository orderRepository,
-            OrderItemRepository orderItemRepository) {
+            OrderItemRepository orderItemRepository, ShippingAddressService addresses) {
         this.productService = productService;
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
+        this.addresses = addresses;
     }
 
     @Transactional
     public Order createOrder(Long userId, Map<Long, Integer> cart,
                              String checkoutToken) {
+        return createOrder(userId, cart, checkoutToken, null);
+    }
+
+    @Transactional
+    public Order createOrder(Long userId, Map<Long, Integer> cart,
+                             String checkoutToken, Long addressId) {
         if (cart == null || cart.isEmpty()) {
             throw new IllegalArgumentException("购物车不能为空");
         }
@@ -80,7 +88,9 @@ public class CheckoutTransactionService {
             throw new IllegalArgumentException("订单总金额超出允许范围");
         }
 
-        Order order = new Order(user, total, checkoutToken);
+        var shipping = addressId == null ? null : new sg.edu.nus.iss.shoppingcart.entity.ShippingSnapshot(
+                addresses.requireForUser(addressId, userId));
+        Order order = new Order(user, total, checkoutToken, shipping);
         order = orderRepository.saveAndFlush(order);
 
         List<OrderItem> items = new ArrayList<>();

@@ -4,7 +4,9 @@
 
 本交付已包含 A–E 的整合源码、构建后的 Angular 静态页面、可运行 JAR、验收记录及录像提纲。演示视频尚未提供，最终提交前必须将视频放入 video 目录，并由组员核对实际作者归属。
 
-2026-10-09 本机复查：已修复 HTTP 错误状态、购买历史分页排序和新增商品上架勾选项。后端 153 项、前端 44 项测试通过，runtime JAR 已更新。新增 `Start-Demo.cmd`、`Start-MySQL.cmd`、`Start-Frontend.cmd`；详细操作和本次验证范围见 [本机检查与运行指南](docs/本机检查与运行指南.md)。本次尚未连接你现有的 MySQL，历史 MySQL 验收记录不能视为这次重跑结果。
+2026-10-10 商城升级：已完成首页与分类重设计、40 件双语商品、图片放大与快速加购、真实评价、资料编辑、收货地址管理、订单地址快照及中英文切换。后端 170 项、前端 51 项、HTTP 流程 35 项、浏览器流程 21 项检查通过，源码、Angular 静态资源及 runtime JAR 已同步更新。功能、运行与演示步骤见 [商城升级说明](docs/商城升级说明.md)。本轮使用隔离 H2 验证，尚未连接你现有的 MySQL；下方早期 MySQL 验收记录属于历史记录。
+
+2026-10-09 的启动器与故障排查仍可参考 [本机检查与运行指南](docs/本机检查与运行指南.md)，其中商品数量与测试数量以本轮升级说明为准。
 
 ## 环境
 
@@ -41,7 +43,7 @@ java -jar runtime/shopping-cart.jar
 $env:DB_URL = 'jdbc:mysql://localhost:3306/shopping_cart'
 ```
 
-JPA 使用 `ddl-auto=update` 建立/更新实体对应表。空商品表会初始化 12 件示例商品；缺失的 alice/bob 会被创建，已有商品、账号、密码与角色不会重置。默认普通账号 alice / demo123、bob / demo123，仅在账号首次初始化时适用。
+JPA 使用 `ddl-auto=update` 建立/更新实体对应表。首次升级会补充四类示例商品（新库每类 10 件，共 40 件），并记录初始化版本；后续启动不重建已删除商品。缺失的 alice/bob 会被创建，已有商品内容、账号、密码与角色不会重置。默认普通账号 alice / demo123、bob / demo123，仅在账号首次初始化时适用。
 
 ### 正式库的管理员
 
@@ -86,15 +88,17 @@ java -jar target/shopping-cart-0.0.1-SNAPSHOT.jar
 
 | 功能 | 地址 |
 | --- | --- |
-| Angular 商品列表与分页 | /products |
+| Angular 首页、分类与分页 | /products、/products?category=audio |
 | Angular 商品详情 | /products?id=1 |
 | 商品 REST | /api/products?page=0&size=6、/api/products/1 |
 | 登录、注册、资料 | /login、/register、/account |
+| 收货地址管理 | /account/addresses |
+| 分类、评价、快速加购 REST | /api/categories、/api/products/{id}/reviews、/api/cart/items |
 | 购物车、结账 | /cart、/checkout |
 | 购买历史 | /orders |
 | 管理后台 | /admin/products |
 
-商品 ID 以上仅为新库示例。详情加购通过 C 的表单接口取得当前 Session 的令牌，再向 `/cart/add` 提交。身份只取服务器 Session 的 `loginUserId`（Long）。订单在事务中重新核价、保存明细快照；事务提交成功后清空购物车。
+商品 ID 以上仅为新库示例。Angular 加购先取得当前 Session 的购物车令牌，再向 `/api/cart/items` 提交 JSON，原 `/cart/add` 表单接口保留。身份只取服务器 Session 的 `loginUserId`（Long）。结账必须选择自己的收货地址；订单在事务中重新核价、保存商品明细与收货地址快照，事务提交成功后清空购物车。
 
 ## 成员与交付
 

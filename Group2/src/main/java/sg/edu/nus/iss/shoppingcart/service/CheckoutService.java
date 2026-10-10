@@ -31,6 +31,12 @@ public class CheckoutService {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Order checkout(Long userId, Map<Long, Integer> cart,
                           String checkoutToken) {
+        return checkout(userId, cart, checkoutToken, null);
+    }
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Order checkout(Long userId, Map<Long, Integer> cart,
+                          String checkoutToken, Long addressId) {
         if (userId == null || userId <= 0) {
             throw new IllegalArgumentException("请先登录");
         }
@@ -51,7 +57,7 @@ public class CheckoutService {
 
         try {
             return transactionService.createOrder(
-                    userId, cartSnapshot, checkoutToken);
+                    userId, cartSnapshot, checkoutToken, addressId);
         } catch (DataIntegrityViolationException ex) {
             // 两次请求同时到达时，数据库唯一约束阻止第二张订单。
             // 到这里，失败的写入事务已经回滚，可以重新查询。

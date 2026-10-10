@@ -99,7 +99,7 @@ public class PurchaseHistoryService {
                 .toList();
 
         return new OrderDetailDto(order.getId(), order.getCreatedAt(),
-                order.getTotalAmount(), lines);
+                order.getTotalAmount(), lines, order.getShipping());
     }
 
     /**

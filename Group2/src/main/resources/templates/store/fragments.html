@@ -1,0 +1,25 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="navbar" class="navbar store-navbar">
+  <a class="skip-link" href="#main-content" th:text="#{nav.skip}">Skip to content</a>
+  <div class="container store-topline"><span th:text="#{store.tagline}">Thoughtful things for everyday living</span><span th:text="#{store.location}">SGD · Singapore</span></div>
+  <nav class="container store-navigation" th:attr="aria-label=#{nav.main}">
+    <a class="store-brand" th:href="@{/products}"><span class="store-brand-mark">e.</span> Everyday Market</a>
+    <div class="store-links">
+      <a th:href="@{/products}" th:text="#{nav.products}">Products</a>
+      <a th:href="@{/cart}" th:text="#{nav.cart}">Cart</a>
+      <a th:if="${isLoggedIn}" th:href="@{/orders}" th:text="#{nav.orders}">Orders</a>
+      <a th:if="${isLoggedIn}" th:href="@{/account}" th:text="#{nav.account}">Account</a>
+      <a th:if="${isAdmin}" th:href="@{/admin/products}" th:text="#{nav.admin}">Admin</a>
+      <a th:unless="${isLoggedIn}" th:href="@{/login}" th:text="#{nav.login}">Log in</a>
+      <form th:if="${isLoggedIn}" th:action="@{/logout}" method="post"><button type="submit" th:text="#{nav.logout}">Log out</button></form>
+      <button class="language-toggle" type="button" th:attr="data-language=${#locale.language == 'zh' ? 'en' : 'zh'},aria-label=#{nav.switchLanguage}" th:text="${#locale.language == 'zh' ? 'EN / English' : '中文 / ZH'}">中文 / ZH</button>
+    </div>
+  </nav>
+</header>
+<footer th:fragment="footer" class="store-footer container"><strong>Everyday Market<span>.</span></strong><p th:text="#{store.tagline}">Thoughtful things for everyday living</p><span th:text="#{store.currency}">All prices in SGD</span></footer>
+<section th:fragment="shipping(shipping)" class="card shipping-receipt" th:if="${shipping != null}">
+  <h2 th:text="#{checkout.deliverTo}">Deliver to</h2>
+  <strong th:text="${shipping.recipientName}"></strong><p th:text="${shipping.phone}"></p><p th:text="${shipping.fullAddress}"></p>
+</section>
+</body></html>

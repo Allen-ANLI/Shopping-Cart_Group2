@@ -22,6 +22,9 @@ import java.time.LocalDateTime;
 @Table(name = "orders")
 public class Order {
 
+    @jakarta.persistence.Embedded
+    private ShippingSnapshot shipping;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -60,6 +63,13 @@ public class Order {
         this.totalAmount = totalAmount;
         this.checkoutToken = checkoutToken;
     }
+
+    public Order(User user, BigDecimal totalAmount, String checkoutToken, ShippingSnapshot shipping) {
+        this(user, totalAmount, checkoutToken);
+        this.shipping = shipping;
+    }
+
+    public ShippingSnapshot getShipping() { return shipping; }
 
     public Long getId() {
         return id;

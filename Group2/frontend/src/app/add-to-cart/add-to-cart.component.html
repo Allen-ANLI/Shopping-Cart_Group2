@@ -1,32 +1,14 @@
-<!--
- 商品详情的加购表单与登录、加载、重试状态。
- @author Letian Xie
--->
-<section class="add-to-cart" aria-label="Add to cart">
-  @if (loading()) {
-    <p class="cart-message" role="status">Preparing your cart...</p>
-  } @else if (loginRequired()) {
-    <a class="button-primary cart-action" [href]="loginUrl">Log in to add to cart</a>
-  } @else if (error()) {
-    <p class="cart-error" role="alert">{{ error() }}</p>
-    <button type="button" class="button-primary cart-action" (click)="refresh()">Try again</button>
-  } @else if (cartFormToken()) {
-    <form method="post" action="/cart/add" (submit)="submit($event)"
-          [attr.aria-busy]="submitting() ? 'true' : null">
-      <input type="hidden" name="productId" [value]="productId">
-      <input type="hidden" name="cartFormToken" [value]="cartFormToken()">
-      <div class="cart-controls">
-        <label class="quantity-control" [attr.for]="quantityId">Quantity
-          <input [id]="quantityId" type="number" name="quantity" value="1"
-                 min="1" max="99" step="1" required>
-        </label>
-        <button type="submit" class="button-primary cart-action" [disabled]="submitting()">
-          {{ submitting() ? 'Adding to cart...' : 'Add to cart' }}
-        </button>
-      </div>
-      <p class="cart-message" role="status" aria-live="polite">
-        {{ submitting() ? 'Please wait while your cart is updated.' : 'Choose between 1 and 99 per product.' }}
-      </p>
-    </form>
-  }
-</section>
+@if (compact) {
+  <button class="quick-add icon-button" type="button" (click)="submit()" [disabled]="submitting()" [attr.aria-label]="lang.text('Quick add to cart', '一键加入购物车')" [title]="lang.text('Quick add to cart', '一键加入购物车')"><app-icon [name]="added() ? 'check' : 'cart'" /></button>
+} @else {
+  <form class="add-cart-form" (submit)="submit($event)" [attr.aria-busy]="submitting()">
+    <label [for]="'quantity-' + productId">{{ lang.text('Quantity', '数量') }}
+      <input [id]="'quantity-' + productId" name="quantity" type="number" min="1" max="99" step="1" required [value]="quantity" (input)="quantity = +$any($event.target).value" [disabled]="submitting()">
+    </label>
+    <button class="button-primary" type="submit" [disabled]="submitting()"><app-icon name="cart" />{{ submitting() ? lang.text('Adding…', '正在添加…') : lang.text('Add to cart', '加入购物车') }}</button>
+  </form>
+}
+@if (added()) { <p class="cart-feedback success" role="status">{{ lang.text('Added to cart.', '已加入购物车。') }} <a href="/cart">{{ lang.text('View cart', '查看购物车') }}</a></p> }
+@if (error() === 'login') { <p class="cart-feedback" role="alert"><a [href]="loginUrl">{{ lang.text('Log in to add to cart', '登录后加入购物车') }}</a></p> }
+@if (error() === 'limit') { <p class="cart-feedback" role="alert">{{ lang.text('Check quantity (maximum 99 per product) or availability.', '请检查数量（每件商品最多99件）或商品是否在售。') }}</p> }
+@if (error() === 'failed') { <p class="cart-feedback" role="alert">{{ lang.text('Could not add this item. Please try again.', '添加失败，请重试。') }}</p> }

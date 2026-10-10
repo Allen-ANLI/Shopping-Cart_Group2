@@ -29,6 +29,6 @@ public class CheckoutReceiptService {
         var lines = items.findByOrder_IdOrderByIdAsc(order.getId()).stream()
                 .map(item -> new CheckoutReceipt.Line(item.getProductNameSnapshot(),
                         item.getUnitPrice(), item.getQuantity(), item.getSubtotal())).toList();
-        return new CheckoutReceipt(order.getId(), order.getCreatedAt(), order.getTotalAmount(), lines);
+        return new CheckoutReceipt(order.getId(), order.getCreatedAt(), order.getTotalAmount(), lines, order.getShipping());
     }
 }

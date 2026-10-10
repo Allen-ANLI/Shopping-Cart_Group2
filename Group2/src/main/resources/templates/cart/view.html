@@ -1,27 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{cart/fragments :: head('Shopping cart')}"></head>
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{cart/fragments :: head(#{cart.title})}"></head>
 <body>
 <header th:replace="~{cart/fragments :: navbar}"></header>
-<main class="container">
+<main class="container" id="main-content">
     <div class="page-header">
         <div>
-            <h1>Shopping cart</h1>
-            <p class="muted small" th:text="${totalQuantity} + ' item(s) in your cart'">0 items</p>
+            <h1 th:text="#{cart.title}">Shopping cart</h1>
+            <p class="muted small" th:text="#{cart.count(${totalQuantity})}">0 items</p>
         </div>
-        <a th:href="@{/products}" class="btn btn-secondary">Continue shopping</a>
+        <a th:href="@{/products}" class="btn btn-secondary" data-continue-shopping th:text="#{cart.continue}">Continue shopping</a>
     </div>
     <div th:replace="~{cart/fragments :: alerts}"></div>
     <div class="card empty-cart" th:if="${#lists.isEmpty(cartItems)}">
-        <h2>Your cart is empty</h2>
-        <p class="muted">Find something you like and add it to your cart.</p>
-        <a th:href="@{/products}" class="btn">Browse products</a>
+        <h2 th:text="#{cart.empty}">Your cart is empty</h2>
+        <p class="muted" th:text="#{cart.emptyHint}">Find something you like and add it to your cart.</p>
+        <a th:href="@{/products}" class="btn" th:text="#{cart.browse}">Browse products</a>
     </div>
     <div class="checkout-layout" th:unless="${#lists.isEmpty(cartItems)}">
-        <section class="card" aria-label="Cart items">
+        <section class="card" th:attr="aria-label=#{cart.items}">
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>Product</th><th>Unit price</th><th>Quantity</th><th>Subtotal</th><th>Action</th></tr></thead>
+                    <thead><tr><th th:text="#{product}">Product</th><th th:text="#{unitPrice}">Unit price</th><th th:text="#{quantity}">Quantity</th><th th:text="#{subtotal}">Subtotal</th><th th:text="#{action}">Action</th></tr></thead>
                     <tbody>
                     <tr th:each="item : ${cartItems}" th:attr="data-product-id=${item.productId}">
                         <td>
@@ -36,8 +36,8 @@
                                 <input type="hidden" name="cartFormToken" th:value="${cartFormToken}">
                                 <input type="hidden" name="productId" th:value="${item.productId}">
                                 <input type="number" name="quantity" min="0" max="99" required
-                                       th:value="${item.quantity}" class="form-control" aria-label="Quantity">
-                                <button type="submit" class="btn btn-sm btn-outline">Update</button>
+                                       th:value="${item.quantity}" class="form-control" th:attr="aria-label=#{quantity}">
+                                <button type="submit" class="btn btn-sm btn-outline" th:text="#{update}">Update</button>
                             </form>
                         </td>
                         <td th:text="'S$' + ${item.subtotal}">S$0.00</td>
@@ -45,28 +45,28 @@
                             <form th:action="@{/cart/remove}" method="post">
                                 <input type="hidden" name="cartFormToken" th:value="${cartFormToken}">
                                 <input type="hidden" name="productId" th:value="${item.productId}">
-                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                                <button type="submit" class="btn btn-sm btn-danger" th:text="#{remove}">Remove</button>
                             </form>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-            <p class="form-hint">Set a quantity to 0 to remove an item. Maximum 99 per product.</p>
-            <form th:action="@{/cart/clear}" method="post">
+            <p class="form-hint" th:text="#{cart.quantityHint}"></p>
+            <form th:action="@{/cart/clear}" method="post" th:attr="data-confirm=#{cart.clearConfirm}">
                 <input type="hidden" name="cartFormToken" th:value="${cartFormToken}">
-                <button type="submit" class="btn btn-sm btn-secondary">Clear cart</button>
+                <button type="submit" class="btn btn-sm btn-secondary" th:text="#{cart.clear}">Clear cart</button>
             </form>
         </section>
-        <aside class="card cart-summary" aria-label="Order summary">
-            <h2>Order summary</h2>
-            <div class="summary-row"><span>Items</span><span th:text="${totalQuantity}">0</span></div>
-            <div class="summary-row summary-total"><span>Total</span><span th:text="'S$' + ${cartTotal}">S$0.00</span></div>
-            <p class="form-hint">Prices are checked again when you place the order.</p>
-            <a th:if="${canCheckout}" th:href="@{/checkout}" class="btn btn-block btn-lg">Proceed to checkout</a>
+        <aside class="card cart-summary" th:attr="aria-label=#{cart.summary}">
+            <h2 th:text="#{cart.summary}">Order summary</h2>
+            <div class="summary-row"><span th:text="#{items}">Items</span><span th:text="${totalQuantity}">0</span></div>
+            <div class="summary-row summary-total"><span th:text="#{total}">Total</span><span th:text="'S$' + ${cartTotal}">S$0.00</span></div>
+            <p class="form-hint" th:text="#{cart.priceHint}">Prices are checked again when you place the order.</p>
+            <a th:if="${canCheckout}" th:href="@{/checkout}" class="btn btn-block btn-lg" th:text="#{cart.checkout}">Proceed to checkout</a>
             <div th:unless="${canCheckout}">
-                <p class="form-error">Update or remove the unavailable items before checking out.</p>
-                <button class="btn btn-block btn-lg" disabled>Proceed to checkout</button>
+                <p class="form-error" th:text="#{cart.unavailable}">Update or remove the unavailable items before checking out.</p>
+                <button class="btn btn-block btn-lg" disabled th:text="#{cart.checkout}">Proceed to checkout</button>
             </div>
         </aside>
     </div>

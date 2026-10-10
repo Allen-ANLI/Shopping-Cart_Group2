@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="Monitor riser shelf">
+<title>Monitor riser shelf</title><rect width="640" height="400" fill="#fff"/>
+<ellipse cx="320" cy="328" rx="205" ry="16" fill="#e7eced"/>
+<path d="M130 217h380v30H130z" fill="#b78860"/><path d="M130 217l38-24h307l35 24z" fill="#dfb78f"/>
+<path d="M153 247h23v73h-23zM464 247h23v73h-23z" fill="#485c67"/>
+<rect x="224" y="59" width="192" height="126" rx="8" fill="#253642"/><rect x="235" y="70" width="170" height="98" rx="3" fill="#bcd8d4"/>
+<path d="M313 185h15v17h-15zM282 202h77v8h-77z" fill="#485c67"/>
+<rect x="213" y="288" width="215" height="21" rx="5" fill="#e5e9e8"/>
+<path d="M227 293h185M227 300h185" stroke="#9aa9ac" stroke-width="2"/>
+</svg>

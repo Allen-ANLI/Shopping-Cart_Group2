@@ -21,8 +21,8 @@ public class BusinessException extends RuntimeException {
      * @param userMessage 展示给用户的友好提示
      */
     public BusinessException(String userMessage) {
-        super(userMessage);
-        this.userMessage = userMessage;
+        super(sg.edu.nus.iss.shoppingcart.service.UiText.localize(userMessage));
+        this.userMessage = getMessage();
     }
 
     /**
@@ -32,8 +32,8 @@ public class BusinessException extends RuntimeException {
      * @param internalCause 内部原因
      */
     public BusinessException(String userMessage, Throwable internalCause) {
-        super(userMessage, internalCause);
-        this.userMessage = userMessage;
+        super(sg.edu.nus.iss.shoppingcart.service.UiText.localize(userMessage), internalCause);
+        this.userMessage = getMessage();
     }
 
     /**

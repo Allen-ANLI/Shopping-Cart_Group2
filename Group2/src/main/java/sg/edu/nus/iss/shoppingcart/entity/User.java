@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 
 /**
  * 用户实体。
@@ -54,6 +55,14 @@ public class User {
  * 邮箱，个人资料管理加分项使用。 */
     @Column(length = 255)
     private String email;
+
+    @Column(name = "full_name", length = 120)
+    private String fullName;
+
+    @Column(length = 30)
+    private String phone;
+
+    private LocalDate birthday;
 
     /**
      * 用户角色。
@@ -130,4 +139,11 @@ public class User {
     public void setRole(Role role) {
         this.role = role;
     }
+
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+    public LocalDate getBirthday() { return birthday; }
+    public void setBirthday(LocalDate birthday) { this.birthday = birthday; }
 }

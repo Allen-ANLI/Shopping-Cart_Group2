@@ -1,99 +1,28 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments :: head(${pageTitle})}"></head>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+<head th:replace="~{fragments :: head(#{catalog.admin.product})}"></head>
 <body>
-
 <header th:replace="~{fragments :: navbar}"></header>
-
-<main class="container">
-    <div class="form-wrapper">
-
-        <p class="small back-link">
-            <a th:href="@{/admin/products}">&larr; Back to product list</a>
-        </p>
-
-        <div class="card">
-            <h1 class="form-title" th:text="${pageTitle}">Product</h1>
-
-            <!--
-              th:object 让 #fields 拿到绑定上下文，
-              所以汇总错误块必须放在这个 form 内部——
-              放在外面会抛 "Could not bind form errors"。
-            -->
-            <form th:action="@{${formAction}}" method="post" th:object="${productForm}">
-                <input type="hidden" th:field="*{id}">
-
-                <div class="alert alert-error" th:if="${#fields.hasAnyErrors()}">
-                    Please correct the errors below.
-                </div>
-
-                <div class="form-group">
-                    <label for="name">Product name</label>
-                    <input type="text" id="name" th:field="*{name}" class="form-control"
-                           maxlength="100">
-                    <p class="form-error" th:if="${#fields.hasErrors('name')}"
-                       th:errors="*{name}">Name error</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" th:field="*{description}" class="form-control"
-                              rows="3" maxlength="1000"></textarea>
-                    <p class="form-error" th:if="${#fields.hasErrors('description')}"
-                       th:errors="*{description}">Description error</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="price">Price (S$)</label>
-                    <!--
-                      min/step 只是浏览器的即时提示，
-                      真正的拒绝逻辑在 @DecimalMin / @Digits 上，
-                      绕过页面直接 POST 同样会被服务端拦下。
-                    -->
-                    <input type="number" id="price" th:field="*{price}"
-                           class="form-control" min="0.01" step="0.01">
-                    <p class="form-error" th:if="${#fields.hasErrors('price')}"
-                       th:errors="*{price}">Price error</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="imageUrl">Image URL</label>
-                    <!--
-                      分工文档：后台先使用图片地址，不做图片上传。
-                      所以是普通文本框，不是 file 控件。
-                    -->
-                    <input type="text" id="imageUrl" th:field="*{imageUrl}"
-                           class="form-control" maxlength="500"
-                           placeholder="/images/product.png">
-                    <p class="form-hint">
-                        Path to an image in the project, or an external image link.
-                        Leave blank if the product has no image.
-                    </p>
-                    <p class="form-error" th:if="${#fields.hasErrors('imageUrl')}"
-                       th:errors="*{imageUrl}">Image URL error</p>
-                </div>
-
-                <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" th:field="*{active}">
-                        <span>Visible in the store</span>
-                    </label>
-                    <p class="form-hint">
-                        Uncheck to hide this product. Hidden products are not sold,
-                        but existing orders still display correctly.
-                    </p>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-lg">Save</button>
-                    <a th:href="@{/admin/products}" class="btn btn-lg btn-secondary">Cancel</a>
-                </div>
-            </form>
-        </div>
-
-    </div>
-</main>
-
+<main class="container" id="main-content"><div class="form-wrapper">
+<p class="small back-link"><a th:href="@{/admin/products}" th:text="#{catalog.back}">Back to product list</a></p>
+<div class="card">
+<h1 class="form-title" th:text="${productForm.id == null} ? #{catalog.add} : #{catalog.edit}">Product</h1>
+<form th:action="@{${formAction}}" method="post" th:object="${productForm}">
+<input type="hidden" th:field="*{id}">
+<div class="alert alert-error" th:if="${#fields.hasAnyErrors()}"><p th:text="#{catalog.correct}"></p><ul><li th:each="error : ${#fields.allErrors()}" th:text="${error}"></li></ul></div>
+<div class="form-group"><label for="name" th:text="#{catalog.name}"></label><input id="name" th:field="*{name}" class="form-control" maxlength="100" required></div>
+<div class="form-group"><label for="nameZh" th:text="#{catalog.nameZh}"></label><input id="nameZh" th:field="*{nameZh}" class="form-control" maxlength="100"></div>
+<div class="form-group"><label for="category" th:text="#{catalog.category}"></label><select id="category" th:field="*{category}" class="form-control" required><option th:each="c : ${catalogCategories}" th:value="${c.slug}" th:text="${#locale.language == 'zh' ? c.nameZh : c.name}"></option></select></div>
+<div class="form-group"><label for="brand" th:text="#{catalog.brand}"></label><input id="brand" th:field="*{brand}" class="form-control" maxlength="80"></div>
+<div class="form-group"><label for="origin" th:text="#{catalog.origin}"></label><input id="origin" th:field="*{origin}" class="form-control" maxlength="100"></div>
+<div class="form-group"><label for="originZh" th:text="#{catalog.originZh}"></label><input id="originZh" th:field="*{originZh}" class="form-control" maxlength="100"></div>
+<div class="form-group"><label for="description" th:text="#{catalog.description}"></label><textarea id="description" th:field="*{description}" class="form-control" rows="3" maxlength="1000"></textarea></div>
+<div class="form-group"><label for="descriptionZh" th:text="#{catalog.descriptionZh}"></label><textarea id="descriptionZh" th:field="*{descriptionZh}" class="form-control" rows="3" maxlength="1000"></textarea></div>
+<p class="form-hint" th:text="#{catalog.translationHint}"></p>
+<div class="form-group"><label for="price" th:text="#{catalog.price}"></label><input type="number" id="price" th:field="*{price}" class="form-control" min="0.01" max="99999999.99" step="0.01" required></div>
+<div class="form-group"><label for="imageUrl" th:text="#{catalog.image}"></label><input id="imageUrl" th:field="*{imageUrl}" class="form-control" maxlength="500" placeholder="/images/product.png"><p class="form-hint" th:text="#{catalog.imageHint}"></p></div>
+<div class="form-group"><label class="checkbox-label"><input type="checkbox" th:field="*{active}"><span th:text="#{catalog.visible}"></span></label><p class="form-hint" th:text="#{catalog.visibilityHint}"></p></div>
+<div class="form-actions"><button type="submit" class="btn btn-lg" th:text="#{catalog.save}"></button><a th:href="@{/admin/products}" class="btn btn-lg btn-secondary" th:text="#{catalog.cancel}"></a></div>
+</form></div></div></main>
 <footer th:replace="~{fragments :: footer}"></footer>
-</body>
-</html>
+</body></html>

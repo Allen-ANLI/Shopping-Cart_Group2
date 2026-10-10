@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{cart/fragments :: head('Add to cart')}"></head>
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{cart/fragments :: head(#{add.title})}"></head>
 <body>
 <header th:replace="~{cart/fragments :: navbar}"></header>
-<main class="container">
+<main class="container" id="main-content">
     <div class="page-header">
-        <div><h1 th:text="${selectedProduct} ? 'Add to your cart' : 'Add products to your cart'">Add products</h1>
-            <p class="muted">Choose a quantity before adding your item.</p></div>
-        <a th:href="@{/products}" class="btn btn-secondary">Back to products</a>
+        <div><h1 th:text="#{add.title}">Add products</h1>
+            <p class="muted" th:text="#{add.hint}">Choose a quantity before adding your item.</p></div>
+        <a th:href="@{/products}" class="btn btn-secondary" th:text="#{add.back}">Back to products</a>
     </div>
     <div th:replace="~{cart/fragments :: alerts}"></div>
     <section class="card empty-cart" th:if="${#lists.isEmpty(products)}">
-        <h2>No products available</h2><p>Please check the product catalogue again later.</p>
-        <a th:href="@{/products}" class="btn">Browse products</a>
+        <h2 th:text="#{add.empty}">No products available</h2><p th:text="#{add.emptyHint}">Please check the product catalogue again later.</p>
+        <a th:href="@{/products}" class="btn" th:text="#{cart.browse}">Browse products</a>
     </section>
     <section class="card add-product-card" th:each="product : ${products}">
         <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" th:alt="${product.name}" class="add-product-image">
@@ -23,10 +23,10 @@
             <form th:action="@{/cart/add}" method="post" class="add-product-form">
                 <input type="hidden" name="cartFormToken" th:value="${cartFormToken}">
                 <input type="hidden" name="productId" th:value="${product.id}">
-                <label th:for="'quantity-' + ${product.id}">Quantity</label>
+                <label th:for="'quantity-' + ${product.id}" th:text="#{quantity}">Quantity</label>
                 <input type="number" name="quantity" th:id="'quantity-' + ${product.id}"
                        value="1" min="1" max="99" required class="form-control">
-                <button type="submit" class="btn">Add to cart</button>
+                <button type="submit" class="btn" th:text="#{add.title}">Add to cart</button>
             </form>
         </div>
     </section>

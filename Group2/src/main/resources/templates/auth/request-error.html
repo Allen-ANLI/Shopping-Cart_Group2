@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{auth/fragments :: head('Method not allowed')}"></head>
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{auth/fragments :: head(#{error.method})}"></head>
 <body>
 <header th:replace="~{auth/fragments :: navbar}"></header>
-<main class="container narrow card">
-    <p class="eyebrow">405 · METHOD NOT ALLOWED</p>
-    <h1>Please use the form</h1>
-    <p class="muted" th:text="${errorMessage}">This action must be submitted using its form.</p>
-    <a class="btn primary" th:href="@{/account}">Back to account</a>
+<main class="container narrow card" id="main-content">
+    <p class="eyebrow" th:text="'405 · ' + #{error.method}">405</p>
+    <h1 th:text="#{error.method}">Please use the form</h1>
+    <p class="muted" th:text="${@uiText.translate(errorMessage)}">This action must be submitted using its form.</p>
+    <a class="btn primary" th:href="@{/account}" th:text="#{nav.account}">Back to account</a>
 </main>
 <footer th:replace="~{auth/fragments :: footer}"></footer>
 </body>

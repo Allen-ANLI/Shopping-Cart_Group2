@@ -1,0 +1,28 @@
+{
+  "passed": 21,
+  "checks": [
+    "homepage renders 12 products and four active category controls",
+    "mobile catalogue has no horizontal overflow",
+    "category click filters actual products",
+    "image opens a modal without navigation",
+    "Escape closes zoom",
+    "guest quick-add has a return-to-login link",
+    "login returns to original category",
+    "quick-add stays on catalog and updates cart badge",
+    "detail link opens metadata and review form",
+    "saved review and rating survive reload",
+    "one-click Chinese updates details",
+    "language persists from Angular to account",
+    "profile saves from browser form",
+    "continue shopping restores catalog filter",
+    "adding address returns directly to checkout",
+    "mobile checkout has no horizontal overflow",
+    "checkout succeeds and displays delivery snapshot",
+    "receipt links to persistent order detail",
+    "mobile address management has no horizontal overflow",
+    "profile survives logout and new browser login",
+    "no uncaught browser JavaScript exceptions"
+  ],
+  "browser": "Chrome headless, desktop and 390px mobile",
+  "timestamp": "2026-10-10 14:23:14"
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{auth/fragments :: head(#{address.title})}"></head>
+<body>
+<header th:replace="~{auth/fragments :: navbar}"></header>
+<main id="main-content" class="container address-page">
+    <nav class="account-breadcrumb" th:aria-label="#{account.breadcrumb}">
+        <a th:href="@{/account}" th:text="#{account.title}">My account</a><span aria-hidden="true"> / </span><span th:text="#{address.title}">Shipping addresses</span>
+    </nav>
+    <div class="address-heading">
+        <div><p class="eyebrow" th:text="#{address.eyebrow}">DELIVER TO YOU</p><h1 th:text="#{address.title}">Shipping addresses</h1></div>
+        <a class="btn primary" th:href="@{/account/addresses/new(returnTo=${returnTo})}" th:text="#{address.add}">Add address</a>
+    </div>
+    <p class="muted" th:text="#{address.description}">Save your delivery details. Choose an address at checkout.</p>
+    <div th:replace="~{auth/fragments :: alerts}"></div>
+    <div class="alert info" th:if="${fromCheckout}">
+        <span th:text="#{address.checkoutHint}">Add or update an address, then return to checkout.</span>
+        <a th:href="@{/checkout}" th:text="#{address.backCheckout}">Back to checkout →</a>
+    </div>
+    <section class="card address-empty" th:if="${#lists.isEmpty(addresses)}">
+        <h2 th:text="#{address.emptyTitle}">Your first delivery address</h2>
+        <p class="muted" th:text="#{address.emptyHint}">Add an address so your next order is ready to go.</p>
+        <a class="btn primary" th:href="@{/account/addresses/new(returnTo=${returnTo})}" th:text="#{address.add}">Add address</a>
+    </section>
+    <div class="address-grid">
+        <article class="card address-card" th:each="address : ${addresses}" th:classappend="${address.defaultAddress} ? 'address-default'">
+            <span class="address-badge" th:if="${address.defaultAddress}" th:text="#{address.default}">Default</span>
+            <h2 th:text="${address.recipientName}">Recipient</h2>
+            <p class="muted" th:text="${address.phone}"></p>
+            <address>
+                <span th:text="${address.addressLine1}"></span>
+                <span th:if="${!#strings.isEmpty(address.addressLine2)}" th:text="${address.addressLine2}"></span>
+                <span th:text="${address.city + ' ' + address.postalCode}"></span>
+                <span th:text="${address.country}"></span>
+            </address>
+            <div class="address-actions">
+                <a class="btn" th:href="@{/account/addresses/{id}/edit(id=${address.id},returnTo=${returnTo})}" th:text="#{address.edit}">Edit</a>
+                <form th:unless="${address.defaultAddress}" th:action="@{/account/addresses/{id}/default(id=${address.id})}" method="post">
+                    <input type="hidden" name="accountFormToken" th:value="${accountFormToken}">
+                    <input type="hidden" name="returnTo" th:value="${returnTo}">
+                    <button class="btn" type="submit" th:text="#{address.makeDefault}">Set default</button>
+                </form>
+                <details class="address-delete">
+                    <summary th:text="#{address.delete}">Delete</summary>
+                    <p th:text="#{address.deleteConfirm}">Remove this address? Existing orders will keep their delivery details.</p>
+                    <form th:action="@{/account/addresses/{id}/delete(id=${address.id})}" method="post">
+                        <input type="hidden" name="accountFormToken" th:value="${accountFormToken}">
+                        <input type="hidden" name="returnTo" th:value="${returnTo}">
+                        <button class="btn" type="submit" th:text="#{address.confirmDelete}">Confirm deletion</button>
+                    </form>
+                </details>
+            </div>
+        </article>
+    </div>
+</main>
+<footer th:replace="~{auth/fragments :: footer}"></footer>
+</body>
+</html>

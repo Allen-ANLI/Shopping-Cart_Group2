@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import sg.edu.nus.iss.shoppingcart.dto.ProductForm;
 import sg.edu.nus.iss.shoppingcart.entity.Product;
 import sg.edu.nus.iss.shoppingcart.service.AdminProductService;
+import sg.edu.nus.iss.shoppingcart.model.CatalogCategory;
+import java.util.List;
 
 /**
  * 管理员商品后台控制器 —— E 模块。
@@ -44,6 +46,9 @@ public class AdminProductController {
         this.adminProductService = adminProductService;
     }
 
+    @ModelAttribute("catalogCategories")
+    public List<CatalogCategory> categories() { return CatalogCategory.ALL; }
+
     /**
      * 后台商品列表，含已下架商品。
      *
@@ -57,7 +62,7 @@ public class AdminProductController {
         Page<Product> productPage = adminProductService.findAllForAdmin(pageIndex);
 
         model.addAttribute("products", productPage.getContent());
-        model.addAttribute("currentPage", page);
+        model.addAttribute("currentPage", pageIndex + 1);
         model.addAttribute("totalPages", productPage.getTotalPages());
         model.addAttribute("totalProducts", adminProductService.countAll());
         model.addAttribute("inactiveProducts", adminProductService.countInactive());
@@ -103,8 +108,7 @@ public class AdminProductController {
             return "admin/product-form";
         }
 
-        adminProductService.create(form.getName(), form.getDescription(),
-                form.getPrice(), form.getImageUrl(), form.isActive());
+        adminProductService.create(form);
 
         return "redirect:/admin/products?created";
     }
@@ -130,6 +134,12 @@ public class AdminProductController {
         form.setPrice(product.getPrice());
         form.setImageUrl(product.getImageUrl());
         form.setActive(product.isActive());
+        form.setCategory(product.getCategory());
+        form.setBrand(product.getBrand());
+        form.setOrigin(product.getOrigin());
+        form.setOriginZh(product.getOriginZh());
+        form.setNameZh(product.getNameZh());
+        form.setDescriptionZh(product.getDescriptionZh());
 
         model.addAttribute("pageTitle", "Edit product");
         model.addAttribute("formAction", "/admin/products/" + id);
@@ -157,8 +167,7 @@ public class AdminProductController {
             return "admin/product-form";
         }
 
-        adminProductService.update(id, form.getName(), form.getDescription(),
-                form.getPrice(), form.getImageUrl(), form.isActive());
+        adminProductService.update(id, form);
 
         return "redirect:/admin/products?updated";
     }

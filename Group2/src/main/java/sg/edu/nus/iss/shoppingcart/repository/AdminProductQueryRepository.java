@@ -33,4 +33,7 @@ public interface AdminProductQueryRepository extends JpaRepository<Product, Long
     @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END "
             + "FROM OrderItem i WHERE i.product.id = :productId")
     boolean isReferencedByAnyOrder(@Param("productId") Long productId);
+
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM ProductReview r WHERE r.product.id = :productId")
+    boolean isReferencedByAnyReview(@Param("productId") Long productId);
 }

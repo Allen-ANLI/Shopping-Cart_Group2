@@ -6,6 +6,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.edu.nus.iss.shoppingcart.entity.Product;
+import sg.edu.nus.iss.shoppingcart.dto.ProductForm;
+import sg.edu.nus.iss.shoppingcart.model.CatalogCategory;
 import sg.edu.nus.iss.shoppingcart.exception.BusinessException;
 import sg.edu.nus.iss.shoppingcart.exception.ResourceNotFoundException;
 import sg.edu.nus.iss.shoppingcart.repository.AdminProductQueryRepository;
@@ -116,6 +118,37 @@ public class AdminProductService {
         return productRepository.save(product);
     }
 
+    public Product create(ProductForm form) {
+        requireMetadata(form);
+        Product product = create(form.getName(), form.getDescription(), form.getPrice(), form.getImageUrl(), form.isActive());
+        applyMetadata(product, form);
+        return productRepository.save(product);
+    }
+
+    public Product update(Long id, ProductForm form) {
+        requireMetadata(form);
+        Product product = update(id, form.getName(), form.getDescription(), form.getPrice(), form.getImageUrl(), form.isActive());
+        applyMetadata(product, form);
+        return productRepository.save(product);
+    }
+
+    private void requireMetadata(ProductForm form) {
+        if (!CatalogCategory.isValid(form.getCategory())) throw new BusinessException("Select a valid product category");
+        checkLength(form.getBrand(), 80); checkLength(form.getOrigin(), 100);
+        checkLength(form.getOriginZh(), 100); checkLength(form.getNameZh(), 100);
+        checkLength(form.getDescriptionZh(), 1000);
+    }
+
+    private void checkLength(String value, int limit) {
+        if (value != null && value.length() > limit) throw new BusinessException("Product information is too long");
+    }
+
+    private void applyMetadata(Product product, ProductForm form) {
+        product.setCategory(form.getCategory()); product.setBrand(trimToNull(form.getBrand()));
+        product.setOrigin(trimToNull(form.getOrigin())); product.setOriginZh(trimToNull(form.getOriginZh()));
+        product.setNameZh(trimToNull(form.getNameZh())); product.setDescriptionZh(trimToNull(form.getDescriptionZh()));
+    }
+
     /**
      * 编辑商品。
      *
@@ -175,9 +208,9 @@ public class AdminProductService {
     public void deleteIfUnreferenced(Long id) {
         Product product = findById(id);
 
-        if (productRepository.isReferencedByAnyOrder(id)) {
+        if (productRepository.isReferencedByAnyOrder(id) || productRepository.isReferencedByAnyReview(id)) {
             throw new BusinessException(
-                    "'" + product.getName() + "' appears in existing orders and cannot be deleted. "
+                    "'" + product.getName() + "' appears in existing orders or reviews and cannot be deleted. "
                             + "Please hide (deactivate) it instead.");
         }
 

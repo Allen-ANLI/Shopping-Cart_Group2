@@ -1,45 +1,53 @@
-<!--
- 展示商品图片、名称、价格、详细描述及详情状态提示。
- @author 王重一
- @author Letian Xie 加购表单接入
--->
 <main class="store-container detail-page" id="main-content">
-  <nav class="breadcrumbs" aria-label="Breadcrumb">
-    <a [href]="listUrl">All products</a><span>/</span><span>Product details</span>
-  </nav>
-  @if (loading()) {
-    <div class="state-panel" role="status"><span class="loading-ring"></span><h1>Loading product...</h1></div>
-  } @else if (error()) {
-    <div class="state-panel" role="alert"><app-icon name="bag" />
-      <h1>{{ notFound() ? 'Product not found.' : 'Unable to load product.' }}</h1>
-      <p>{{ notFound() ? 'This product is unavailable. Explore the collection for something else.' : error() }}</p>
-      @if (!notFound()) { <button type="button" class="button-primary" (click)="retry()">Try again</button> }
-      <a class="button-primary" [href]="listUrl">Back to products <app-icon name="arrow" /></a>
+  <nav class="breadcrumbs" [attr.aria-label]="lang.text('Breadcrumb', '当前位置')"><a [href]="listUrl">{{ lang.text('Back to collection', '返回商品列表') }}</a><span>/</span><span>{{ lang.text('Product details', '商品详情') }}</span></nav>
+  @if (loading()) { <div class="state-panel" role="status"><span class="loading-ring"></span><h1>{{ lang.text('Loading product...', '正在加载商品…') }}</h1></div> }
+  @else if (error()) {
+    <div class="state-panel" role="alert"><app-icon name="bag" /><h1>{{ notFound() ? lang.text('Product not found.', '未找到商品。') : lang.text('Unable to load product.', '无法加载商品。') }}</h1><p>{{ lang.text('Please try again or explore the collection.', '请重试或浏览其他商品。') }}</p>
+      @if (!notFound()) { <button type="button" class="button-primary" (click)="retry()">{{ lang.text('Try again', '重试') }}</button> }
+      <a class="text-button" [href]="listUrl">{{ lang.text('Back to products', '返回商品列表') }}</a>
     </div>
   } @else if (product(); as item) {
     <article class="detail-card">
-      <div class="detail-photo">
-        <span class="detail-photo-label">TAKE A CLOSER LOOK</span>
-        @if (item.imageUrl) { <img [src]="item.imageUrl" [alt]="item.name"> }
+      <button class="detail-photo" type="button" (click)="zoomed.set(true)" [disabled]="!item.imageUrl" [attr.aria-label]="lang.text('Enlarge image: ', '放大图片：') + lang.name(item)">
+        @if (item.imageUrl) { <img [src]="item.imageUrl" [alt]="lang.name(item)"><span class="detail-photo-caption"><app-icon name="zoom" />{{ lang.text('Click to enlarge', '点击放大图片') }}</span> }
         @else { <app-icon name="bag" /> }
-        <span class="detail-photo-caption">The everyday edit / Shopping Cart</span>
-      </div>
-      <div class="detail-content">
-        <span class="section-eyebrow">EVERYDAY ESSENTIALS</span>
-        <h1>{{ item.name }}</h1>
-        <span class="detail-availability"><app-icon name="check" />Available in the collection</span>
-        <div class="detail-price"><span>SGD</span> {{ item.price.toFixed(2) }}<small>Price in Singapore dollars</small></div>
-        <section class="detail-description"><h2>About this product</h2>
-          <p>{{ item.description || 'No description is available for this product.' }}</p>
-        </section>
+      </button>
+      <div class="detail-content"><a class="eyebrow" [href]="'/products?category=' + (item.category || '') + '#catalog'">{{ categoryName(item) }}</a><h1>{{ lang.name(item) }}</h1>
+        <p class="detail-brand">{{ item.brand || 'Everyday Market' }}</p>
+        <div class="detail-price"><span>SGD</span> {{ item.price.toFixed(2) }}<small>{{ lang.text('Price in Singapore dollars', '价格以新加坡元计算') }}</small></div>
+        <section class="detail-description"><h2>{{ lang.text('Made for your everyday', '为日常而设计') }}</h2><p>{{ lang.description(item) }}</p></section>
+        <dl class="product-specs"><div><dt>{{ lang.text('Brand', '品牌') }}</dt><dd>{{ item.brand || 'Everyday Market' }}</dd></div><div><dt>{{ lang.text('Ships from', '发货地') }}</dt><dd>{{ lang.origin(item) }}</dd></div><div><dt>{{ lang.text('Category', '分类') }}</dt><dd>{{ categoryName(item) }}</dd></div></dl>
         <app-add-to-cart [productId]="item.id" />
-        <a class="button-primary detail-back" [href]="listUrl">Back to products <app-icon name="arrow" /></a>
-        <p class="detail-note">Find the little things that fit your everyday.</p>
+        <p class="detail-note"><app-icon name="check" />{{ lang.text('Choose your delivery address at checkout.', '结账时选择收货地址。') }}</p>
+        <a class="detail-back text-button" [href]="listUrl">{{ lang.text('Continue browsing', '继续选购') }}<app-icon name="arrow" /></a>
       </div>
     </article>
+    <section class="review-section" aria-labelledby="reviews-heading">
+      <div class="section-heading"><div><span class="eyebrow">{{ lang.text('FROM THE COMMUNITY', '来自用户的声音') }}</span><h2 id="reviews-heading">{{ lang.text('Customer reviews', '用户评价') }}</h2></div>
+        @if (reviews(); as summary) { <div class="rating-summary"><strong>{{ summary.totalReviews ? summary.averageRating.toFixed(1) : '—' }}</strong><span> / 5 · {{ summary.totalReviews }} {{ lang.text('reviews', '条评价') }}</span></div> }
+      </div>
+      <div class="review-layout"><div class="reviews-list">
+        @if (reviewsError()) { <div class="state-panel" role="alert"><p>{{ lang.text('Unable to load reviews.', '无法加载评价。') }}</p><button class="text-button" type="button" (click)="loadReviews()">{{ lang.text('Try again', '重试') }}</button></div> }
+        @else if (reviews(); as summary) {
+          @for (review of summary.reviews; track review.id) { <article class="review-card"><div class="review-card-heading"><strong>{{ review.displayName }}</strong><time [attr.datetime]="review.createdAt">{{ date(review.createdAt) }}</time></div><p class="stars" [attr.aria-label]="review.rating + lang.text(' out of 5 stars', '星，满分5星')">{{ stars(review.rating) }}</p><p class="review-comment">{{ review.comment }}</p></article> }
+          @empty { <div class="review-empty"><app-icon name="heart" /><h3>{{ lang.text('Be the first to share your thoughts.', '成为第一位分享体验的用户。') }}</h3><p>{{ lang.text('Your experience helps others find their next favourite.', '你的真实体验，帮助其他人找到心仪商品。') }}</p></div> }
+        } @else { <p role="status">{{ lang.text('Loading reviews…', '正在加载评价…') }}</p> }
+      </div><aside class="review-form-panel">
+        <h3>{{ lang.text('Share your experience', '分享你的体验') }}</h3>
+        @if (reviews()?.canReview) {
+          <p class="subtle">{{ lang.text('One review per product. Submit again to update yours.', '每件商品可发表一条评价，再次提交即可更新。') }}</p>
+          <form (submit)="saveReview($event)" class="review-form">
+            <label for="review-rating">{{ lang.text('Your rating', '你的评分') }}</label><select id="review-rating" name="rating" [value]="rating" (change)="rating = +$any($event.target).value" [disabled]="savingReview()">@for (n of [5,4,3,2,1]; track n) { <option [value]="n" [selected]="n === rating">{{ n }} {{ lang.text('stars', '星') }}</option> }</select>
+            <label for="review-comment">{{ lang.text('Your review', '评价内容') }}</label><textarea id="review-comment" name="comment" rows="5" minlength="5" maxlength="1000" required [value]="comment" (input)="comment = $any($event.target).value" [disabled]="savingReview()" [placeholder]="lang.text('What did you like? How do you use it?', '说说你的使用感受，哪些地方让你满意？')" aria-describedby="review-help"></textarea>
+            <small id="review-help">{{ lang.text('5–1,000 characters', '5–1,000个字符') }} · {{ comment.length }}/1000</small>
+            <button class="button-primary" type="submit" [disabled]="savingReview() || comment.trim().length < 5">{{ savingReview() ? lang.text('Saving…', '保存中…') : lang.text('Save review', '保存评价') }}</button>
+          </form>
+        } @else if (reviews()) { <p>{{ lang.text('Log in to write a review and help other shoppers.', '登录后发表评价，与其他用户分享你的体验。') }}</p><a class="button-primary" [href]="loginUrl">{{ lang.text('Log in to review', '登录后评价') }}</a> }
+        @if (reviewStatus() === 'saved') { <p class="success" role="status">{{ lang.text('Your review has been saved.', '你的评价已保存。') }}</p> }
+        @if (reviewStatus() === 'failed') { <p class="error-message" role="alert">{{ lang.text('Could not save your review. Please try again.', '评价保存失败，请重试。') }}</p> }
+        @if (reviewStatus() === 'login') { <p role="alert"><a [href]="loginUrl">{{ lang.text('Your session expired. Please log in again.', '登录已过期，请重新登录。') }}</a></p> }
+      </aside></div>
+    </section>
+    @if (zoomed()) { <app-image-zoom [product]="item" (close)="zoomed.set(false)" /> }
   }
-  <section class="detail-bottom-note" id="catalog">
-    <app-icon name="grid" /><div><h2>There's more to explore.</h2><p>Take another look at the everyday collection.</p></div>
-    <a [href]="listUrl">Explore all products <app-icon name="arrow" /></a>
-  </section>
 </main>

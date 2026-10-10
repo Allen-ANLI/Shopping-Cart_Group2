@@ -15,6 +15,8 @@ import sg.edu.nus.iss.shoppingcart.form.LoginForm;
 import sg.edu.nus.iss.shoppingcart.form.RegisterForm;
 import sg.edu.nus.iss.shoppingcart.interceptor.LoginInterceptor;
 import sg.edu.nus.iss.shoppingcart.service.AuthService;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
  * 复用 A 的 AuthService/PasswordConfig；登录后为 C/D/E 提供统一 Session。
@@ -23,23 +25,29 @@ import sg.edu.nus.iss.shoppingcart.service.AuthService;
 @Controller
 public class AuthController {
     private final AuthService authService;
-    public AuthController(AuthService authService) { this.authService = authService; }
+    private final MessageSource messages;
+    public AuthController(AuthService authService, MessageSource messages) {
+        this.authService = authService; this.messages = messages;
+    }
 
     @InitBinder("loginForm")
     public void bindLogin(WebDataBinder binder) { binder.setAllowedFields("username", "password"); }
     @InitBinder("registerForm")
     public void bindRegistration(WebDataBinder binder) {
-        binder.setAllowedFields("username", "password", "confirmPassword", "displayName", "email");
+        binder.setAllowedFields("username", "password", "confirmPassword", "displayName", "email", "fullName", "phone", "birthday");
     }
 
     @GetMapping("/login")
     public String showLogin(@ModelAttribute("loginForm") LoginForm form,
                             @RequestParam(required = false) String required,
                             @RequestParam(required = false) String registered,
-                            @RequestParam(required = false) String loggedOut, Model model) {
-        if (required != null) { model.addAttribute("infoMessage", "Please log in to continue"); }
-        if (registered != null) { model.addAttribute("successMessage", "Registration successful. Please log in."); }
-        if (loggedOut != null) { model.addAttribute("successMessage", "You have been logged out."); }
+                            @RequestParam(required = false) String loggedOut,
+                            @RequestParam(required = false) String returnTo,
+                            HttpSession session, Model model) {
+        rememberReturnTo(returnTo, session);
+        if (required != null) { model.addAttribute("infoMessage", message("auth.login.required")); }
+        if (registered != null) { model.addAttribute("successMessage", message("auth.register.success")); }
+        if (loggedOut != null) { model.addAttribute("successMessage", message("auth.logout.success")); }
         return "auth/login";
     }
 
@@ -49,7 +57,7 @@ public class AuthController {
         if (result.hasErrors()) { return "auth/login"; }
         User user = authService.authenticate(form.getUsername(), form.getPassword()).orElse(null);
         if (user == null) {
-            model.addAttribute("errorMessage", "Invalid username or password");
+            model.addAttribute("errorMessage", message("auth.login.invalid"));
             return "auth/login";
         }
         String savedRedirect = null;
@@ -72,7 +80,11 @@ public class AuthController {
     }
 
     @GetMapping("/register")
-    public String showRegister(@ModelAttribute("registerForm") RegisterForm form) { return "auth/register"; }
+    public String showRegister(@ModelAttribute("registerForm") RegisterForm form,
+                               @RequestParam(required = false) String returnTo, HttpSession session) {
+        rememberReturnTo(returnTo, session);
+        return "auth/register";
+    }
 
     @PostMapping("/register")
     public String processRegister(@Valid @ModelAttribute("registerForm") RegisterForm form,
@@ -86,7 +98,7 @@ public class AuthController {
         } catch (DataIntegrityViolationException ex) {
             // 等 Service 事务回滚后再查询，兼顾两个注册请求的唯一约束竞争。
             if (authService.findByUsername(form.getUsername()).isEmpty()) { throw ex; }
-            result.rejectValue("username", "username.duplicate", "This username is already taken.");
+            result.rejectValue("username", "auth.username.duplicate", message("auth.username.duplicate"));
             return "auth/register";
         }
         return "redirect:/login?registered";
@@ -107,4 +119,12 @@ public class AuthController {
     @GetMapping("/forbidden")
     @ResponseStatus(org.springframework.http.HttpStatus.FORBIDDEN)
     public String forbidden() { return "auth/forbidden"; }
+
+    private void rememberReturnTo(String returnTo, HttpSession session) {
+        String safe = LoginInterceptor.safeRedirect(returnTo);
+        if (safe != null) { session.setAttribute(LoginInterceptor.REDIRECT_AFTER_LOGIN, safe); }
+    }
+    private String message(String key) {
+        return messages.getMessage(key, null, LocaleContextHolder.getLocale());
+    }
 }

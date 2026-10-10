@@ -18,7 +18,9 @@ public final class CartLine {
     public CartLine(Long productId, int quantity, Product product) {
         this.productId = productId;
         this.quantity = quantity;
-        this.productName = product == null ? "Unavailable product #" + productId : product.getName();
+        boolean chinese = org.springframework.context.i18n.LocaleContextHolder.getLocale().getLanguage().equals("zh");
+        this.productName = product == null ? (chinese ? "失效商品 #" : "Unavailable product #") + productId
+                : chinese && product.getNameZh() != null && !product.getNameZh().isBlank() ? product.getNameZh() : product.getName();
         this.unitPrice = product == null ? BigDecimal.ZERO : product.getPrice();
         this.problem = product == null ? "This product has been removed. Please remove it from your cart."
                 : !product.isActive() ? "This product is no longer for sale. Please remove it."
@@ -30,6 +32,6 @@ public final class CartLine {
     public String getProductName() { return productName; }
     public BigDecimal getUnitPrice() { return unitPrice; }
     public BigDecimal getSubtotal() { return unitPrice.multiply(BigDecimal.valueOf(quantity)); }
-    public String getProblem() { return problem; }
+    public String getProblem() { return problem == null ? null : sg.edu.nus.iss.shoppingcart.service.UiText.localize(problem); }
     public boolean isAvailable() { return problem == null; }
 }

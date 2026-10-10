@@ -2,174 +2,88 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { AddToCartComponent } from './add-to-cart.component';
+import { CartService } from '../services/cart.service';
 
-/**
- * 验证会话令牌、普通表单数据、登录提示、重试和提交状态。
- * @author Letian Xie
- */
-describe('C product add-to-cart form', () => {
+describe('Cart actions stay on the selected product or collection', () => {
   let fixture: ComponentFixture<AddToCartComponent>;
   let http: HttpTestingController;
   let element: HTMLElement;
-  const request = () => http.expectOne('/api/cart/form');
   const render = () => fixture.detectChanges();
-  const prepare = (token = 'current-cart-token') => {
-    request().flush({ cartFormToken: token, itemCount: 0, totalQuantity: 0 });
-    render();
-  };
-  const form = () => element.querySelector<HTMLFormElement>('form')!;
-  const quantity = () => element.querySelector<HTMLInputElement>('input[name="quantity"]')!;
   const submit = () => {
     const event = new Event('submit', { bubbles: true, cancelable: true });
-    form().dispatchEvent(event);
-    render();
-    return event;
+    element.querySelector('form')!.dispatchEvent(event); render(); return event;
   };
-
+  const prepare = (token = 'fresh-token') => {
+    http.expectOne('/api/cart/form').flush({ cartFormToken: token, itemCount: 0, totalQuantity: 0 }); render();
+  };
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [AddToCartComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
-    }).compileComponents();
-    fixture = TestBed.createComponent(AddToCartComponent);
-    http = TestBed.inject(HttpTestingController);
-    element = fixture.nativeElement as HTMLElement;
-    fixture.componentRef.setInput('productId', 12);
-    render();
+    document.cookie = 'store_lang=en; Path=/';
+    history.replaceState(null, '', '/products?category=typing&id=12');
+    await TestBed.configureTestingModule({ imports: [AddToCartComponent], providers: [provideHttpClient(), provideHttpClientTesting()] }).compileComponents();
+    fixture = TestBed.createComponent(AddToCartComponent); http = TestBed.inject(HttpTestingController);
+    element = fixture.nativeElement; fixture.componentRef.setInput('productId', 12); render();
   });
-  afterEach(() => { fixture.destroy(); http.verify(); });
-
-  it('loads the current session form token before allowing a purchase', () => {
-    expect(element.textContent).toContain('Preparing your cart...');
-    expect(element.querySelector('form')).toBeNull();
-    const pending = request();
-    expect(pending.request.method).toBe('GET');
-    pending.flush({ cartFormToken: 'server-token', itemCount: 2, totalQuantity: 4 });
-    render();
-    expect(element.querySelector('form')).not.toBeNull();
+  afterEach(() => { fixture.destroy(); http.verify(); history.replaceState(null, '', '/'); });
+  it('does not request one cart token per visible product on initial render', () => {
+    http.expectNone('/api/cart/form');
+    expect(element.querySelector('input')?.getAttribute('min')).toBe('1');
+    expect(element.querySelector('input')?.getAttribute('max')).toBe('99');
   });
-
-  it('posts the product, quantity and token using a native form', () => {
+  it('posts product, chosen quantity and a fresh session token without navigating', () => {
+    const input = element.querySelector('input')!; input.value = '3'; input.dispatchEvent(new Event('input'));
+    expect(submit().defaultPrevented).toBe(true);
+    expect(element.querySelector('button')!.disabled).toBe(true);
+    expect(element.querySelector('form')?.getAttribute('aria-busy')).toBe('true');
     prepare('server-token');
-    expect(form().getAttribute('method')).toBe('post');
-    expect(form().getAttribute('action')).toBe('/cart/add');
-    const fields = new window.FormData(form());
-    expect(fields.get('productId')).toBe('12');
-    expect(fields.get('cartFormToken')).toBe('server-token');
-    expect(fields.get('quantity')).toBe('1');
-    expect([...fields.keys()].sort()).toEqual(['cartFormToken', 'productId', 'quantity']);
-    expect(quantity().getAttribute('min')).toBe('1');
-    expect(quantity().getAttribute('max')).toBe('99');
-    expect(quantity().getAttribute('step')).toBe('1');
-    expect(quantity().required).toBe(true);
+    const request = http.expectOne('/api/cart/items'); expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ productId: 12, quantity: 3, cartFormToken: 'server-token' });
+    request.flush({ itemCount: 1, totalQuantity: 3 }); render();
+    expect(window.location.search).toBe('?category=typing&id=12');
+    expect(element.querySelector('[role="status"]')?.textContent).toContain('Added to cart.');
+    expect(element.querySelector('a[href="/cart"]')).not.toBeNull();
+    expect(TestBed.inject(CartService).totalQuantity()).toBe(3);
   });
-
-  it('shows a server-side login entry for the selected product after HTTP 401', () => {
-    request().flush({ error: 'LOGIN_REQUIRED' }, { status: 401, statusText: 'Unauthorized' });
-    render();
-    const link = element.querySelector<HTMLAnchorElement>('a')!;
-    expect(link.textContent).toBe('Log in to add to cart');
-    expect(link.getAttribute('href')).toBe('/cart/products?productId=12');
+  it('quick add uses one item and its own accessible icon', () => {
+    fixture.componentRef.setInput('compact', true); render();
     expect(element.querySelector('form')).toBeNull();
+    const button = element.querySelector('button')!;
+    expect(button.getAttribute('aria-label')).toBe('Quick add to cart'); button.click(); prepare();
+    const request = http.expectOne('/api/cart/items'); expect(request.request.body.quantity).toBe(1);
+    request.flush({ itemCount: 1, totalQuantity: 1 }); render();
+    expect(element.querySelector('[role="status"]')).not.toBeNull();
+  });
+  it('prevents repeated clicks while a request is in flight', () => {
+    submit(); submit(); prepare();
+    http.expectOne('/api/cart/items').flush({ itemCount: 1, totalQuantity: 1 }); render();
+    expect(element.querySelector('button')!.disabled).toBe(false);
+  });
+  it.each(['0', '100', '1.5', ''])('rejects invalid quantity %s before requesting a token', value => {
+    const input = element.querySelector('input')!; input.value = value; input.dispatchEvent(new Event('input'));
+    submit(); http.expectNone('/api/cart/form'); expect(element.querySelector('button')!.disabled).toBe(false);
+  });
+  it('preserves category and selected product when asking an anonymous customer to log in', () => {
+    submit(); http.expectOne('/api/cart/form').flush({}, { status: 401, statusText: 'Unauthorized' }); render();
+    expect(element.querySelector('a')?.getAttribute('href')).toBe('/login?returnTo=%2Fproducts%3Fcategory%3Dtyping%26id%3D12');
+    http.expectNone('/api/cart/items');
+  });
+  it('rejects malformed token responses without posting unprotected mutations', () => {
+    submit(); http.expectOne('/api/cart/form').flush({ itemCount: 0, totalQuantity: 0 }); render();
+    http.expectNone('/api/cart/items');
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain('Could not add');
+  });
+  it('shows quantity and availability validation returned by the server', () => {
+    submit(); prepare(); http.expectOne('/api/cart/items').flush({}, { status: 400, statusText: 'Bad Request' }); render();
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain('maximum 99');
+  });
+  it('fetches a new token on retry after a network error', () => {
+    submit(); http.expectOne('/api/cart/form').error(new ProgressEvent('error')); render();
+    expect(element.querySelector('[role="alert"]')).not.toBeNull();
+    submit(); prepare('retry-token');
+    const request = http.expectOne('/api/cart/items'); expect(request.request.body.cartFormToken).toBe('retry-token');
+    request.flush({ itemCount: 1, totalQuantity: 1 }); render();
     expect(element.querySelector('[role="alert"]')).toBeNull();
   });
-
-  it('offers a retry after a server failure and uses the fresh token', () => {
-    request().flush({}, { status: 503, statusText: 'Unavailable' });
-    render();
-    expect(element.querySelector('[role="alert"]')?.textContent).toContain('Unable to prepare your cart');
-    expect(element.querySelector('form')).toBeNull();
-    element.querySelector<HTMLButtonElement>('button')!.click();
-    render();
-    expect(element.textContent).toContain('Preparing your cart...');
-    prepare('retry-token');
-    expect(new window.FormData(form()).get('cartFormToken')).toBe('retry-token');
-  });
-
-  it('offers a retry after a network failure', () => {
-    request().error(new ProgressEvent('error'));
-    render();
-    expect(element.querySelector('[role="alert"]')).not.toBeNull();
-    element.querySelector<HTMLButtonElement>('button')!.click();
-    prepare();
-    expect(element.querySelector('form')).not.toBeNull();
-  });
-
-  it('does not render a form when the server response has no token', () => {
-    request().flush({ itemCount: 0, totalQuantity: 0 });
-    render();
-    expect(element.querySelector('form')).toBeNull();
-    expect(element.querySelector('[role="alert"]')).not.toBeNull();
-  });
-
-  it('allows native navigation and keeps quantity in the submitted fields', () => {
-    prepare();
-    quantity().value = '3';
-    expect(submit().defaultPrevented).toBe(false);
-    expect(form().getAttribute('aria-busy')).toBe('true');
-    expect(element.querySelector<HTMLButtonElement>('button')!.disabled).toBe(true);
-    expect(element.textContent).toContain('Adding to cart...');
-    expect(element.querySelector('[role="status"]')?.textContent).toContain('Please wait');
-    expect(new window.FormData(form()).get('quantity')).toBe('3');
-    http.expectNone('/cart/add');
-  });
-
-  it('suppresses a second submit while the browser is navigating', () => {
-    prepare();
-    expect(submit().defaultPrevented).toBe(false);
-    expect(submit().defaultPrevented).toBe(true);
-  });
-
-  it.each(['0', '100', '1.5', ''])('does not submit an invalid quantity of %s', (value) => {
-    prepare();
-    quantity().value = value;
-    expect(submit().defaultPrevented).toBe(true);
-    expect(element.querySelector<HTMLButtonElement>('button')!.disabled).toBe(false);
-    expect(form().getAttribute('aria-busy')).toBeNull();
-  });
-
-  it('cancels an obsolete token request when the product ID changes', () => {
-    const old = request();
-    fixture.componentRef.setInput('productId', 25);
-    render();
-    expect(old.cancelled).toBe(true);
-    prepare('new-product-token');
-    expect(new window.FormData(form()).get('productId')).toBe('25');
-  });
-
-  it('updates the anonymous entry after the product ID changes', () => {
-    request().flush({}, { status: 401, statusText: 'Unauthorized' });
-    render();
-    fixture.componentRef.setInput('productId', 25);
-    render();
-    request().flush({}, { status: 401, statusText: 'Unauthorized' });
-    render();
-    expect(element.querySelector('a')?.getAttribute('href')).toBe('/cart/products?productId=25');
-  });
-
-  it('cancels the previous request when refreshing before it finishes', () => {
-    const old = request();
-    fixture.componentInstance.refresh();
-    expect(old.cancelled).toBe(true);
-    prepare();
-  });
-
-  it('reloads the token and restores submission controls when returning from the browser cache', () => {
-    prepare();
-    submit();
-    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
-    render();
-    expect(element.querySelector('form')).toBeNull();
-    prepare('restored-token');
-    expect(element.querySelector<HTMLButtonElement>('button')!.disabled).toBe(false);
-    expect(new window.FormData(form()).get('cartFormToken')).toBe('restored-token');
-  });
-
-  it('cancels a pending request and removes the browser listener when destroyed', () => {
-    const pending = request();
-    fixture.destroy();
-    expect(pending.cancelled).toBe(true);
-    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
-    http.expectNone('/api/cart/form');
+  it('cancels an outstanding request when the card is removed', () => {
+    submit(); const request = http.expectOne('/api/cart/form'); fixture.destroy(); expect(request.cancelled).toBe(true);
   });
 });

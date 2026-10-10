@@ -41,6 +41,13 @@ public class GlobalExceptionHandler {
     /** 日志记录器。 */
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public Object handleStatus(org.springframework.web.server.ResponseStatusException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        return requestError(request, status, status.getReasonPhrase(),
+                ex.getReason() == null ? status.getReasonPhrase() : ex.getReason());
+    }
+
     /** Preserve 404 for missing pages and assets instead of invoking the 500 fallback. */
     @ExceptionHandler(NoResourceFoundException.class)
     public Object handleMissingResource(NoResourceFoundException ex, HttpServletRequest request) {

@@ -1,5 +1,1 @@
-/**
- * 设置商品详情组件的宿主显示方式。
- * @author 王重一
- */
-:host { display: block; }
+/* Shared storefront layout and responsive styles live in styles.css. */

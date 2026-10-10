@@ -27,6 +27,25 @@ public class Product {
     @Column(length = 1000)
     private String description;
 
+    // Nullable additions let Hibernate update an existing catalogue without data loss.
+    @Column(length = 30)
+    private String category;
+
+    @Column(length = 80)
+    private String brand;
+
+    @Column(length = 100)
+    private String origin;
+
+    @Column(name = "name_zh", length = 100)
+    private String nameZh;
+
+    @Column(name = "description_zh", length = 1000)
+    private String descriptionZh;
+
+    @Column(name = "origin_zh", length = 100)
+    private String originZh;
+
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 
@@ -88,6 +107,36 @@ public class Product {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getCategory() { return fallback(category, "workspace"); }
+    public void setCategory(String category) { this.category = category; }
+    public String getBrand() { return fallback(brand, "Group2 Essentials"); }
+    public void setBrand(String brand) { this.brand = brand; }
+    public String getOrigin() { return fallback(origin, "Singapore"); }
+    public void setOrigin(String origin) { this.origin = origin; }
+    public String getNameZh() { return fallback(nameZh, name); }
+    public void setNameZh(String nameZh) { this.nameZh = nameZh; }
+    public String getDescriptionZh() { return fallback(descriptionZh, description); }
+    public void setDescriptionZh(String descriptionZh) { this.descriptionZh = descriptionZh; }
+    public String getOriginZh() { return fallback(originZh, getOrigin()); }
+    public void setOriginZh(String originZh) { this.originZh = originZh; }
+
+    /** Used only by the one-time catalogue migration. Existing populated fields are retained. */
+    public void fillMissingCatalogMetadata(Product seed) {
+        if (category == null || category.isBlank()) category = seed.category;
+        if (brand == null || brand.isBlank()) brand = seed.brand;
+        if (origin == null || origin.isBlank()) origin = seed.origin;
+        if (nameZh == null || nameZh.isBlank()) nameZh = seed.nameZh;
+        // Do not attach a seed translation to administrator-edited information.
+        if ((descriptionZh == null || descriptionZh.isBlank()) && java.util.Objects.equals(description, seed.description)) {
+            descriptionZh = seed.descriptionZh;
+        }
+        if ((originZh == null || originZh.isBlank()) && java.util.Objects.equals(origin, seed.origin)) originZh = seed.originZh;
+    }
+
+    private String fallback(String value, String defaultValue) {
+        return value == null || value.isBlank() ? defaultValue : value;
     }
 
 }

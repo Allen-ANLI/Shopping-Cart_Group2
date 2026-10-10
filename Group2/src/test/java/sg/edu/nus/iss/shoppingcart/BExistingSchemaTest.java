@@ -37,6 +37,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ContextConfiguration(initializers = BExistingSchemaTest.LegacySchemaInitializer.class)
 class BExistingSchemaTest {
+    @Autowired sg.edu.nus.iss.shoppingcart.service.ShippingAddressService deliveryAddresses;
+    @Autowired sg.edu.nus.iss.shoppingcart.repository.ShippingAddressRepository deliveryAddressRows;
+    private String deliveryAddress(MockHttpSession session) {
+        Long userId = (Long) session.getAttribute("loginUserId");
+        var existing = deliveryAddresses.listForUser(userId);
+        if (!existing.isEmpty()) return existing.get(0).getId().toString();
+        var form = new sg.edu.nus.iss.shoppingcart.form.ShippingAddressForm();
+        form.setRecipientName("Test Buyer"); form.setPhone("+65 81234567");
+        form.setCountry("Singapore"); form.setCity("Singapore");
+        form.setPostalCode("123456"); form.setAddressLine1("12 Test Street");
+        return deliveryAddresses.saveForUser(userId, null, form).getId().toString();
+    }
+
     @Autowired AuthService auth;
     @Autowired MockMvc mvc;
     @Autowired CartService cart;
@@ -91,7 +104,7 @@ class BExistingSchemaTest {
         var product = products.findAll().get(0);
         cart.addItem(session, product.getId(), 1);
         String token = checkout.prepare(session);
-        mvc.perform(post("/checkout").session(session).param("checkoutToken", token))
+        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
                 .andExpect(redirectedUrl("/checkout/success?key=" + token));
         assertThat(orders.findByCheckoutTokenAndUser_Id(token, 41L)).isPresent();
         assertThat(auth.findById(41L)).isPresent();

@@ -1,40 +1,9 @@
-<!--
- 展示商城品牌、公共导航、页面内容插槽和页脚。
- @author 王重一
- @author luopeiwen 账户导航接入
--->
-<a class="skip-link" [href]="skipUrl">Skip to content</a>
-<div class="utility-bar">
-  <div class="store-container utility-inner">
-    <span>Singapore <span class="utility-divider">/</span> SGD</span>
-    <span class="utility-welcome">A little upgrade for your everyday.</span>
-    <a href="/">Home <app-icon name="arrow" /></a>
-  </div>
-</div>
+<a class="skip-link" [href]="skipUrl">{{ lang.text('Skip to content', '跳转到正文') }}</a>
+<div class="utility-bar"><div class="store-container utility-inner"><span>{{ lang.text('Everyday essentials. Thoughtfully selected.', '用心挑选，日常好物。') }}</span><span>{{ lang.text('Singapore', '新加坡') }} · SGD</span></div></div>
 <header class="store-container store-header">
-  <a class="brand" [href]="listUrl" aria-label="Shopping Cart home">
-    <span class="brand-mark"><app-icon name="bag" /></span>
-    <span><strong>Shopping Cart<span class="brand-dot">.</span></strong>
-      <small>EVERYDAY ESSENTIALS</small></span>
-  </a>
-  <a class="catalog-jump" [href]="catalogUrl">
-    <app-icon name="grid" />
-    <span>Discover your next desk essential</span>
-    <span class="catalog-jump-action">Explore <app-icon name="arrow" /></span>
-  </a>
-  <div class="header-note"><app-icon name="monitor" />
-    <span>For work.<br><strong>For everyday.</strong></span>
-  </div>
+  <a class="brand" href="/products" [attr.aria-label]="lang.text('Everyday Market home', 'Everyday Market 首页')"><span class="brand-mark"><app-icon name="bag" /></span><span><strong>Everyday Market<span class="brand-dot">.</span></strong><small>{{ lang.text('SMALL THINGS. BETTER DAYS.', '小小好物，美好日常。') }}</small></span></a>
+  <button type="button" class="language-switch" (click)="lang.toggle()" [attr.aria-label]="lang.text('Switch to Chinese', '切换到英文')"><app-icon name="globe" /><span>{{ lang.text('中文', 'English') }}</span></button>
 </header>
-<nav class="store-container store-nav" aria-label="Store navigation">
-  <a class="store-nav-current" [href]="catalogUrl"><app-icon name="grid" />All products</a>
-  <span>Computer accessories</span><span>Work &amp; study</span><span>Desk essentials</span>
-  <span class="nav-end">Small things. Better days.</span>
-</nav>
-<div class="store-container"><app-auth-navigation /></div>
+<div class="nav-band"><div class="store-container"><app-auth-navigation /></div></div>
 <ng-content />
-<footer class="store-container store-footer">
-  <a [href]="listUrl">Shopping Cart<span class="brand-dot">.</span></a>
-  <p>Everyday essentials, all in one place.</p>
-  <span>Prices in SGD</span>
-</footer>
+<footer class="store-container store-footer"><div><a class="footer-brand" href="/products">Everyday Market.</a><p>{{ lang.text('A little upgrade for your everyday.', '为日常，添一点美好。') }}</p></div><nav [attr.aria-label]="lang.text('Footer navigation', '页脚导航')"><a href="/products#catalog">{{ lang.text('Collection', '商品系列') }}</a><a href="/account">{{ lang.text('My account', '我的账户') }}</a><a href="/account/addresses">{{ lang.text('Delivery addresses', '收货地址') }}</a></nav><span>{{ lang.text('All prices in SGD', '所有价格均为新加坡元') }}</span></footer>

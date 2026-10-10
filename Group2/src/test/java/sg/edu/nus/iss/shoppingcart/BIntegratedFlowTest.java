@@ -43,6 +43,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("h2")
 class BIntegratedFlowTest {
+    @Autowired sg.edu.nus.iss.shoppingcart.service.ShippingAddressService deliveryAddresses;
+    @Autowired sg.edu.nus.iss.shoppingcart.repository.ShippingAddressRepository deliveryAddressRows;
+    private String deliveryAddress(MockHttpSession session) {
+        Long userId = (Long) session.getAttribute("loginUserId");
+        var existing = deliveryAddresses.listForUser(userId);
+        if (!existing.isEmpty()) return existing.get(0).getId().toString();
+        var form = new sg.edu.nus.iss.shoppingcart.form.ShippingAddressForm();
+        form.setRecipientName("Test Buyer"); form.setPhone("+65 81234567");
+        form.setCountry("Singapore"); form.setCity("Singapore");
+        form.setPostalCode("123456"); form.setAddressLine1("12 Test Street");
+        return deliveryAddresses.saveForUser(userId, null, form).getId().toString();
+    }
+
     @Autowired MockMvc mvc;
     @Autowired UserRepository users;
     @Autowired ProductRepository products;
@@ -82,6 +95,7 @@ class BIntegratedFlowTest {
         }
         items.deleteAllInBatch();
         orders.deleteAllInBatch();
+        deliveryAddressRows.deleteAllInBatch();
         users.deleteAllInBatch();
         products.deleteAllInBatch();
     }
@@ -190,12 +204,16 @@ class BIntegratedFlowTest {
     void registrationUsesExistingAppUsersAndCannotGrantRoleOrChooseId() throws Exception {
         mvc.perform(post("/register").param("username", "NewBUser").param("password", "newpass123")
                         .param("confirmPassword", "newpass123").param("displayName", "New user")
+                        .param("fullName", "New Customer").param("phone", "+65 9123 4567").param("birthday", "1998-05-12")
                         .param("email", "new@example.test").param("role", "ADMIN")
                         .param("id", admin.getId().toString()).param("passwordHash", "injected"))
                 .andExpect(redirectedUrl("/login?registered"));
         User saved = users.findByUsername("newbuser").orElseThrow();
         assertThat(saved.getId()).isNotEqualTo(admin.getId());
         assertThat(saved.getRole()).isEqualTo(User.Role.CUSTOMER);
+        assertThat(saved.getFullName()).isEqualTo("New Customer");
+        assertThat(saved.getPhone()).isEqualTo("+65 9123 4567");
+        assertThat(saved.getBirthday()).isEqualTo(java.time.LocalDate.of(1998, 5, 12));
         assertThat(saved.getPasswordHash()).startsWith("$2").isNotEqualTo("newpass123");
         assertThat(encoder.matches("newpass123", saved.getPasswordHash())).isTrue();
     }
@@ -205,6 +223,7 @@ class BIntegratedFlowTest {
         long count = users.count();
         mvc.perform(post("/register").param("username", customer.getUsername().toUpperCase())
                         .param("password", "newpass123").param("confirmPassword", "newpass123")
+                        .param("fullName", "Duplicate Customer").param("phone", "+65 9123 4567")
                         .param("displayName", "Duplicated").param("email", "new@example.test"))
                 .andExpect(view().name("auth/register"))
                 .andExpect(content().string(containsString("already taken")));
@@ -260,14 +279,21 @@ class BIntegratedFlowTest {
     @Test
     void profileChangesOnlyCurrentUserAndPreservesIdentityHashAndRole() throws Exception {
         String hash = customer.getPasswordHash();
-        mvc.perform(post("/account/profile").session(sessionFor(customer))
+        MockHttpSession profileSession = sessionFor(customer);
+        String profileToken = (String) mvc.perform(get("/account").session(profileSession)).andReturn()
+                .getModelAndView().getModel().get("accountFormToken");
+        mvc.perform(post("/account/profile").session(profileSession).param("accountFormToken", profileToken)
                         .param("displayName", "Updated name").param("email", "updated@example.test")
+                        .param("fullName", "Updated Customer").param("phone", "+65 9876 5432").param("birthday", "1995-09-18")
                         .param("id", other.getId().toString()).param("userId", other.getId().toString())
                         .param("role", "ADMIN").param("username", "hacked").param("passwordHash", "hacked"))
                 .andExpect(redirectedUrl("/account"));
         User saved = users.findById(customer.getId()).orElseThrow();
         assertThat(saved.getDisplayName()).isEqualTo("Updated name");
         assertThat(saved.getEmail()).isEqualTo("updated@example.test");
+        assertThat(saved.getFullName()).isEqualTo("Updated Customer");
+        assertThat(saved.getPhone()).isEqualTo("+65 9876 5432");
+        assertThat(saved.getBirthday()).isEqualTo(java.time.LocalDate.of(1995, 9, 18));
         assertThat(saved.getRole()).isEqualTo(User.Role.CUSTOMER);
         assertThat(saved.getUsername()).isEqualTo("buser001");
         assertThat(saved.getPasswordHash()).isEqualTo(hash);
@@ -276,7 +302,10 @@ class BIntegratedFlowTest {
 
     @Test
     void invalidProfileDoesNotWriteAndRendersErrors() throws Exception {
-        mvc.perform(post("/account/profile").session(sessionFor(customer)).param("displayName", " ")
+        MockHttpSession profileSession = sessionFor(customer);
+        String profileToken = (String) mvc.perform(get("/account").session(profileSession)).andReturn()
+                .getModelAndView().getModel().get("accountFormToken");
+        mvc.perform(post("/account/profile").session(profileSession).param("accountFormToken", profileToken).param("displayName", " ")
                         .param("email", "wrong"))
                 .andExpect(view().name("account/view"))
                 .andExpect(model().attributeHasFieldErrors("profileForm", "displayName", "email"));
@@ -388,7 +417,7 @@ class BIntegratedFlowTest {
         var checkoutPage = mvc.perform(get("/checkout").session(session))
                 .andExpect(status().isOk()).andReturn();
         String token = (String) checkoutPage.getModelAndView().getModel().get("checkoutToken");
-        mvc.perform(post("/checkout").session(session).param("checkoutToken", token)
+        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token)
                         .param("userId", other.getId().toString()).param("totalAmount", "0.01"))
                 .andExpect(redirectedUrl("/checkout/success?key=" + token));
         Order order = orders.findByCheckoutTokenAndUser_Id(token, customer.getId()).orElseThrow();
@@ -413,17 +442,17 @@ class BIntegratedFlowTest {
         String token = checkout.prepare(session);
         product.setActive(false);
         products.saveAndFlush(product);
-        mvc.perform(post("/checkout").session(session).param("checkoutToken", token))
+        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
                 .andExpect(status().isOk()).andExpect(view().name("orders/checkout"));
         assertThat(orders.count()).isZero();
         assertThat(cart.countItems(session)).isEqualTo(1);
         product.setActive(true);
         products.saveAndFlush(product);
         String retryToken = checkout.prepare(session);
-        mvc.perform(post("/checkout").session(session).param("checkoutToken", retryToken))
+        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", retryToken))
                 .andExpect(status().is3xxRedirection());
         cart.addItem(session, product.getId(), 2);
-        mvc.perform(post("/checkout").session(session).param("checkoutToken", retryToken))
+        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", retryToken))
                 .andExpect(status().is3xxRedirection());
         assertThat(orders.count()).isEqualTo(1);
         assertThat(cart.readForCheckout(session)).containsEntry(product.getId(), 2);

@@ -14,9 +14,9 @@
         if (!form.checkValidity()) { return; }
         submitting = true;
         button.disabled = true;
-        button.textContent = 'Placing order…';
+        button.textContent = form.dataset.placing || 'Placing order…';
         form.setAttribute('aria-busy', 'true');
-        status.textContent = 'Please wait while your order is saved.';
+        status.textContent = form.dataset.wait || 'Please wait while your order is saved.';
     });
 
     // 浏览器返回上一页或网络失败后返回时，恢复提交按钮，允许安全重试同一请求标识。

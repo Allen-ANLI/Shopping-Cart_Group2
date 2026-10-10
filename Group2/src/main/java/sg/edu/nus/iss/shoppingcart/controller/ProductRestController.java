@@ -30,8 +30,10 @@ public class ProductRestController {
     }
 
     @GetMapping(params = "!page")
-    public List<Product> findAllProducts() {
-        return productService.findAllProducts();
+    public List<Product> findAllProducts(@RequestParam(required = false) String category,
+                                         @RequestParam(required = false) String q,
+                                         @RequestParam(required = false) String sort) {
+        return productService.findAllProducts(category, q, sort);
     }
 
     @GetMapping(params = "page")
@@ -40,10 +42,13 @@ public class ProductRestController {
             @Min(0) int page,
 
             @RequestParam(name = "size", defaultValue = "6")
-            @Min(1) @Max(100) int size) {
+            @Min(1) @Max(100) int size,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String sort) {
 
         Page<Product> result =
-                productService.findProductPage(page, size);
+                productService.findProductPage(page, size, category, q, sort);
 
         return new ProductPageResponse(result);
     }

@@ -80,7 +80,7 @@ public class CartController {
                     throw new BusinessException("Enter a valid product ID and a whole-number quantity from 0 to 99");
                 }
                 action.run();
-                flash.addFlashAttribute("successMessage", success);
+                flash.addFlashAttribute("successMessage", sg.edu.nus.iss.shoppingcart.service.UiText.localize(success));
             } catch (BusinessException ex) {
                 flash.addFlashAttribute("errorMessage", ex.getUserMessage());
             }

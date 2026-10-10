@@ -8,11 +8,11 @@ import jakarta.validation.constraints.Size;
  * @author luopeiwen (B integration)
  */
 public class LoginForm {
-    @NotBlank(message = "Username is required")
-    @Size(max = 50, message = "Username must not exceed 50 characters")
+    @NotBlank(message = "{auth.username.required}")
+    @Size(max = 50, message = "{auth.username.max}")
     private String username;
-    @NotBlank(message = "Password is required")
-    @Size(max = 72, message = "Password must not exceed 72 characters")
+    @NotBlank(message = "{auth.password.required}")
+    @Size(max = 72, message = "{auth.password.max}")
     private String password;
 
     public String getUsername() { return username; }

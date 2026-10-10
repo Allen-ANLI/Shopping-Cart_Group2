@@ -9,7 +9,10 @@ import java.util.List;
  * @author 邱弈杰
  */
 public record CheckoutReceipt(Long id, LocalDateTime createdAt, BigDecimal totalAmount,
-                              List<Line> items) {
+                              List<Line> items, sg.edu.nus.iss.shoppingcart.entity.ShippingSnapshot shipping) {
+    public CheckoutReceipt(Long id, LocalDateTime createdAt, BigDecimal totalAmount, List<Line> items) {
+        this(id, createdAt, totalAmount, items, null);
+    }
     /**
      * 订单商品的成交名称、单价、数量与小计。
      * @author 邱弈杰

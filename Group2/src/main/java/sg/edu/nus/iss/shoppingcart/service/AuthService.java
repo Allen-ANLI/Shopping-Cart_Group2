@@ -1,6 +1,8 @@
 package sg.edu.nus.iss.shoppingcart.service;
 
 import jakarta.validation.Validator;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +25,14 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final Validator validator;
+    private final MessageSource messages;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                       Validator validator) {
+                       Validator validator, MessageSource messages) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.validator = validator;
+        this.messages = messages;
     }
 
     @Transactional(readOnly = true)
@@ -58,11 +62,14 @@ public class AuthService {
         validate(form);
         String username = form.getUsername().toLowerCase(Locale.ROOT);
         if (userRepository.existsByUsernameIgnoreCase(username)) {
-            throw new BusinessException("This username is already taken.");
+            throw new BusinessException(message("auth.username.duplicate"));
         }
         User user = new User(username, passwordEncoder.encode(form.getPassword()),
                 form.getDisplayName(), form.getEmail());
         user.setRole(User.Role.CUSTOMER); // 服务器固定，绝不从表单读取角色。
+        user.setFullName(form.getFullName());
+        user.setPhone(form.getPhone());
+        user.setBirthday(form.getBirthday());
         return userRepository.saveAndFlush(user);
     }
 
@@ -70,17 +77,24 @@ public class AuthService {
     public void updateProfile(Long currentUserId, ProfileForm form) {
         validate(form);
         User user = findById(currentUserId)
-                .orElseThrow(() -> new BusinessException("The account is no longer available."));
+                .orElseThrow(() -> new BusinessException(message("account.unavailable")));
         user.setDisplayName(form.getDisplayName());
         user.setEmail(form.getEmail());
+        user.setFullName(form.getFullName());
+        user.setPhone(form.getPhone());
+        user.setBirthday(form.getBirthday());
         userRepository.saveAndFlush(user);
     }
 
     private <T> void validate(T form) {
-        if (form == null) { throw new BusinessException("Please provide valid account details."); }
+        if (form == null) { throw new BusinessException(message("account.details.invalid")); }
         var violations = validator.validate(form);
         if (!violations.isEmpty()) {
             throw new BusinessException(violations.iterator().next().getMessage());
         }
+    }
+
+    private String message(String key) {
+        return messages.getMessage(key, null, LocaleContextHolder.getLocale());
     }
 }

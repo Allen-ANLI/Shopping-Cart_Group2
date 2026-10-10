@@ -112,6 +112,9 @@ public class LoginInterceptor implements HandlerInterceptor {
             boolean allowed = path.equals("/cart") || path.equals("/cart/products")
                     || path.equals("/checkout") || path.equals("/checkout/success")
                     || path.equals("/account") || path.equals("/orders")
+                    || path.equals("/products") || path.equals("/products/")
+                    || path.equals("/account/addresses") || path.equals("/account/addresses/new")
+                    || path.matches("/account/addresses/[0-9]+/edit")
                     || path.matches("/orders/[0-9]+")
                     || path.equals("/admin") || path.startsWith("/admin/");
             return allowed ? candidate : null;

@@ -3,6 +3,7 @@ package sg.edu.nus.iss.shoppingcart.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import sg.edu.nus.iss.shoppingcart.entity.Product;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.Optional;
  * @author 王重一
  */
 public interface ProductRepository
-        extends JpaRepository<Product, Long> {
+        extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
     List<Product> findByActiveTrue();
 

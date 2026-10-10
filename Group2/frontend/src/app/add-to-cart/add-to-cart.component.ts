@@ -1,78 +1,33 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, Input, OnChanges, OnDestroy, OnInit, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, inject, Input, OnDestroy, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { CartService } from '../services/cart.service';
+import { LanguageService } from '../services/language.service';
+import { IconComponent } from '../icon/icon.component';
 
-interface CartFormState {
-  cartFormToken: string;
-  itemCount: number;
-  totalQuantity: number;
-}
-
-/**
- * 读取当前会话的购物车表单令牌，使用普通 POST 表单加入商品。
- * @author Letian Xie
- */
-@Component({
-  selector: 'app-add-to-cart',
-  templateUrl: './add-to-cart.component.html',
-  styleUrl: './add-to-cart.component.css',
-})
-export class AddToCartComponent implements OnChanges, OnInit, OnDestroy {
+@Component({ selector: 'app-add-to-cart', imports: [IconComponent], templateUrl: './add-to-cart.component.html', styleUrl: './add-to-cart.component.css' })
+export class AddToCartComponent implements OnDestroy {
   @Input({ required: true }) productId!: number;
-  private readonly http = inject(HttpClient);
+  @Input() compact = false;
+  readonly lang = inject(LanguageService);
+  private readonly cart = inject(CartService);
   private pending?: Subscription;
-  readonly loading = signal(true);
-  readonly loginRequired = signal(false);
-  readonly error = signal('');
-  readonly cartFormToken = signal<string | null>(null);
   readonly submitting = signal(false);
-
-  private readonly restoredPage = (event: PageTransitionEvent) => {
-    if (event.persisted) this.refresh();
-  };
-
-  get quantityId() { return `cart-quantity-${this.productId}`; }
-  get loginUrl() { return `/cart/products?productId=${encodeURIComponent(String(this.productId))}`; }
-
-  ngOnChanges() { this.refresh(); }
-  ngOnInit() { window.addEventListener('pageshow', this.restoredPage); }
-
-  refresh() {
-    this.pending?.unsubscribe();
-    this.loading.set(true);
-    this.loginRequired.set(false);
-    this.error.set('');
-    this.cartFormToken.set(null);
-    this.submitting.set(false);
-    this.pending = this.http.get<CartFormState>('/api/cart/form').subscribe({
-      next: (state) => {
-        if (state && typeof state.cartFormToken === 'string' && state.cartFormToken.trim()) {
-          this.cartFormToken.set(state.cartFormToken);
-        } else {
-          this.error.set('Unable to prepare your cart. Please try again.');
-        }
-        this.loading.set(false);
-      },
+  readonly added = signal(false);
+  readonly error = signal<'login' | 'failed' | 'limit' | null>(null);
+  quantity = 1;
+  get loginUrl(): string { return '/login?returnTo=' + encodeURIComponent(window.location.pathname + window.location.search); }
+  submit(event?: Event): void {
+    event?.preventDefault();
+    if (this.submitting() || !Number.isInteger(this.quantity) || this.quantity < 1 || this.quantity > 99) return;
+    this.submitting.set(true); this.error.set(null); this.added.set(false);
+    this.pending = this.cart.add(this.productId, this.compact ? 1 : this.quantity).subscribe({
+      next: () => { this.submitting.set(false); this.added.set(true); },
       error: (error: HttpErrorResponse) => {
-        this.loginRequired.set(error.status === 401);
-        if (error.status !== 401) this.error.set('Unable to prepare your cart. Please try again.');
-        this.loading.set(false);
+        this.submitting.set(false);
+        this.error.set(error.status === 401 ? 'login' : error.status === 400 ? 'limit' : 'failed');
       },
     });
   }
-
-  submit(event: Event) {
-    const form = event.currentTarget as HTMLFormElement;
-    if (this.submitting() || !this.cartFormToken() || !form.checkValidity()) {
-      event.preventDefault();
-      return;
-    }
-    // 让浏览器提交原生表单并导航；购物车接口返回 HTML 重定向。
-    this.submitting.set(true);
-  }
-
-  ngOnDestroy() {
-    this.pending?.unsubscribe();
-    window.removeEventListener('pageshow', this.restoredPage);
-  }
+  ngOnDestroy(): void { this.pending?.unsubscribe(); }
 }
