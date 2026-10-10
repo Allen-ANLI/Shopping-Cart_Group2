@@ -32,7 +32,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public List<Product> findAllProducts() {
-        return productRepository.findByActiveTrue();
+        return findAllProducts(null, null, "featured");
     }
 
     @Transactional(readOnly = true)
@@ -41,7 +41,7 @@ public class ProductService {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return productRepository.findByActiveTrue(pageable);
+        return productRepository.findAll(filters(null, null), pageable);
     }
 
     @Transactional(readOnly = true)
@@ -52,6 +52,14 @@ public class ProductService {
     @Transactional(readOnly = true)
     public List<Product> findAllProducts(String category, String query, String order) {
         return productRepository.findAll(filters(category, query), sort(order));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Product> dailyDeals() {
+        Specification<Product> promoted = (root, query, builder) -> builder.and(
+                builder.greaterThan(root.get("discountPercent"), 0), builder.greaterThan(root.get("stockQuantity"), 0));
+        return productRepository.findAll(filters(null, null).and(promoted),
+                Sort.by("discountPercent").descending().and(Sort.by("salesCount").descending()).and(Sort.by("id")));
     }
 
     @Transactional(readOnly = true)
@@ -68,6 +76,8 @@ public class ProductService {
         return (root, criteria, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(builder.isTrue(root.get("active")));
+            predicates.add(builder.or(builder.isFalse(root.get("hideWhenOutOfStock")),
+                    builder.greaterThan(root.get("stockQuantity"), 0)));
             if (category != null && !category.isBlank()) {
                 predicates.add(builder.equal(builder.coalesce(root.<String>get("category"), "workspace"), category));
             }
@@ -89,10 +99,10 @@ public class ProductService {
         String selected = order == null || order.isBlank() ? "featured" : order;
         return switch (selected) {
             case "featured" -> Sort.by("id").ascending();
-            case "price-asc" -> Sort.by("price").ascending().and(Sort.by("id"));
-            case "price-desc" -> Sort.by("price").descending().and(Sort.by("id"));
-            case "name" -> Sort.by("name").ascending().and(Sort.by("id"));
-            case "newest" -> Sort.by("id").descending();
+            case "price-asc" -> Sort.by("effectivePriceValue").ascending().and(Sort.by("id"));
+            case "price-desc" -> Sort.by("effectivePriceValue").descending().and(Sort.by("id"));
+            case "sales" -> Sort.by("salesCount").descending().and(Sort.by("id"));
+            case "rating" -> Sort.by("averageRating").descending().and(Sort.by("totalReviews").descending()).and(Sort.by("id"));
             default -> throw new IllegalArgumentException("Unknown product sort order");
         };
     }
@@ -101,6 +111,11 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Optional<Product> findProductById(Long id) {
-        return productRepository.findByIdAndActiveTrue(id);
+        return productRepository.findByIdAndActiveTrue(id).filter(Product::isVisible);
+    }
+
+    @Transactional
+    public Optional<Product> findForCheckout(Long id) {
+        return productRepository.findForUpdate(id).filter(Product::isActive);
     }
 }

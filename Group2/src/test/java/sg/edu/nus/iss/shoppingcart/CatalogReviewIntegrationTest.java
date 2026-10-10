@@ -35,6 +35,8 @@ class CatalogReviewIntegrationTest extends ModuleETestBase {
     @Autowired CartService cart;
     @Autowired AdminProductService admin;
     @Autowired EntityManager entityManager;
+    @Autowired sg.edu.nus.iss.shoppingcart.repository.OrderRepository orders;
+    @Autowired sg.edu.nus.iss.shoppingcart.repository.OrderItemRepository orderItems;
 
     @Test void filtersSearchesAndSortsOnlyActiveProductsAndRetainsBilingualMetadata() throws Exception {
         String marker = UUID.randomUUID().toString().substring(0, 8);
@@ -58,7 +60,7 @@ class CatalogReviewIntegrationTest extends ModuleETestBase {
         mvc.perform(get("/api/products").param("q", marker).param("category", "audio"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
         mvc.perform(get("/api/categories")).andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].slug", contains("computing", "typing", "workspace", "audio")))
+                .andExpect(jsonPath("$[*].slug", contains("computing", "typing", "workspace", "audio", "displays", "storage", "charging", "networking", "printing", "mobile")))
                 .andExpect(jsonPath("$[0].nameZh").value("电脑与配件"));
     }
 
@@ -88,6 +90,11 @@ class CatalogReviewIntegrationTest extends ModuleETestBase {
         User user = user("Reviewer");
         User other = user("Other user");
         Product product = product("Review target", "audio", "10.00", true);
+        var order = new sg.edu.nus.iss.shoppingcart.entity.Order(user, product.getPrice(), UUID.randomUUID().toString());
+        order.recordPayment("VISA", "test-payment");
+        order.confirmReceipt();
+        orders.saveAndFlush(order);
+        orderItems.saveAndFlush(new sg.edu.nus.iss.shoppingcart.entity.OrderItem(order, product, 1));
         MockHttpSession session = session(user);
         String token = cart.formToken(session);
         mvc.perform(post("/api/products/{id}/reviews", product.getId()).session(session)
@@ -116,7 +123,7 @@ class CatalogReviewIntegrationTest extends ModuleETestBase {
         assertThatThrownBy(() -> admin.deleteIfUnreferenced(product.getId())).isInstanceOf(BusinessException.class);
     }
 
-    @Test void rejectsExpiredTokenInvalidRatingsWhitespaceAndHiddenProducts() throws Exception {
+    @Test void rejectsExpiredTokenInvalidRatingsWhitespaceAndNonbuyers() throws Exception {
         User user = user("Valid user");
         MockHttpSession session = session(user);
         String token = cart.formToken(session);
@@ -136,7 +143,7 @@ class CatalogReviewIntegrationTest extends ModuleETestBase {
         product.setActive(false); products.saveAndFlush(product);
         mvc.perform(post("/api/products/{id}/reviews", product.getId()).session(session)
                         .contentType(MediaType.APPLICATION_JSON).content(body(5, "Normal comment", token)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isForbidden());
         assertThat(reviews.findByProductIdOrderByCreatedAtDescIdDesc(product.getId())).isEmpty();
     }
 

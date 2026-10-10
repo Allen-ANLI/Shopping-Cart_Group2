@@ -46,12 +46,12 @@ class DataInitializerTests {
         initializer = new DataInitializer(products, users, passwords, versions);
     }
 
-    @Test void initializesFortyDistinctBilingualProductsTenPerCategory() {
+    @Test void initializesSixtySixDistinctBilingualProductsAcrossTenDigitalOfficeCategories() {
         initializer.run();
-        assertEquals(40, saved.size());
+        assertEquals(66, saved.size());
         assertEquals("Keyboard", saved.get(0).getName());
         assertEquals("Mouse", saved.get(1).getName());
-        assertEquals(Map.of("computing", 10L, "typing", 10L, "workspace", 10L, "audio", 10L),
+        assertEquals(Map.of("computing", 7L, "typing", 10L, "workspace", 10L, "audio", 10L, "displays", 6L, "storage", 7L, "charging", 4L, "networking", 4L, "printing", 4L, "mobile", 4L),
                 saved.stream().collect(Collectors.groupingBy(Product::getCategory, Collectors.counting())));
         Set<String> names = new HashSet<>();
         for (Product product : saved) {
@@ -81,7 +81,7 @@ class DataInitializerTests {
         existing.setActive(false);
         saved.add(existing);
         initializer.run();
-        assertEquals(40, saved.size());
+        assertEquals(66, saved.size());
         assertEquals("Keyboard", existing.getName());
         assertEquals("Administrator edited description", existing.getDescription());
         assertEquals(new BigDecimal("17.25"), existing.getPrice());
@@ -100,7 +100,7 @@ class DataInitializerTests {
         custom.setName("My own item"); custom.setPrice(new BigDecimal("6.00"));
         saved.add(custom);
         initializer.run();
-        assertEquals(41, saved.size());
+        assertEquals(67, saved.size());
         assertSame(custom, saved.get(0));
     }
 
@@ -110,13 +110,27 @@ class DataInitializerTests {
         saved.get(0).setActive(false);
         saved.get(0).setName("Edited mouse");
         initializer.run();
-        assertEquals(39, saved.size());
+        assertEquals(65, saved.size());
         assertFalse(saved.get(0).isActive());
         assertEquals("Edited mouse", saved.get(0).getName());
         verify(products, times(1)).saveAll(any());
         saved.clear();
         initializer.run();
         assertTrue(saved.isEmpty(), "A completed migration must not repopulate even an empty catalogue");
+    }
+
+    @Test void versionUpgradeAddsNewRangesWithoutRestoringAnAdministratorsDeletedLegacyProducts() {
+        applied.add("catalog-40-bilingual-v1");
+        Product customMouse = CatalogSeedProducts.all().get(1);
+        customMouse.setDiscountPercent(7);
+        customMouse.setActive(false);
+        saved.add(customMouse);
+        initializer.run();
+        assertEquals(27, saved.size()); // One retained old item plus the 26 newly introduced products.
+        assertFalse(saved.stream().anyMatch(p -> p.getName().equals("Keyboard")));
+        assertEquals(7, customMouse.getDiscountPercent());
+        assertFalse(customMouse.isActive());
+        assertEquals(26, saved.stream().filter(p -> !p.getName().equals("Mouse")).count());
     }
 
     @Test void existingDemoUsersAndPasswordsRemainUntouched() {

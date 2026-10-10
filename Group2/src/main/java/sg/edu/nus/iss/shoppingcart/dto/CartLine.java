@@ -13,6 +13,9 @@ public final class CartLine {
     private final int quantity;
     private final String productName;
     private final BigDecimal unitPrice;
+    private final BigDecimal originalUnitPrice;
+    public BigDecimal getOriginalUnitPrice() { return originalUnitPrice; }
+    public BigDecimal getOriginalSubtotal() { return originalUnitPrice.multiply(BigDecimal.valueOf(quantity)); }
     private final String problem;
 
     public CartLine(Long productId, int quantity, Product product) {
@@ -21,9 +24,11 @@ public final class CartLine {
         boolean chinese = org.springframework.context.i18n.LocaleContextHolder.getLocale().getLanguage().equals("zh");
         this.productName = product == null ? (chinese ? "失效商品 #" : "Unavailable product #") + productId
                 : chinese && product.getNameZh() != null && !product.getNameZh().isBlank() ? product.getNameZh() : product.getName();
-        this.unitPrice = product == null ? BigDecimal.ZERO : product.getPrice();
+        this.originalUnitPrice = product == null ? BigDecimal.ZERO : product.getPrice();
+        this.unitPrice = product == null ? BigDecimal.ZERO : product.getEffectivePrice();
         this.problem = product == null ? "This product has been removed. Please remove it from your cart."
                 : !product.isActive() ? "This product is no longer for sale. Please remove it."
+                : quantity > product.getStockQuantity() ? "Not enough stock. Please reduce the quantity."
                     : null;
     }
 

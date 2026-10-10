@@ -1,0 +1,9 @@
+<!DOCTYPE html><html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{orderReview.write})}"></head><body><header th:replace="~{fragments :: navbar}"></header>
+<main class="container review-page" id="main-content"><p class="back-link"><a th:href="@{/orders/{id}(id=${order.id})}" th:text="#{checkout.viewOrder}"></a></p>
+<div class="card"><h1 th:text="#{orderReview.write}"></h1><h2 th:text="${item.productName}"></h2><p class="muted" th:text="#{orderReview.hint}"></p><div th:replace="~{fragments :: alerts}"></div>
+<form th:action="@{/orders/{id}/reviews/{pid}(id=${order.id},pid=${item.productId})}" method="post" novalidate>
+<input type="hidden" name="cartFormToken" th:value="${cartFormToken}"><fieldset class="rating-picker"><legend th:text="#{orderReview.rating}"></legend><div class="rating-stars" th:attr="data-rating=${reviewDraftRating}">
+<label th:each="n : ${#numbers.sequence(1,5)}" th:attr="data-star=${n}"><input type="radio" name="rating" th:value="${n}" th:checked="${reviewDraftRating == n}" required th:attr="aria-label=#{orderReview.stars(${n})}"><span aria-hidden="true">★</span></label></div><p class="form-hint" data-rating-hint th:text="#{orderReview.choose}"></p></fieldset>
+<label for="reviewComment" th:text="#{orderReview.comment}"></label><textarea id="reviewComment" name="comment" rows="6" minlength="5" maxlength="1000" required th:placeholder="#{orderReview.placeholder}" th:text="${reviewDraftComment}"></textarea>
+<button class="btn btn-lg" type="submit" th:text="#{orderReview.submit}"></button></form></div></main><footer th:replace="~{fragments :: footer}"></footer><script th:src="@{/store/payment-orders.js}" defer></script></body></html>

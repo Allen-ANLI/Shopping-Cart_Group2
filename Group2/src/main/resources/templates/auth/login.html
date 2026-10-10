@@ -14,25 +14,33 @@
     <section class="card">
         <h2 th:text="#{auth.login.title}">Log in</h2>
         <div th:replace="~{auth/fragments :: alerts}"></div>
-        <form th:action="@{/login}" th:object="${loginForm}" method="post">
+        <form th:action="@{/login}" th:object="${loginForm}" method="post" novalidate data-localized-form data-login-form>
             <div class="alert error" role="alert" th:if="${#fields.hasAnyErrors()}">
                 <p th:each="message : ${#fields.allErrors()}" th:text="${message}"></p>
             </div>
-            <label for="username" th:text="#{auth.username}">Username</label>
-            <input id="username" type="text" th:field="*{username}" maxlength="50"
-                   autocomplete="username" required>
+            <fieldset class="login-methods">
+                <legend th:text="#{auth.login.method}">Sign in with</legend>
+                <div class="login-method-options">
+                    <label><input type="radio" th:field="*{loginMethod}" value="username"><span th:text="#{auth.username}">Username</span></label>
+                    <label><input type="radio" th:field="*{loginMethod}" value="email"><span th:text="#{account.email}">Email</span></label>
+                    <label><input type="radio" th:field="*{loginMethod}" value="phone"><span th:text="#{auth.login.phone}">Phone</span></label>
+                </div>
+            </fieldset>
+            <label for="username" data-identifier-label
+                   th:text="${loginForm.loginMethod == 'email'} ? #{account.email} : (${loginForm.loginMethod == 'phone'} ? #{account.phone} : #{auth.username})"
+                   th:attr="data-username=#{auth.username},data-email=#{account.email},data-phone=#{account.phone}">Username</label>
+            <input id="username" th:type="${loginForm.loginMethod == 'email'} ? 'email' : (${loginForm.loginMethod == 'phone'} ? 'tel' : 'text')"
+                   th:field="*{username}" maxlength="255" autocomplete="username" required
+                   th:attr="data-required-message=#{auth.identifier.required},data-invalid-message=#{auth.identifier.invalid}"
+                   aria-describedby="login-identifier-hint">
+            <p id="login-identifier-hint" class="hint" th:text="#{auth.login.contactHint}">Use the username, email or phone number saved to your account.</p>
             <label for="password" th:text="#{auth.password}">Password</label>
             <!-- Never echo a password through th:field/value after a failed request. -->
-            <input id="password" name="password" type="password" maxlength="72"
-                   autocomplete="current-password" required>
+            <div class="password-input"><input id="password" name="password" type="password" maxlength="72"
+                   autocomplete="current-password" required th:attr="data-required-message=#{auth.password.required}"><button type="button" class="password-eye" data-password-target="password" aria-pressed="false" th:attr="aria-label=#{auth.password.show},data-show=#{auth.password.show},data-hide=#{auth.password.hide}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m3 3 18 18"/></svg></button></div>
             <button class="btn primary full" type="submit" th:text="#{auth.login.title}">Log in</button>
         </form>
         <p class="small muted"><span th:text="#{auth.login.new}">New here?</span> <a th:href="@{/register}" th:text="#{auth.register.title}">Create an account</a></p>
-        <aside th:if="${showDemoAccounts}" class="demo small">
-            <strong th:text="#{auth.login.demo}">Isolated demo accounts</strong>
-            <p>alice / demo123 · bob / demo123</p>
-            <p>admin / admin123</p>
-        </aside>
     </section>
 </main>
 <footer th:replace="~{auth/fragments :: footer}"></footer>

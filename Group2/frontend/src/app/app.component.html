@@ -3,7 +3,7 @@
  @author 王重一
 -->
 <app-store-layout>
-  @if (productId !== null) {
+  @if (dailyDeals) { <app-daily-deals /> } @else if (productId !== null) {
     <app-product-detail [productId]="productId" />
   } @else {
     <app-product-list />

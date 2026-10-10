@@ -17,8 +17,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
+@org.springframework.core.annotation.Order(10)
 public class DataInitializer implements CommandLineRunner {
-    public static final String CATALOG_VERSION = "catalog-40-bilingual-v1";
+    public static final String CATALOG_VERSION = "catalog-66-digital-office-v2";
     private final ProductRepository products;
     private final UserRepository users;
     private final PasswordEncoder passwords;
@@ -35,10 +36,25 @@ public class DataInitializer implements CommandLineRunner {
             Map<String, Product> existing = products.findAll().stream().collect(Collectors.toMap(
                     Product::getName, Function.identity(), (first, second) -> first));
             List<Product> added = new ArrayList<>();
+            boolean upgradingExistingCatalog = versions.existsById("catalog-40-bilingual-v1");
+            var originalNames = CatalogSeedProducts.all().stream().limit(40).map(Product::getName).collect(Collectors.toSet());
             for (Product seed : CatalogSeedProducts.all()) {
                 Product original = existing.get(seed.getName());
-                if (original == null) added.add(seed);
-                else original.fillMissingCatalogMetadata(seed);
+                if (original == null) {
+                    if (!upgradingExistingCatalog || !originalNames.contains(seed.getName())) added.add(seed);
+                }
+                else {
+                    original.fillMissingCatalogMetadata(seed);
+                    // Split the previous broad computing category while preserving custom admin categories.
+                    if ("computing".equals(original.getCategory()) &&
+                            ("displays".equals(seed.getCategory()) || "storage".equals(seed.getCategory()))) {
+                        original.setCategory(seed.getCategory());
+                    }
+                    // Do not overwrite administrator-edited prices or existing promotions during migration.
+                    if (original.getDiscountPercent() == 0 && original.getPrice().compareTo(seed.getPrice()) == 0) {
+                        original.setDiscountPercent(seed.getDiscountPercent());
+                    }
+                }
             }
             products.saveAll(added);
             // Same transaction: later startups never replenish removed or hidden products.

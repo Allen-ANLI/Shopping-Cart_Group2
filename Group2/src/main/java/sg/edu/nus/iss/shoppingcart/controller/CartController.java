@@ -32,6 +32,7 @@ public class CartController {
     public String viewCart(HttpSession session, Model model) {
         List<CartLine> items = cartService.getCartItems(session);
         model.addAttribute("cartItems", items);
+        model.addAttribute("pricing", sg.edu.nus.iss.shoppingcart.dto.OrderPricing.calculate(items.stream().map(CartLine::getOriginalSubtotal).reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add), cartService.calculateTotal(items)));
         model.addAttribute("cartTotal", cartService.calculateTotal(items));
         model.addAttribute("totalQuantity", cartService.countTotalQuantity(items));
         model.addAttribute("canCheckout", cartService.canCheckout(items));

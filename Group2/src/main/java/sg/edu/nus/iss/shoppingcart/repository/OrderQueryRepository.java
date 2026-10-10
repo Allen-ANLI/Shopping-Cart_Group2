@@ -49,7 +49,7 @@ public interface OrderQueryRepository extends JpaRepository<Order, Long> {
      */
     @Query(value = "SELECT new sg.edu.nus.iss.shoppingcart.dto.OrderSummaryDto("
             + "o.id, o.createdAt, o.totalAmount, "
-            + "(SELECT COALESCE(SUM(i.quantity), 0) FROM OrderItem i WHERE i.order.id = o.id)) "
+            + "(SELECT COALESCE(SUM(i.quantity), 0) FROM OrderItem i WHERE i.order.id = o.id), o.shipmentDeliveredAt, o.receiptConfirmedAt, o.paymentStatus) "
             + "FROM Order o "
             + "WHERE o.user.id = :userId "
             + "ORDER BY o.createdAt DESC, o.id DESC",
@@ -91,6 +91,6 @@ public interface OrderQueryRepository extends JpaRepository<Order, Long> {
      * @return 累计金额；没有订单时返回 0
      */
     @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o "
-            + "WHERE o.user.id = :userId")
+            + "WHERE o.user.id = :userId AND (o.paymentStatus = 'PAID' OR o.paymentStatus IS NULL)")
     java.math.BigDecimal sumTotalAmountByUserId(@Param("userId") Long userId);
 }

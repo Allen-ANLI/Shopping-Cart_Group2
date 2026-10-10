@@ -20,7 +20,8 @@ public class RegisterForm {
     @Pattern(regexp = "[A-Za-z0-9]+", message = "{auth.username.invalid}")
     private String username;
     @NotBlank(message = "{auth.password.required}")
-    @Size(min = 6, max = 50, message = "{auth.password.length}")
+    @Size(min = 8, max = 50, message = "{auth.password.length}")
+    @Pattern(regexp = "(?s)(?=.*[A-Z])(?=.*[a-z])(?=.*[\\p{P}\\p{S}]).+", message = "{auth.password.strength}")
     private String password;
     @NotBlank(message = "{auth.password.confirm.required}")
     @Size(max = 50, message = "{auth.password.confirm.length}")
@@ -33,11 +34,8 @@ public class RegisterForm {
     @Size(max = 255, message = "{account.email.length}")
     private String email;
 
-    @NotBlank(message = "{account.fullName.required}")
-    @Size(max = 120, message = "{account.fullName.length}")
-    private String fullName;
     @NotBlank(message = "{account.phone.required}")
-    @Pattern(regexp = "[+0-9][0-9 ()-]{5,29}", message = "{account.phone.invalid}")
+    @Pattern(regexp = "(?=(?:[^0-9]*[0-9]){6,15}[^0-9]*$)[+0-9][0-9 ()-]{5,29}", message = "{account.phone.invalid}")
     private String phone;
     @Past(message = "{account.birthday.invalid}")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -63,8 +61,6 @@ public class RegisterForm {
     public void setDisplayName(String value) { displayName = value == null ? null : value.trim(); }
     public String getEmail() { return email; }
     public void setEmail(String value) { email = value == null ? null : value.trim(); }
-    public String getFullName() { return fullName; }
-    public void setFullName(String value) { fullName = value == null ? null : value.trim(); }
     public String getPhone() { return phone; }
     public void setPhone(String value) { phone = value == null ? null : value.trim(); }
     public LocalDate getBirthday() { return birthday; }

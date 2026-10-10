@@ -99,7 +99,8 @@ public class PurchaseHistoryService {
                 .toList();
 
         return new OrderDetailDto(order.getId(), order.getCreatedAt(),
-                order.getTotalAmount(), lines, order.getShipping());
+                order.getTotalAmount(), lines, order.getShipping()).withPayment(sg.edu.nus.iss.shoppingcart.dto.PaymentDetails.from(order))
+                .withShipment(order.getShipmentDeliveredAt(), order.getReceiptConfirmedAt()).withPricing(order);
     }
 
     /**
@@ -126,9 +127,8 @@ public class PurchaseHistoryService {
     /**
      * 把明细实体转成视图行。
      *
-     * <p>只取快照字段，不碰 {@code item.getProduct()}——
-     * 那是懒加载代理，事务关闭后访问会抛异常，
-     * 而且读了也没意义：历史订单要显示的就是成交时的值。</p>
+     * <p>名称与成交价使用快照；只读取商品代理的 ID 作为订单内评价的标识，
+     * 不依赖商品后来修改的名称或价格。</p>
      *
      * @param item 明细实体
      * @return 视图行
@@ -137,6 +137,6 @@ public class PurchaseHistoryService {
         return new OrderDetailDto.OrderItemLine(
                 item.getProductNameSnapshot(),
                 item.getUnitPrice(),
-                item.getQuantity());
+                item.getQuantity()).withProductId(item.getProduct().getId()).withOriginalPrice(item.getOriginalUnitPrice());
     }
 }

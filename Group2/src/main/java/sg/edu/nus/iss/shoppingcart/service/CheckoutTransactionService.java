@@ -28,17 +28,19 @@ public class CheckoutTransactionService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ShippingAddressService addresses;
+    private final PaymentService payments;
 
     public CheckoutTransactionService(
             ProductService productService,
             UserRepository userRepository,
             OrderRepository orderRepository,
-            OrderItemRepository orderItemRepository, ShippingAddressService addresses) {
+            OrderItemRepository orderItemRepository, ShippingAddressService addresses, PaymentService payments) {
         this.productService = productService;
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.addresses = addresses;
+        this.payments = payments;
     }
 
     @Transactional
@@ -50,6 +52,17 @@ public class CheckoutTransactionService {
     @Transactional
     public Order createOrder(Long userId, Map<Long, Integer> cart,
                              String checkoutToken, Long addressId) {
+        return createOrder(userId, cart, checkoutToken, addressId, PaymentService.Request.success());
+    }
+
+    @Transactional
+    public Order createPendingOrder(Long userId, Map<Long, Integer> cart, String checkoutToken, Long addressId) {
+        return createOrder(userId, cart, checkoutToken, addressId, null);
+    }
+
+    @Transactional
+    public Order createOrder(Long userId, Map<Long, Integer> cart, String checkoutToken, Long addressId,
+                             PaymentService.Request payment) {
         if (cart == null || cart.isEmpty()) {
             throw new IllegalArgumentException("购物车不能为空");
         }
@@ -58,28 +71,34 @@ public class CheckoutTransactionService {
                 .orElseThrow(() -> new IllegalArgumentException("用户不存在"));
 
         BigDecimal total = BigDecimal.ZERO;
+        BigDecimal original = BigDecimal.ZERO;
         Map<Product, Integer> checkedProducts = new LinkedHashMap<>();
 
-        for (Map.Entry<Long, Integer> entry : cart.entrySet()) {
+        if (cart.keySet().stream().anyMatch(java.util.Objects::isNull)) throw new IllegalArgumentException("Invalid product ID");
+        // A consistent lock order prevents overselling across sessions and reduces deadlock risk.
+        for (Map.Entry<Long, Integer> entry : new java.util.TreeMap<>(cart).entrySet()) {
             Long productId = entry.getKey();
             Integer quantity = entry.getValue();
 
             if (productId == null || productId <= 0
-                    || quantity == null || quantity <= 0) {
+                    || quantity == null || quantity <= 0 || quantity > CartService.MAX_QUANTITY) {
                 throw new IllegalArgumentException("商品 ID 和购买数量必须为正数");
             }
 
-            Product product = productService.findProductById(productId)
+            Product product = productService.findForCheckout(productId)
                     .orElseThrow(() -> new IllegalArgumentException(
                             "商品不存在或已下架，商品 ID：" + productId));
+            if (quantity > product.getStockQuantity()) throw new sg.edu.nus.iss.shoppingcart.exception.BusinessException(
+                    UiText.localize("Not enough stock. Please reduce the quantity."));
 
-            BigDecimal price = product.getPrice();
+            BigDecimal price = product.getEffectivePrice();
             if (price == null || price.signum() < 0) {
                 throw new IllegalArgumentException("商品价格不合法");
             }
 
             BigDecimal subtotal = price.multiply(BigDecimal.valueOf(quantity));
             total = total.add(subtotal);
+            original = original.add(product.getPrice().multiply(BigDecimal.valueOf(quantity)));
             checkedProducts.put(product, quantity);
         }
 
@@ -91,10 +110,19 @@ public class CheckoutTransactionService {
         var shipping = addressId == null ? null : new sg.edu.nus.iss.shoppingcart.entity.ShippingSnapshot(
                 addresses.requireForUser(addressId, userId));
         Order order = new Order(user, total, checkoutToken, shipping);
+        if (payment == null) {
+            order.awaitPayment(sg.edu.nus.iss.shoppingcart.dto.OrderPricing.calculate(original, total));
+            if (order.getTotalAmount().compareTo(new BigDecimal("999999999999.99")) > 0) throw new IllegalArgumentException("Order total is too large");
+        } else {
+            PaymentService.Receipt paymentReceipt = payments.pay(total, checkoutToken, payment);
+            order.recordPayment(paymentReceipt.method(), paymentReceipt.reference());
+            order.recordPaymentInstrument(paymentReceipt.instrument(), paymentReceipt.lastDigits(), paymentReceipt.cryptoAsset(), paymentReceipt.cryptoNetwork(), paymentReceipt.cryptoAmount());
+        }
         order = orderRepository.saveAndFlush(order);
 
         List<OrderItem> items = new ArrayList<>();
         for (Map.Entry<Product, Integer> entry : checkedProducts.entrySet()) {
+            if (payment != null) entry.getKey().setStockQuantity(entry.getKey().getStockQuantity() - entry.getValue());
             items.add(new OrderItem(order, entry.getKey(), entry.getValue()));
         }
         orderItemRepository.saveAllAndFlush(items);

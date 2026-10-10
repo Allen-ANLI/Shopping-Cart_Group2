@@ -104,8 +104,10 @@ class BExistingSchemaTest {
         var product = products.findAll().get(0);
         cart.addItem(session, product.getId(), 1);
         String token = checkout.prepare(session);
-        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
-                .andExpect(redirectedUrl("/checkout/success?key=" + token));
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
+                .andExpect(redirectedUrlPattern("/orders/*/payment"));
         assertThat(orders.findByCheckoutTokenAndUser_Id(token, 41L)).isPresent();
         assertThat(auth.findById(41L)).isPresent();
     }

@@ -132,8 +132,11 @@ public class AdminProductController {
         form.setName(product.getName());
         form.setDescription(product.getDescription());
         form.setPrice(product.getPrice());
+        form.setDiscountPercent(product.getDiscountPercent());
         form.setImageUrl(product.getImageUrl());
         form.setActive(product.isActive());
+        form.setStockQuantity(product.getStockQuantity());
+        form.setHideWhenOutOfStock(product.isHideWhenOutOfStock());
         form.setCategory(product.getCategory());
         form.setBrand(product.getBrand());
         form.setOrigin(product.getOrigin());

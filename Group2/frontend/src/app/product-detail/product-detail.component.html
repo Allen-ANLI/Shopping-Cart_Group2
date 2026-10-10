@@ -13,11 +13,13 @@
         @else { <app-icon name="bag" /> }
       </button>
       <div class="detail-content"><a class="eyebrow" [href]="'/products?category=' + (item.category || '') + '#catalog'">{{ categoryName(item) }}</a><h1>{{ lang.name(item) }}</h1>
-        <p class="detail-brand">{{ item.brand || 'Everyday Market' }}</p>
-        <div class="detail-price"><span>SGD</span> {{ item.price.toFixed(2) }}<small>{{ lang.text('Price in Singapore dollars', '价格以新加坡元计算') }}</small></div>
-        <section class="detail-description"><h2>{{ lang.text('Made for your everyday', '为日常而设计') }}</h2><p>{{ lang.description(item) }}</p></section>
-        <dl class="product-specs"><div><dt>{{ lang.text('Brand', '品牌') }}</dt><dd>{{ item.brand || 'Everyday Market' }}</dd></div><div><dt>{{ lang.text('Ships from', '发货地') }}</dt><dd>{{ lang.origin(item) }}</dd></div><div><dt>{{ lang.text('Category', '分类') }}</dt><dd>{{ categoryName(item) }}</dd></div></dl>
-        <app-add-to-cart [productId]="item.id" />
+        <p class="detail-brand">{{ item.brand || 'NEXUS Digital' }}</p>
+        <a class="detail-rating" [href]="'/products' + locationSearch + '#reviews-heading'"><span class="rating-stars"><span aria-hidden="true">★★★★★</span><span aria-hidden="true" class="filled" [style.width.%]="(reviews()?.averageRating ?? item.averageRating ?? 0) * 20">★★★★★</span></span><strong>{{ (reviews()?.averageRating ?? item.averageRating ?? 0).toFixed(1) }} / 5</strong><span>({{ reviews()?.totalReviews ?? item.totalReviews ?? 0 }} {{ lang.text('reviews', '条评价') }})</span></a>
+        <p class="detail-sales">{{ item.salesCount || 0 }} {{ lang.text('sold', '件已售') }} · {{ item.stockQuantity ?? 99 }} {{ lang.text('in stock', '件库存') }}</p>
+        <div class="detail-price"><span>SGD</span> {{ (item.effectivePrice ?? item.price).toFixed(2) }}@if ((item.discountPercent ?? 0) > 0) { <div class="promotion-price"><del>SGD {{ item.price.toFixed(2) }}</del><span class="discount-badge">−{{ item.discountPercent }}%</span></div> }<small>{{ lang.text('Price in Singapore dollars', '价格以新加坡元计算') }}</small></div>
+        <section class="detail-description"><h2>{{ lang.text('Built for work and play', '为工作与娱乐而设计') }}</h2><p>{{ lang.description(item) }}</p></section>
+        <dl class="product-specs"><div><dt>{{ lang.text('Brand', '品牌') }}</dt><dd>{{ item.brand || 'NEXUS Digital' }}</dd></div><div><dt>{{ lang.text('Ships from', '发货地') }}</dt><dd>{{ lang.origin(item) }}</dd></div><div><dt>{{ lang.text('Category', '分类') }}</dt><dd>{{ categoryName(item) }}</dd></div></dl>
+        <app-add-to-cart [productId]="item.id" [stockQuantity]="item.stockQuantity ?? 99" />
         <p class="detail-note"><app-icon name="check" />{{ lang.text('Choose your delivery address at checkout.', '结账时选择收货地址。') }}</p>
         <a class="detail-back text-button" [href]="listUrl">{{ lang.text('Continue browsing', '继续选购') }}<app-icon name="arrow" /></a>
       </div>
@@ -29,24 +31,11 @@
       <div class="review-layout"><div class="reviews-list">
         @if (reviewsError()) { <div class="state-panel" role="alert"><p>{{ lang.text('Unable to load reviews.', '无法加载评价。') }}</p><button class="text-button" type="button" (click)="loadReviews()">{{ lang.text('Try again', '重试') }}</button></div> }
         @else if (reviews(); as summary) {
-          @for (review of summary.reviews; track review.id) { <article class="review-card"><div class="review-card-heading"><strong>{{ review.displayName }}</strong><time [attr.datetime]="review.createdAt">{{ date(review.createdAt) }}</time></div><p class="stars" [attr.aria-label]="review.rating + lang.text(' out of 5 stars', '星，满分5星')">{{ stars(review.rating) }}</p><p class="review-comment">{{ review.comment }}</p></article> }
-          @empty { <div class="review-empty"><app-icon name="heart" /><h3>{{ lang.text('Be the first to share your thoughts.', '成为第一位分享体验的用户。') }}</h3><p>{{ lang.text('Your experience helps others find their next favourite.', '你的真实体验，帮助其他人找到心仪商品。') }}</p></div> }
+          @for (review of visibleReviews(); track review.id) { <article class="review-card"><div class="review-card-heading"><strong>{{ review.displayName }}</strong><time [attr.datetime]="review.createdAt">{{ date(review.createdAt) }}</time></div><p class="stars" [attr.aria-label]="review.rating + lang.text(' out of 5 stars', '星，满分5星')">{{ stars(review.rating) }}</p><p class="review-comment">{{ review.comment }}</p></article> }
+          @empty { <div class="review-empty"><app-icon name="heart" /><h3>{{ lang.text('No reviews yet.', '暂无评价。') }}</h3><p>{{ lang.text('Customer ratings and reviews will appear here.', '用户评分和评价将显示在这里。') }}</p></div> }
         } @else { <p role="status">{{ lang.text('Loading reviews…', '正在加载评价…') }}</p> }
-      </div><aside class="review-form-panel">
-        <h3>{{ lang.text('Share your experience', '分享你的体验') }}</h3>
-        @if (reviews()?.canReview) {
-          <p class="subtle">{{ lang.text('One review per product. Submit again to update yours.', '每件商品可发表一条评价，再次提交即可更新。') }}</p>
-          <form (submit)="saveReview($event)" class="review-form">
-            <label for="review-rating">{{ lang.text('Your rating', '你的评分') }}</label><select id="review-rating" name="rating" [value]="rating" (change)="rating = +$any($event.target).value" [disabled]="savingReview()">@for (n of [5,4,3,2,1]; track n) { <option [value]="n" [selected]="n === rating">{{ n }} {{ lang.text('stars', '星') }}</option> }</select>
-            <label for="review-comment">{{ lang.text('Your review', '评价内容') }}</label><textarea id="review-comment" name="comment" rows="5" minlength="5" maxlength="1000" required [value]="comment" (input)="comment = $any($event.target).value" [disabled]="savingReview()" [placeholder]="lang.text('What did you like? How do you use it?', '说说你的使用感受，哪些地方让你满意？')" aria-describedby="review-help"></textarea>
-            <small id="review-help">{{ lang.text('5–1,000 characters', '5–1,000个字符') }} · {{ comment.length }}/1000</small>
-            <button class="button-primary" type="submit" [disabled]="savingReview() || comment.trim().length < 5">{{ savingReview() ? lang.text('Saving…', '保存中…') : lang.text('Save review', '保存评价') }}</button>
-          </form>
-        } @else if (reviews()) { <p>{{ lang.text('Log in to write a review and help other shoppers.', '登录后发表评价，与其他用户分享你的体验。') }}</p><a class="button-primary" [href]="loginUrl">{{ lang.text('Log in to review', '登录后评价') }}</a> }
-        @if (reviewStatus() === 'saved') { <p class="success" role="status">{{ lang.text('Your review has been saved.', '你的评价已保存。') }}</p> }
-        @if (reviewStatus() === 'failed') { <p class="error-message" role="alert">{{ lang.text('Could not save your review. Please try again.', '评价保存失败，请重试。') }}</p> }
-        @if (reviewStatus() === 'login') { <p role="alert"><a [href]="loginUrl">{{ lang.text('Your session expired. Please log in again.', '登录已过期，请重新登录。') }}</a></p> }
-      </aside></div>
+      </div></div>
+      @if (reviewPages() > 1) { <nav class="pagination" [attr.aria-label]="lang.text('Review pages', '评价分页')"><p>{{ lang.text('Page', '第') }} {{ reviewPage() + 1 }} / {{ reviewPages() }}</p><div><button type="button" [disabled]="reviewPage() === 0" (click)="reviewPage.set(reviewPage() - 1)">{{ lang.text('Previous', '上一页') }}</button><button type="button" [disabled]="reviewPage() + 1 >= reviewPages()" (click)="reviewPage.set(reviewPage() + 1)">{{ lang.text('Next', '下一页') }}</button></div></nav> }
     </section>
     @if (zoomed()) { <app-image-zoom [product]="item" (close)="zoomed.set(false)" /> }
   }

@@ -23,4 +23,23 @@
       if (!window.confirm(form.dataset.confirm)) event.preventDefault();
     });
   });
+  const avatar = document.querySelector('[data-nav-avatar]');
+  if (avatar) {
+    const refreshAvatar = async () => {
+      if (document.hidden) return;
+      try {
+        const response = await fetch('/api/auth/session', {credentials: 'same-origin', cache: 'no-store'});
+        if (!response.ok) return;
+        const state = await response.json();
+        if (!state.loggedIn || String(state.user.id) !== avatar.dataset.userId) return;
+        if (state.avatarUrl) {
+          const image = new Image(); image.alt = '';
+          image.onload = () => avatar.replaceChildren(image);
+          image.src = state.avatarUrl + '?v=' + Date.now();
+        } else { avatar.textContent = avatar.dataset.initial || ''; }
+      } catch { /* Keep the currently displayed identity when offline. */ }
+    };
+    document.addEventListener('visibilitychange', refreshAvatar);
+    window.addEventListener('pageshow', event => { if (event.persisted) refreshAvatar(); });
+  }
 })();

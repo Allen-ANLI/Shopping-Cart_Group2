@@ -9,7 +9,11 @@ import java.util.List;
  * @author 邱弈杰
  */
 public record CheckoutReceipt(Long id, LocalDateTime createdAt, BigDecimal totalAmount,
-                              List<Line> items, sg.edu.nus.iss.shoppingcart.entity.ShippingSnapshot shipping) {
+                              List<Line> items, sg.edu.nus.iss.shoppingcart.entity.ShippingSnapshot shipping, PaymentDetails payment) {
+    public CheckoutReceipt(Long id, LocalDateTime createdAt, BigDecimal totalAmount, List<Line> items,
+                           sg.edu.nus.iss.shoppingcart.entity.ShippingSnapshot shipping) {
+        this(id, createdAt, totalAmount, items, shipping, null);
+    }
     public CheckoutReceipt(Long id, LocalDateTime createdAt, BigDecimal totalAmount, List<Line> items) {
         this(id, createdAt, totalAmount, items, null);
     }

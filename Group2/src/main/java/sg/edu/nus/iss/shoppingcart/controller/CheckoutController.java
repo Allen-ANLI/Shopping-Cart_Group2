@@ -52,9 +52,8 @@ public class CheckoutController {
                 throw new BusinessException(org.springframework.context.i18n.LocaleContextHolder.getLocale()
                         .getLanguage().equals("zh") ? "请选择收货地址" : "Please select a delivery address");
             }
-            coordinator.submit(session, checkoutToken, addressId);
-            return "redirect:" + UriComponentsBuilder.fromPath("/checkout/success")
-                    .queryParam("key", checkoutToken).build().encode().toUriString();
+            Long orderId = coordinator.placeOrder(session, checkoutToken, addressId);
+            return "redirect:/orders/" + orderId + "/payment";
         } catch (NotAuthenticatedException ex) {
             throw ex;
         } catch (org.springframework.web.server.ResponseStatusException ex) {
@@ -76,16 +75,19 @@ public class CheckoutController {
     public String success(@RequestParam String key, HttpSession session, Model model) {
         synchronized (session) {
             Long userId = cartService.requireUserId(session);
-            coordinator.completedOrder(session, key);
-            model.addAttribute("receipt", receipts.forUser(key, userId));
+            Long id = coordinator.completedOrder(session, key);
+            return "redirect:/orders/" + id;
+
         }
-        return "orders/checkout-success";
+
     }
 
     private void populate(HttpSession session, Model model) {
         synchronized (session) {
             var items = cartService.getCartItems(session);
             model.addAttribute("cartItems", items);
+            var original = items.stream().map(sg.edu.nus.iss.shoppingcart.dto.CartLine::getOriginalSubtotal).reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+            model.addAttribute("pricing", sg.edu.nus.iss.shoppingcart.dto.OrderPricing.calculate(original, cartService.calculateTotal(items)));
             model.addAttribute("cartTotal", cartService.calculateTotal(items));
             model.addAttribute("totalQuantity", cartService.countTotalQuantity(items));
             model.addAttribute("canCheckout", cartService.canCheckout(items));

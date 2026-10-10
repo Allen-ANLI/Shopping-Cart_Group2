@@ -11,6 +11,7 @@ $javaCommand = Get-Command java -ErrorAction SilentlyContinue
 if (-not $javaCommand) { throw 'Java is missing from PATH. Install JDK 17 or newer, then reopen the terminal.' }
 $jars = @(
     (Join-Path $projectPath 'target\shopping-cart-0.0.1-SNAPSHOT.jar'),
+    (Join-Path $projectPath 'runtime\nexus-shopping-cart.jar'),
     (Join-Path $projectPath 'runtime\shopping-cart.jar')
 ) | Where-Object { Test-Path -LiteralPath $_ } | ForEach-Object { Get-Item -LiteralPath $_ }
 $jar = $jars | Sort-Object LastWriteTime -Descending | Select-Object -First 1

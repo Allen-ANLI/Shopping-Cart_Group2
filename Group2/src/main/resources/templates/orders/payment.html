@@ -1,0 +1,17 @@
+<!DOCTYPE html><html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{payment.title})}"></head><body><header th:replace="~{fragments :: navbar}"></header>
+<main class="container payment-page" id="main-content"><p class="back-link"><a th:href="@{/orders/{id}(id=${order.id})}" th:text="#{checkout.viewOrder}"></a></p>
+<ol class="checkout-steps"><li th:text="#{checkout.done}"></li><li aria-hidden="true">→</li><li class="current" th:text="#{payment.title}"></li><li aria-hidden="true">→</li><li th:text="#{payment.paid}"></li></ol>
+<div class="page-header"><div><h1 th:text="#{payment.complete}"></h1><p class="muted" th:text="#{orders.number(${order.id})}"></p></div><span class="order-status pending" th:text="#{payment.pending}"></span></div>
+<div th:replace="~{fragments :: alerts}"></div><div class="checkout-layout">
+<form class="card payment-options" th:action="@{/orders/{id}/payment(id=${order.id})}" method="post" data-payment-form novalidate>
+<input type="hidden" name="cartFormToken" th:value="${cartFormToken}">
+<h2 th:text="#{payment.cardDetails}"></h2><p class="form-hint" th:text="#{payment.entryHint}"></p>
+<label for="paymentMethod"><span th:text="#{payment.networkChoice}"></span><select id="paymentMethod" name="paymentMethod"><option value="VISA">Visa</option><option value="MASTERCARD" th:selected="${selectedPaymentMethod == 'MASTERCARD'}">Mastercard</option></select></label>
+<label for="cardholderName"><span th:text="#{payment.holder}"></span><input id="cardholderName" name="cardholderName" autocomplete="cc-name" maxlength="80" required></label>
+<label for="cardNumber"><span th:text="#{payment.number}"></span><input id="cardNumber" name="cardNumber" inputmode="numeric" autocomplete="off" placeholder="0000 0000 0000 0000" maxlength="23" required></label>
+<div class="payment-field-pair"><label for="cardExpiry"><span th:text="#{payment.expiry}"></span><input id="cardExpiry" name="cardExpiry" inputmode="numeric" autocomplete="off" placeholder="MM/YY" maxlength="5" required></label>
+<label for="cardSecurityCode"><span th:text="#{payment.security}"></span><input id="cardSecurityCode" name="cardSecurityCode" type="password" inputmode="numeric" autocomplete="off" placeholder="CVV" maxlength="3" required></label></div>
+<button class="btn btn-block btn-lg" type="submit" th:text="#{payment.payAmount(${#numbers.formatDecimal(order.totalAmount,1,2)})}"></button><p class="form-hint" role="status" data-payment-status></p></form>
+<aside><section class="card"><h2 th:text="#{checkout.total}"></h2><div th:replace="~{store/fragments :: pricing(${order.pricing})}"></div></section><section th:replace="~{store/fragments :: shipping(${order.shipping})}"></section></aside>
+</div></main><footer th:replace="~{fragments :: footer}"></footer><script th:src="@{/store/payment-orders.js}" defer></script></body></html>

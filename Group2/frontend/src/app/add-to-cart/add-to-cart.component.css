@@ -1,1 +1,8 @@
 :host { display:block; } .add-cart-form { display:flex; align-items:end; gap:12px; margin:24px 0 12px; } label { display:grid; gap:6px; font-size:12px; color:var(--muted); } input { width:80px; height:46px; border:1px solid var(--border); border-radius:8px; padding:10px; font:inherit; } .button-primary { flex:1; min-height:46px; } .cart-feedback { margin:8px 0 0; font-size:12px; color:#9d3c21; } .cart-feedback a { text-decoration:underline; text-underline-offset:3px; } .success { color:#27614d; } .quick-add { color:var(--accent); background:var(--soft-accent); border-color:transparent; } button:disabled { opacity:.55; cursor:wait; }
+
+.quantity-stepper { display:flex; align-items:center; border:1px solid #cad8c5; border-radius:8px; overflow:hidden; background:var(--soft-accent); height:36px; }
+.quantity-stepper button { width:30px; height:34px; padding:0; background:transparent; color:var(--accent); border:0; font-size:19px; }
+.quantity-stepper input { width:34px; height:34px; text-align:center; padding:0; border:0; border-inline:1px solid #dae3d5; border-radius:0; font-size:13px; appearance:textfield; -moz-appearance:textfield; }
+.quantity-stepper input::-webkit-inner-spin-button,.quantity-stepper input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+
+:host .cart-quantity-label{font-size:13px;color:var(--muted);margin:0 0 8px}:host:has(.cart-quantity-label) .quantity-stepper{width:180px;height:44px}:host:has(.cart-quantity-label) .quantity-stepper input{width:80px}

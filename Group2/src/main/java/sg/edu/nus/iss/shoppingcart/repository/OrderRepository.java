@@ -12,6 +12,11 @@ import java.util.Optional;
  */
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select o from Order o where o.id = :id and o.user.id = :userId")
+    Optional<Order> findForUserUpdate(@org.springframework.data.repository.query.Param("id") Long id,
+                                     @org.springframework.data.repository.query.Param("userId") Long userId);
+
     // 根据结账请求标识和用户 ID，查找这个用户已提交的订单。
     Optional<Order> findByCheckoutTokenAndUser_Id(
             String checkoutToken,

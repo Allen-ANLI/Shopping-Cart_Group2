@@ -22,6 +22,11 @@ public class ProductReview {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean sample;
+    public boolean isSample() { return sample; }
+    public void setSample(boolean sample) { this.sample = sample; }
+
     public Long getId() { return id; }
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }

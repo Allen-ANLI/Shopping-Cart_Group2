@@ -31,6 +31,24 @@ public class OrderDetailDto {
     /** 明细行。 */
     private final List<OrderItemLine> items;
     private sg.edu.nus.iss.shoppingcart.entity.ShippingSnapshot shipping;
+    private PaymentDetails payment;
+    private OrderPricing pricing;
+    public OrderPricing getPricing() { return pricing; }
+    public OrderDetailDto withPricing(sg.edu.nus.iss.shoppingcart.entity.Order order) {
+        pricing = new OrderPricing(order.getOriginalSubtotal(), order.getDiscountAmount(), order.getMerchandiseSubtotal(), order.getGstAmount(), order.getTotalAmount()); return this;
+    }
+    public boolean isPendingPayment() { return payment != null && "PENDING".equals(payment.status()); }
+
+    private LocalDateTime shipmentDeliveredAt;
+    private LocalDateTime receiptConfirmedAt;
+    public LocalDateTime getShipmentDeliveredAt() { return shipmentDeliveredAt; }
+    public LocalDateTime getReceiptConfirmedAt() { return receiptConfirmedAt; }
+    public boolean isReceiptConfirmed() { return receiptConfirmedAt != null; }
+    public OrderDetailDto withShipment(LocalDateTime delivered, LocalDateTime confirmed) {
+        shipmentDeliveredAt = delivered; receiptConfirmedAt = confirmed; return this;
+    }
+    public PaymentDetails getPayment() { return payment; }
+    public OrderDetailDto withPayment(PaymentDetails payment) { this.payment = payment; return this; }
 
     public OrderDetailDto(Long id, LocalDateTime createdAt, BigDecimal totalAmount, List<OrderItemLine> items,
                           sg.edu.nus.iss.shoppingcart.entity.ShippingSnapshot shipping) {
@@ -83,6 +101,13 @@ public class OrderDetailDto {
      * @author 蔡千一（Module E）
      */
     public static class OrderItemLine {
+        private BigDecimal originalUnitPrice;
+        public BigDecimal getOriginalUnitPrice() { return originalUnitPrice == null ? unitPrice : originalUnitPrice; }
+        public OrderItemLine withOriginalPrice(BigDecimal price) { originalUnitPrice=price; return this; }
+        private Long productId;
+        public Long getProductId() { return productId; }
+        public OrderItemLine withProductId(Long id) { productId = id; return this; }
+
 
         /** 成交时的商品名称快照。 */
         private final String productName;

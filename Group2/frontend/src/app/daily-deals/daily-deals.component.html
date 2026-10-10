@@ -1,0 +1,23 @@
+<main class="store-container daily-deals" id="main-content">
+  <a class="deals-back" href="/products">← {{ lang.text('Back to home', '返回首页') }}</a>
+  <header class="deals-heading"><div><span class="eyebrow">{{ lang.text('A LITTLE MORE FOR LESS', '好物有价，优惠每一天') }}</span><h1>{{ lang.text('Daily deals', '每日促销') }}</h1><p>{{ lang.text('Discover current offers for your workday and beyond.', '精选数码办公优惠，为工作与生活添一份从容。') }}</p></div><time [attr.datetime]="date()">{{ dateLabel() }}</time></header>
+  @if (loading()) { <div class="state-panel" role="status"><span class="loading-ring"></span><p>{{ lang.text('Finding today’s offers…', '正在查找今日优惠…') }}</p></div> }
+  @else if (error()) { <div class="state-panel" role="alert"><p>{{ lang.text('Unable to load offers. Please try again.', '暂时无法加载优惠，请重试。') }}</p><button class="button-primary" (click)="load()">{{ lang.text('Try again', '重试') }}</button></div> }
+  @else if (products().length === 0) { <div class="state-panel"><h2>{{ lang.text('More offers are on the way', '更多优惠即将到来') }}</h2><p>{{ lang.text('Browse our everyday essentials while we prepare the next offers.', '你可以先探索数码办公日常好物。') }}</p><a class="button-primary" href="/products#catalog">{{ lang.text('Browse products', '浏览商品') }}</a></div> }
+  @else {
+    @if (products()[0]; as featured) {
+      <section class="deal-spotlight">
+        <div class="deal-copy"><span class="deal-kicker">{{ lang.text('TODAY’S BIGGEST DISCOUNT', '今日最高折扣') }}</span><p class="deal-discount">−{{ featured.discountPercent }}<span>%</span></p><h2>{{ lang.name(featured) }}</h2><p>{{ lang.text('The biggest percentage saving among today’s available offers.', '从今日在售优惠中，为你选出折扣力度最大的商品。') }}</p><div class="deal-price"><strong>SGD {{ (featured.effectivePrice ?? featured.price).toFixed(2) }}</strong><del>SGD {{ featured.price.toFixed(2) }}</del></div><a class="button-primary featured-deal-link" [href]="productUrl(featured)">{{ lang.text('View today’s top deal', '查看今日最佳优惠') }} <app-icon name="arrow" /></a></div>
+        <a class="deal-image" [href]="productUrl(featured)" [attr.aria-label]="lang.name(featured)"><img [src]="featured.imageUrl" [alt]="lang.name(featured)"></a>
+      </section>
+    }
+    @if (products().length > 1) {
+      <div class="section-heading"><h2>{{ lang.text('More offers today', '今日更多优惠') }}</h2><span class="deals-order">{{ lang.text('Biggest discounts first', '按折扣力度从高到低排列') }}</span></div>
+      <ul class="product-grid">
+        @for (product of products().slice(1); track product.id) {
+          <li class="product-card"><a class="product-photo" [href]="productUrl(product)"><img [src]="product.imageUrl" [alt]="lang.name(product)" loading="lazy"></a><div class="product-card-body"><div class="product-meta"><span>{{ product.brand }}</span><span class="discount-badge">−{{ product.discountPercent }}%</span></div><h3>{{ lang.name(product) }}</h3><p class="deal-rating">★ {{ (product.averageRating || 0).toFixed(1) }} <span>({{ product.totalReviews || 0 }}) · {{ product.salesCount || 0 }} {{ lang.text('sold', '件已售') }}</span></p><div class="product-card-bottom"><div><p class="product-price"><span>SGD</span> {{ (product.effectivePrice ?? product.price).toFixed(2) }}</p><del class="deal-original">SGD {{ product.price.toFixed(2) }}</del></div><app-add-to-cart [productId]="product.id" [compact]="true" [stockQuantity]="product.stockQuantity ?? 99" /></div><a class="product-details-link" [href]="productUrl(product)">{{ lang.text('View details', '查看详情') }}</a></div></li>
+        }
+      </ul>
+    }
+  }
+</main>

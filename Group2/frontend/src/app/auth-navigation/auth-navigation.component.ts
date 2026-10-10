@@ -15,6 +15,7 @@ import { CartService } from '../services/cart.service';
   styleUrl: './auth-navigation.component.css',
 })
 export class AuthNavigationComponent implements OnInit, OnDestroy {
+  readonly dailyDeals = window.location.pathname === '/deals';
   readonly lang = inject(LanguageService);
   readonly cart = inject(CartService);
   private cartPending?: Subscription;
@@ -23,6 +24,9 @@ export class AuthNavigationComponent implements OnInit, OnDestroy {
   readonly state = signal<AuthSessionState>({ loggedIn: false, user: null });
   readonly loading = signal(true);
   readonly unavailable = signal(false);
+  readonly avatarFailed = signal(false);
+  readonly avatarVersion = signal(0);
+  private readonly visiblePage = () => { if (!document.hidden) this.refresh(); };
 
   private readonly restoredPage = (event: PageTransitionEvent) => {
     if (event.persisted) this.refresh();
@@ -30,6 +34,7 @@ export class AuthNavigationComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     window.addEventListener('pageshow', this.restoredPage);
+    document.addEventListener('visibilitychange', this.visiblePage);
     this.refresh();
   }
 
@@ -40,12 +45,15 @@ export class AuthNavigationComponent implements OnInit, OnDestroy {
     this.pending = this.auth.getSession().subscribe({
       next: (state) => {
         this.state.set(state);
+        this.avatarFailed.set(false);
+        this.avatarVersion.set(Date.now());
         this.loading.set(false);
         this.cartPending?.unsubscribe();
-        if (state.loggedIn) this.cartPending = this.cart.prepare().subscribe({ error: () => this.cart.totalQuantity.set(null) });
-        else this.cart.totalQuantity.set(null);
+        if (state.loggedIn) this.cartPending = this.cart.prepare().subscribe({ error: () => this.cart.reset() });
+        else this.cart.reset();
       },
       error: () => {
+        this.cart.reset();
         this.state.set({ loggedIn: false, user: null });
         this.loading.set(false);
         this.unavailable.set(true);
@@ -57,5 +65,6 @@ export class AuthNavigationComponent implements OnInit, OnDestroy {
     this.pending?.unsubscribe();
     this.cartPending?.unsubscribe();
     window.removeEventListener('pageshow', this.restoredPage);
+    document.removeEventListener('visibilitychange', this.visiblePage);
   }
 }

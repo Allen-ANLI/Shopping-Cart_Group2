@@ -59,7 +59,8 @@ class AccountAddressIntegrationTest {
         entityManager.flush();
         entityManager.clear();
         User reloaded = users.findById(owner.getId()).orElseThrow();
-        assertThat(reloaded.getFullName()).isEqualTo("Lin Mei");
+        assertThat(reloaded.getFullName()).isNull();
+        assertThat(reloaded.getDisplayName()).isEqualTo("Mei");
         assertThat(reloaded.getPhone()).isEqualTo("+65 8123 4567");
         assertThat(reloaded.getBirthday()).isEqualTo(LocalDate.of(1995, 4, 3));
         mvc.perform(post("/logout").session(session)).andExpect(status().is3xxRedirection());
@@ -67,7 +68,8 @@ class AccountAddressIntegrationTest {
                 .andExpect(status().is3xxRedirection()).andReturn();
         MockHttpSession fresh = (MockHttpSession) login.getRequest().getSession(false);
         mvc.perform(get("/account").session(fresh)).andExpect(status().isOk())
-                .andExpect(content().string(containsString("Lin Mei")))
+                .andExpect(content().string(containsString("Mei")))
+                .andExpect(content().string(not(containsString("id=\"fullName\""))))
                 .andExpect(content().string(containsString("+65 8123 4567")))
                 .andExpect(content().string(containsString("1995-04-03")));
     }
@@ -165,8 +167,9 @@ class AccountAddressIntegrationTest {
                 .andExpect(status().isOk()).andExpect(content().string(containsString("收件人姓名")));
         mvc.perform(post("/register").cookie(new jakarta.servlet.http.Cookie("store_lang", "zh")).param("username", "validuser").param("password", "testpass123")
                         .param("confirmPassword", "testpass123").param("displayName", "测试").param("email", "test@example.test"))
-                .andExpect(model().attributeHasFieldErrors("registerForm", "fullName", "phone"))
-                .andExpect(content().string(containsString("请填写真实姓名")));
+                .andExpect(model().attributeHasFieldErrors("registerForm", "password", "phone"))
+                .andExpect(content().string(containsString("请填写联系电话")))
+                .andExpect(content().string(not(containsString("请填写真实姓名"))));
     }
 
     private MockHttpSession sessionFor(User user) {

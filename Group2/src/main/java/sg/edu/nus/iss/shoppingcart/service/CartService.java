@@ -86,6 +86,10 @@ public class CartService {
         synchronized (session) { return state(session).getQuantities().size(); }
     }
 
+    public Map<Long, Integer> quantities(HttpSession session) {
+        synchronized (session) { return state(session).getQuantities(); }
+    }
+
     public long revision(HttpSession session) {
         synchronized (session) { return state(session).getRevision(); }
     }
@@ -160,7 +164,7 @@ public class CartService {
         }
         Product product = productRepository.findByIdAndActiveTrue(productId)
                 .orElseThrow(() -> new BusinessException("This product is no longer available"));
-
+        if (quantity > product.getStockQuantity()) throw new BusinessException("Not enough stock. Please reduce the quantity.");
         return product;
     }
 

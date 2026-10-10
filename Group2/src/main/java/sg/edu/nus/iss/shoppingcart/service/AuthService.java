@@ -37,13 +37,31 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public Optional<User> authenticate(String username, String rawPassword) {
-        if (username == null || username.isBlank() || rawPassword == null || rawPassword.isBlank()
+        return authenticate("username", username, rawPassword);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<User> authenticate(String method, String identifier, String rawPassword) {
+        if (identifier == null || identifier.isBlank() || identifier.length() > 255
+                || rawPassword == null || rawPassword.isBlank()
                 || rawPassword.getBytes(StandardCharsets.UTF_8).length > 72) {
             return Optional.empty();
         }
-        return userRepository.findByUsernameIgnoreCase(username.trim())
+        Optional<User> account = switch (method == null ? "" : method) {
+            case "username" -> userRepository.findByUsernameIgnoreCase(identifier.trim());
+            case "email" -> uniqueAccount(userRepository.findAllByEmailIgnoreCase(identifier.trim()));
+            case "phone" -> identifier.trim().matches("(?=(?:[^0-9]*[0-9]){6,15}[^0-9]*$)[+0-9][0-9 ()-]{5,29}")
+                    ? uniqueAccount(userRepository.findAllByPhoneDigits(phoneDigits(identifier))) : Optional.empty();
+            default -> Optional.empty();
+        };
+        return account
                 .filter(user -> user.getPasswordHash() != null
                         && passwordEncoder.matches(rawPassword, user.getPasswordHash()));
+    }
+
+    private Optional<User> uniqueAccount(java.util.List<User> matches) {
+        // Legacy data can contain shared contact details; never choose an arbitrary account.
+        return matches.size() == 1 ? Optional.of(matches.get(0)) : Optional.empty();
     }
 
     @Transactional(readOnly = true)
@@ -64,10 +82,10 @@ public class AuthService {
         if (userRepository.existsByUsernameIgnoreCase(username)) {
             throw new BusinessException(message("auth.username.duplicate"));
         }
+        requireAvailableContact(form.getEmail(), form.getPhone(), null);
         User user = new User(username, passwordEncoder.encode(form.getPassword()),
                 form.getDisplayName(), form.getEmail());
         user.setRole(User.Role.CUSTOMER); // 服务器固定，绝不从表单读取角色。
-        user.setFullName(form.getFullName());
         user.setPhone(form.getPhone());
         user.setBirthday(form.getBirthday());
         return userRepository.saveAndFlush(user);
@@ -78,13 +96,26 @@ public class AuthService {
         validate(form);
         User user = findById(currentUserId)
                 .orElseThrow(() -> new BusinessException(message("account.unavailable")));
+        requireAvailableContact(form.getEmail(), form.getPhone(), currentUserId);
         user.setDisplayName(form.getDisplayName());
         user.setEmail(form.getEmail());
-        user.setFullName(form.getFullName());
         user.setPhone(form.getPhone());
         user.setBirthday(form.getBirthday());
         userRepository.saveAndFlush(user);
     }
+
+    private void requireAvailableContact(String email, String phone, Long currentUserId) {
+        if (userRepository.findAllByEmailIgnoreCase(email).stream()
+                .anyMatch(user -> !user.getId().equals(currentUserId))) {
+            throw new BusinessException(message("account.email.duplicate"));
+        }
+        if (userRepository.findAllByPhoneDigits(phoneDigits(phone)).stream()
+                .anyMatch(user -> !user.getId().equals(currentUserId))) {
+            throw new BusinessException(message("account.phone.duplicate"));
+        }
+    }
+
+    private static String phoneDigits(String phone) { return phone.replaceAll("[^0-9]", ""); }
 
     private <T> void validate(T form) {
         if (form == null) { throw new BusinessException(message("account.details.invalid")); }

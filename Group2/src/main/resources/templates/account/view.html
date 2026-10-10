@@ -6,7 +6,7 @@
 <main id="main-content" class="container account-layout account-dashboard">
     <aside class="intro account-sidebar">
         <p class="eyebrow" th:text="#{account.eyebrow}">MY ACCOUNT</p>
-        <div class="account-avatar" aria-hidden="true" th:text="${#strings.substring(account.displayName,0,1)}">A</div>
+        <section th:replace="~{account/avatar :: editor}"></section>
         <h1 th:text="${account.displayName}">My account</h1>
         <dl class="summary">
             <dt th:text="#{auth.username}">Username</dt><dd th:text="${account.username}"></dd>
@@ -24,31 +24,27 @@
         <h2 th:text="#{account.personal}">Personal details</h2>
         <p class="muted" th:text="#{account.description}">Your details are saved to your account and available when you sign in again.</p>
         <div th:replace="~{auth/fragments :: alerts}"></div>
-        <form th:action="@{/account/profile}" th:object="${profileForm}" method="post">
+        <form th:action="@{/account/profile}" th:object="${profileForm}" method="post" novalidate data-localized-form data-form-kind="profile">
             <input type="hidden" name="accountFormToken" th:value="${accountFormToken}">
             <div class="alert error" role="alert" th:if="${#fields.hasAnyErrors()}">
                 <p th:each="message : ${#fields.allErrors()}" th:text="${message}"></p>
             </div>
             <div class="account-form-grid">
                 <div>
-                    <label for="fullName" th:text="#{account.fullName}">Full name</label>
-                    <input id="fullName" th:field="*{fullName}" maxlength="120" autocomplete="name" required>
-                </div>
-                <div>
                     <label for="displayName" th:text="#{account.displayName}">Display name</label>
-                    <input id="displayName" th:field="*{displayName}" maxlength="100" autocomplete="nickname" required>
+                    <input id="displayName" th:field="*{displayName}" maxlength="100" autocomplete="nickname" required th:attr="data-required-message=#{account.displayName.required},data-length-message=#{account.displayName.length}">
                 </div>
                 <div>
                     <label for="email" th:text="#{account.email}">Email</label>
-                    <input id="email" type="email" th:field="*{email}" maxlength="255" autocomplete="email" required>
+                    <input id="email" type="email" th:field="*{email}" maxlength="255" autocomplete="email" required th:attr="data-required-message=#{account.email.required},data-invalid-message=#{account.email.invalid},data-length-message=#{account.email.length}">
                 </div>
                 <div>
                     <label for="phone" th:text="#{account.phone}">Phone</label>
-                    <input id="phone" type="tel" th:field="*{phone}" maxlength="30" autocomplete="tel" required>
+                    <input id="phone" type="tel" th:field="*{phone}" maxlength="30" autocomplete="tel" required th:attr="data-required-message=#{account.phone.required},data-invalid-message=#{account.phone.invalid}">
                 </div>
                 <div>
                     <label for="birthday" th:text="#{account.birthday}">Birthday (optional)</label>
-                    <input id="birthday" type="date" th:field="*{birthday}" autocomplete="bday">
+                    <input id="birthday" type="date" th:field="*{birthday}" autocomplete="bday" th:attr="data-invalid-message=#{account.birthday.invalid}">
                 </div>
             </div>
             <button class="btn primary" type="submit" th:text="#{account.save}">Save profile</button>
@@ -61,5 +57,6 @@
     </section>
 </main>
 <footer th:replace="~{auth/fragments :: footer}"></footer>
+<script th:src="@{/auth-assets/avatar.js}" defer></script>
 </body>
 </html>

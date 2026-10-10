@@ -101,4 +101,16 @@ describe('B Angular account navigation', () => {
     expect(element.textContent).toContain('<img src=x onerror=alert(1)>');
     expect(element.querySelector('img')).toBeNull();
   });
+  it('shows the uploaded avatar beside the name and recovers from a failed image', () => {
+    request().flush({...session(), avatarUrl: '/api/account/avatar'}); render();
+    const avatar = element.querySelector<HTMLImageElement>('.account-name .nexus-avatar img')!;
+    expect(avatar.getAttribute('src')).toMatch(/^\/api\/account\/avatar\?v=\d+$/);
+    expect(element.querySelector('.account-name .account-label')?.textContent).toBe('Alice');
+    avatar.dispatchEvent(new Event('error')); render();
+    expect(element.querySelector('.nexus-avatar img')).toBeNull();
+    expect(element.querySelector('.nexus-avatar')?.textContent?.trim()).toBe('A');
+    document.dispatchEvent(new Event('visibilitychange'));
+    request().flush({...session(), avatarUrl: '/api/account/avatar'}); render();
+    expect(element.querySelector('.nexus-avatar img')).not.toBeNull();
+  });
 });

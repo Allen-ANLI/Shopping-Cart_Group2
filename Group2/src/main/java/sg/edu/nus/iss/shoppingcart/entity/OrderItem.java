@@ -48,6 +48,10 @@ public class OrderItem {
     )
     private BigDecimal unitPrice;
 
+    @Column(precision=12, scale=2)
+    private BigDecimal originalUnitPrice;
+    public BigDecimal getOriginalUnitPrice() { return originalUnitPrice == null ? unitPrice : originalUnitPrice; }
+
     @Column(nullable = false)
     private int quantity;
 
@@ -66,7 +70,8 @@ public class OrderItem {
 
         // 保存成交时的名称与单价，供历史订单使用。
         this.productNameSnapshot = product.getName();
-        this.unitPrice = product.getPrice();
+        this.unitPrice = product.getEffectivePrice();
+        this.originalUnitPrice = product.getPrice();
 
         this.quantity = quantity;
     }

@@ -31,6 +31,21 @@ public class OrderSummaryDto {
 
     /** 商品件数，由 count 子查询得出。 */
     private final long itemCount;
+    private String paymentStatus;
+    public boolean isPendingPayment() { return "PENDING".equals(paymentStatus); }
+    public OrderSummaryDto(Long id, LocalDateTime createdAt, BigDecimal totalAmount, long itemCount,
+                           LocalDateTime deliveredAt, LocalDateTime confirmedAt, String paymentStatus) {
+        this(id, createdAt, totalAmount, itemCount, deliveredAt, confirmedAt); this.paymentStatus=paymentStatus;
+    }
+    private LocalDateTime receiptConfirmedAt;
+    private LocalDateTime shipmentDeliveredAt;
+    public OrderSummaryDto(Long id, LocalDateTime createdAt, BigDecimal totalAmount, long itemCount,
+                           LocalDateTime deliveredAt, LocalDateTime confirmedAt) {
+        this(id, createdAt, totalAmount, itemCount);
+        shipmentDeliveredAt = deliveredAt; receiptConfirmedAt = confirmedAt;
+    }
+    public boolean isReceiptConfirmed() { return receiptConfirmedAt != null; }
+    public LocalDateTime getShipmentDeliveredAt() { return shipmentDeliveredAt; }
 
     /**
      * 供 JPQL 投影表达式使用的构造方法。

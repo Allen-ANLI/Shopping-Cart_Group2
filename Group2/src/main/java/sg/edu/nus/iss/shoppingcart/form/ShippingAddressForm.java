@@ -10,7 +10,7 @@ public class ShippingAddressForm {
     @Size(max = 120, message = "{account.fullName.length}")
     private String recipientName;
     @NotBlank(message = "{account.phone.required}")
-    @Pattern(regexp = "[+0-9][0-9 ()-]{5,29}", message = "{account.phone.invalid}")
+    @Pattern(regexp = "(?=(?:[^0-9]*[0-9]){6,15}[^0-9]*$)[+0-9][0-9 ()-]{5,29}", message = "{account.phone.invalid}")
     private String phone;
     @NotBlank(message = "{address.country.required}") @Size(max = 80, message = "{address.field.tooLong}")
     private String country;

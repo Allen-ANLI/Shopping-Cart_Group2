@@ -31,10 +31,10 @@ public class AuthController {
     }
 
     @InitBinder("loginForm")
-    public void bindLogin(WebDataBinder binder) { binder.setAllowedFields("username", "password"); }
+    public void bindLogin(WebDataBinder binder) { binder.setAllowedFields("username", "password", "loginMethod"); }
     @InitBinder("registerForm")
     public void bindRegistration(WebDataBinder binder) {
-        binder.setAllowedFields("username", "password", "confirmPassword", "displayName", "email", "fullName", "phone", "birthday");
+        binder.setAllowedFields("username", "password", "confirmPassword", "displayName", "email", "phone", "birthday");
     }
 
     @GetMapping("/login")
@@ -55,7 +55,7 @@ public class AuthController {
     public String processLogin(@Valid @ModelAttribute("loginForm") LoginForm form,
                                BindingResult result, HttpServletRequest request, Model model) {
         if (result.hasErrors()) { return "auth/login"; }
-        User user = authService.authenticate(form.getUsername(), form.getPassword()).orElse(null);
+        User user = authService.authenticate(form.getLoginMethod(), form.getUsername(), form.getPassword()).orElse(null);
         if (user == null) {
             model.addAttribute("errorMessage", message("auth.login.invalid"));
             return "auth/login";
@@ -73,10 +73,7 @@ public class AuthController {
             }
         }
         LoginInterceptor.establishSession(request.getSession(true), user);
-        if (savedRedirect != null && (user.isAdmin() || !savedRedirect.startsWith("/admin"))) {
-            return "redirect:" + savedRedirect;
-        }
-        return user.isAdmin() ? "redirect:/admin/products" : "redirect:/products";
+        return "redirect:/products";
     }
 
     @GetMapping("/register")

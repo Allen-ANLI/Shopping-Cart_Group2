@@ -69,11 +69,26 @@ public class ProductForm {
     /** 是否上架。 */
     private boolean active = true;
 
-    @Pattern(regexp = "computing|typing|workspace|audio", message = "{catalog.validation.category}")
+    @jakarta.validation.constraints.Min(value = 0, message = "{catalog.validation.stock}")
+    @jakarta.validation.constraints.Max(value = 1000000, message = "{catalog.validation.stock}")
+    private int stockQuantity = 100;
+    private boolean hideWhenOutOfStock;
+    public int getStockQuantity() { return stockQuantity; }
+    public void setStockQuantity(int value) { stockQuantity = value; }
+    public boolean isHideWhenOutOfStock() { return hideWhenOutOfStock; }
+    public void setHideWhenOutOfStock(boolean value) { hideWhenOutOfStock = value; }
+
+    @jakarta.validation.constraints.Min(value = 0, message = "{catalog.validation.discount}")
+    @jakarta.validation.constraints.Max(value = 99, message = "{catalog.validation.discount}")
+    private int discountPercent;
+    public int getDiscountPercent() { return discountPercent; }
+    public void setDiscountPercent(int value) { discountPercent = value; }
+
+    @Pattern(regexp = "computing|typing|workspace|audio|displays|storage|charging|networking|printing|mobile", message = "{catalog.validation.category}")
     @NotBlank(message = "{catalog.validation.category}")
     private String category = "workspace";
     @Size(max = 80, message = "{catalog.validation.brand}")
-    private String brand = "Group2 Essentials";
+    private String brand = "NEXUS Essentials";
     @Size(max = 100, message = "{catalog.validation.origin}")
     private String origin = "Singapore";
     @Size(max = 100, message = "{catalog.validation.nameZh}")

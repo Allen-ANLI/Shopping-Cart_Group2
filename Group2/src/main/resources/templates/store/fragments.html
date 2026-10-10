@@ -1,25 +1,39 @@
 <!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org">
 <body>
-<header th:fragment="navbar" class="navbar store-navbar">
-  <a class="skip-link" href="#main-content" th:text="#{nav.skip}">Skip to content</a>
-  <div class="container store-topline"><span th:text="#{store.tagline}">Thoughtful things for everyday living</span><span th:text="#{store.location}">SGD · Singapore</span></div>
-  <nav class="container store-navigation" th:attr="aria-label=#{nav.main}">
-    <a class="store-brand" th:href="@{/products}"><span class="store-brand-mark">e.</span> Everyday Market</a>
-    <div class="store-links">
-      <a th:href="@{/products}" th:text="#{nav.products}">Products</a>
-      <a th:href="@{/cart}" th:text="#{nav.cart}">Cart</a>
-      <a th:if="${isLoggedIn}" th:href="@{/orders}" th:text="#{nav.orders}">Orders</a>
-      <a th:if="${isLoggedIn}" th:href="@{/account}" th:text="#{nav.account}">Account</a>
-      <a th:if="${isAdmin}" th:href="@{/admin/products}" th:text="#{nav.admin}">Admin</a>
-      <a th:unless="${isLoggedIn}" th:href="@{/login}" th:text="#{nav.login}">Log in</a>
-      <form th:if="${isLoggedIn}" th:action="@{/logout}" method="post"><button type="submit" th:text="#{nav.logout}">Log out</button></form>
-      <button class="language-toggle" type="button" th:attr="data-language=${#locale.language == 'zh' ? 'en' : 'zh'},aria-label=#{nav.switchLanguage}" th:text="${#locale.language == 'zh' ? 'EN / English' : '中文 / ZH'}">中文 / ZH</button>
+<header th:fragment="navbar" class="nexus-header">
+  <a class="nexus-skip" href="#main-content" th:text="#{nav.skip}">Skip to content</a>
+  <div class="nexus-topline"><div class="nexus-container"><span th:text="#{store.tagline}"></span><span th:text="#{store.location}"></span></div></div>
+  <div class="nexus-container nexus-brand-row"><a class="nexus-brand" th:href="@{/products}"><span class="nexus-mark">N<span>↗</span></span><span><strong>NEXUS<span> Digital</span></strong><small th:text="#{store.brandline}">TECH &amp; OFFICE ESSENTIALS</small></span></a><button class="nexus-language" type="button" th:attr="data-language=${#locale.language == 'zh' ? 'en' : 'zh'},aria-label=#{nav.switchLanguage}" th:text="${#locale.language == 'zh' ? '◎ EN / English' : '◎ 中文 / ZH'}"></button></div>
+  <div class="nexus-nav-band"><nav class="nexus-container nexus-navigation" th:attr="aria-label=#{nav.main}">
+    <div class="nexus-links">
+      <a th:href="@{/products}" th:classappend="${activeNav == 'products' ? 'active' : ''}" th:attr="aria-current=${activeNav == 'products' ? 'page' : null}" th:text="#{nav.products}"></a>
+      <a th:href="@{/deals}" th:text="#{nav.deals}"></a>
+      <a th:href="@{/cart}" th:classappend="${activeNav == 'cart' ? 'active' : ''}" th:attr="aria-current=${activeNav == 'cart' ? 'page' : null}"><span th:text="#{nav.cart}"></span> <span th:if="${isLoggedIn}" class="nexus-cart-count" th:text="${navCartQuantity}">0</span></a>
+      <a th:href="@{/orders}" th:classappend="${activeNav == 'orders' ? 'active' : ''}" th:attr="aria-current=${activeNav == 'orders' ? 'page' : null}" th:text="#{nav.orders}"></a>
+      <a th:href="@{/account}" th:classappend="${activeNav == 'account' ? 'active' : ''}" th:attr="aria-current=${activeNav == 'account' ? 'page' : null}" th:text="#{nav.account}"></a>
+      <a th:if="${isAdmin}" th:href="@{/admin/products}" th:classappend="${activeNav == 'admin' ? 'active' : ''}" th:attr="aria-current=${activeNav == 'admin' ? 'page' : null}" th:text="#{nav.admin}"></a>
     </div>
-  </nav>
+    <div class="nexus-identity"><a th:if="${isLoggedIn}" class="account-name" th:href="@{/account}"><span class="nexus-avatar" data-nav-avatar aria-hidden="true" th:attr="data-user-id=${currentUser.id},data-initial=${#strings.substring(currentUser.displayName,0,1)}"><img th:if="${currentAvatarUrl != null}" th:src="${currentAvatarUrl}" alt=""><span th:unless="${currentAvatarUrl != null}" th:text="${#strings.substring(currentUser.displayName,0,1)}"></span></span><span class="account-label" th:text="${currentUser.displayName}"></span></a><form th:if="${isLoggedIn}" th:action="@{/logout}" method="post"><button type="submit" th:text="#{nav.logout}"></button></form><a th:unless="${isLoggedIn}" th:href="@{/login}" th:attr="aria-current=${activeNav == 'login' ? 'page' : null}" th:text="#{nav.login}"></a><a th:unless="${isLoggedIn}" class="register-link" th:href="@{/register}" th:attr="aria-current=${activeNav == 'register' ? 'page' : null}" th:text="#{nav.register}"></a></div>
+  </nav></div>
 </header>
-<footer th:fragment="footer" class="store-footer container"><strong>Everyday Market<span>.</span></strong><p th:text="#{store.tagline}">Thoughtful things for everyday living</p><span th:text="#{store.currency}">All prices in SGD</span></footer>
+<footer th:fragment="footer" class="nexus-container nexus-footer"><div><a th:href="@{/products}">NEXUS Digital</a><p th:text="#{store.tagline}"></p></div><span th:text="#{store.currency}"></span></footer>
 <section th:fragment="shipping(shipping)" class="card shipping-receipt" th:if="${shipping != null}">
   <h2 th:text="#{checkout.deliverTo}">Deliver to</h2>
   <strong th:text="${shipping.recipientName}"></strong><p th:text="${shipping.phone}"></p><p th:text="${shipping.fullAddress}"></p>
 </section>
-</body></html>
+<section th:fragment="payment(payment)" class="card payment-receipt" th:if="${payment != null and payment.status != 'PENDING'}"><h2 th:text="#{payment.receipt}"></h2><dl>
+<div><dt th:text="#{payment.status}"></dt><dd class="paid" th:text="${payment.status == 'PAID'} ? #{payment.paid} : #{payment.legacy}"></dd></div>
+<div th:if="${payment.method != null}"><dt th:text="#{payment.method}"></dt><dd th:text="${payment.instrument != null ? payment.instrument : (payment.method == 'SAMPLE_PURCHASE' ? #messages.msg('payment.sample') : #messages.msg('payment.card'))}"></dd></div>
+<div th:if="${payment.lastDigits != null}"><dt th:text="${payment.method == 'CRYPTO'} ? #{payment.walletAddress} : #{payment.number}"></dt><dd th:text="'•••• ' + ${payment.lastDigits}"></dd></div>
+<div th:if="${payment.cryptoNetwork != null}"><dt th:text="#{payment.network}"></dt><dd th:text="${payment.cryptoNetwork}"></dd></div>
+<div th:if="${payment.cryptoAmount != null}"><dt th:text="#{payment.cryptoAmount}"></dt><dd th:text="${payment.cryptoAmount} + ' ' + ${payment.cryptoAsset}"></dd></div>
+<div th:if="${payment.reference != null}"><dt th:text="#{payment.reference}"></dt><dd th:text="${payment.reference}"></dd></div>
+<div th:if="${payment.paidAt != null}"><dt th:text="#{payment.time}"></dt><dd th:text="${#temporals.format(payment.paidAt, 'yyyy-MM-dd HH:mm')}"></dd></div>
+</dl></section>
+<div th:fragment="pricing(pricing)" class="order-pricing">
+<div class="summary-row"><span th:text="#{pricing.original}"></span><span th:text="'S$' + ${pricing.originalSubtotal}"></span></div>
+<div class="summary-row savings"><span th:text="#{pricing.discount}"></span><span th:text="'-S$' + ${pricing.discountAmount}"></span></div>
+<div class="summary-row"><span th:text="#{pricing.subtotal}"></span><strong th:text="'S$' + ${pricing.subtotal}"></strong></div>
+<div class="summary-row"><span th:text="#{pricing.gst}"></span><span th:text="'S$' + ${pricing.gstAmount}"></span></div>
+<div class="summary-row summary-total"><span th:text="#{total}"></span><strong th:text="'S$' + ${pricing.total}"></strong></div>
+</div></body></html>

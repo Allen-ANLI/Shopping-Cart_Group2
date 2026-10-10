@@ -1,34 +1,48 @@
 <main id="main-content" class="store-container">
+  <section class="top-search">      <form class="search-form" (submit)="search($event)"><app-icon name="search" /><input type="search" name="q" [value]="searchInput" (input)="searchInput = $any($event.target).value" [placeholder]="lang.text('Search products or brands', '搜索商品或品牌')" [attr.aria-label]="lang.text('Search products or brands', '搜索商品或品牌')"><button type="submit">{{ lang.text('Search', '搜索') }}</button></form><p>{{ lang.text("Find your next tech or office upgrade.", "寻找你的下一件数码与办公装备。") }}</p></section>
   @if (!category() && !query()) {
-    <section class="store-intro" [attr.aria-label]="lang.text('Discover the collection', '探索商品系列')">
-      <div class="feature-copy">
-        <span class="eyebrow">{{ lang.text('THOUGHTFULLY CHOSEN. EVERY DAY.', '精选好物，悦享日常。') }}</span>
-        <h1>{{ lang.text('Make room for', '让每一天') }}<br><em>{{ lang.text('a better everyday.', '多一点美好。') }}</em></h1>
-        <p>{{ lang.text('Well-made essentials for your desk, your work, and everything in between. Find the little things that make a difference.', '从工作到生活，发现实用又舒适的桌面好物。小小改变，让日常更有品质。') }}</p>
-        <a class="button-primary" href="/products#catalog">{{ lang.text('Explore the collection', '探索全部商品') }}<app-icon name="arrow" /></a>
-        <div class="hero-meta"><span>{{ lang.text('4 curated categories', '四大精选品类') }}</span><span>{{ lang.text('Prices in SGD', '新加坡元计价') }}</span></div>
+    <section class="campaign" (mouseenter)="setCampaignHover(true)" (mouseleave)="setCampaignHover(false)" (focusin)="setCampaignFocus(true)" (focusout)="campaignBlur($event)" [attr.aria-roledescription]="lang.text('carousel', '轮播')" [class.promotion]="campaign() !== 0" [class.best-deal]="campaign() === 2" [attr.aria-label]="lang.text('Brand advertisements and events', '品牌广告与促销活动')">
+      <div class="campaign-copy" aria-live="off">
+        @if (campaign() === 2 && featuredDeal(); as deal) {
+          <span class="campaign-label">{{ lang.text('DAILY SPECIAL · BIGGEST SAVING', '每日特惠 · 今日最高折扣') }}</span>
+          <h1>{{ lang.text('Save ', '立省 ') }}{{ deal.discountPercent }}%<br><em class="campaign-featured-name">{{ lang.name(deal) }}</em></h1>
+          <p class="campaign-deal-price"><strong>SGD {{ (deal.effectivePrice ?? deal.price).toFixed(2) }}</strong><del>SGD {{ deal.price.toFixed(2) }}</del></p>
+          <a class="button-primary campaign-featured-link" [href]="'/products?id=' + deal.id">{{ lang.text('View today’s top deal', '查看今日最佳优惠') }} <app-icon name="arrow" /></a>
+        } @else {
+          <span class="campaign-label">{{ campaign() === 0 ? lang.text('BRAND SPOTLIGHT · KEYCRAFT', '品牌广告 · KEYCRAFT') : lang.text('DAILY DEALS', '每日促销') }}</span>
+          <h1>{{ campaign() === 0 ? lang.text('A better day,', '美好一天，') : lang.text('Your daily dose', '每日精选，') }}<br><em>{{ campaign() === 0 ? lang.text('at your fingertips.', '从指尖开始。') : lang.text('of better deals.', '优惠正当时。') }}</em></h1>
+          <p>{{ campaign() === 0 ? lang.text('Discover Keycraft. Considered keyboards for your everyday work and play.', '探索 Keycraft 键盘系列，让每一次工作与娱乐都舒适自如。') : lang.text('Explore today’s tech and office offers, with our biggest discount picked for you.', '探索今日数码办公优惠，为你精选当前折扣力度最大的好物。') }}</p>
+          <a class="button-primary" [href]="campaign() === 0 ? '/products?category=typing&q=Keycraft#catalog' : '/deals'">{{ campaign() === 0 ? lang.text('Discover Keycraft', '探索 Keycraft') : lang.text('Explore daily deals', '查看每日促销') }} <app-icon name="arrow" /></a>
+        }
+        <div class="campaign-controls" [attr.aria-label]="lang.text('Choose advertisement', '选择广告')">
+          <button type="button" [class.active]="campaign() === 0" [attr.aria-pressed]="campaign() === 0" (click)="showCampaign(0)">01 <span>{{ lang.text('Keycraft', '品牌精选') }}</span></button>
+          <button type="button" [class.active]="campaign() === 1" [attr.aria-pressed]="campaign() === 1" (click)="showCampaign(1)">02 <span>{{ lang.text('Daily deals', '每日促销') }}</span></button>
+          <button type="button" [class.active]="campaign() === 2" [attr.aria-pressed]="campaign() === 2" (click)="showCampaign(2)">03 <span>{{ lang.text('Top deal', '今日特惠') }}</span></button>
+        </div>
       </div>
-      <div class="feature-art" aria-hidden="true"><span class="art-circle"></span><img src="/images/keyboard.png" class="hero-keyboard" alt=""><img src="/images/mouse.png" class="hero-mouse" alt=""><span class="art-label">THE EVERYDAY EDIT<br><strong>01 — 04</strong></span></div>
+      <div class="campaign-art" aria-hidden="true"><span class="campaign-orbit"></span><img [src]="campaign() === 0 ? '/images/keyboard.png' : campaign() === 2 && featuredDeal()?.imageUrl ? featuredDeal()!.imageUrl : '/images/desk-lamp.svg'" alt=""><span class="campaign-stamp">{{ campaign() === 0 ? 'KEYCRAFT' : campaign() === 2 && featuredDeal() ? featuredDeal()!.brand : 'NEXUS WORKSPACE' }}<small>{{ lang.text('TECH FOR WORK & PLAY', '科技相伴，高效每一天') }}</small></span></div>
+      <button class="campaign-arrow previous" type="button" (click)="showCampaign(campaign() - 1)" [attr.aria-label]="lang.text('Previous banner', '上一张横幅')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
+      <button class="campaign-arrow next" type="button" (click)="showCampaign(campaign() + 1)" [attr.aria-label]="lang.text('Next banner', '下一张横幅')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
     </section>
   }
-  <section class="category-section" [attr.aria-label]="lang.text('Shop by category', '按分类选购')">
-    <div class="section-heading"><div><span class="eyebrow">{{ lang.text('FIND YOUR FOCUS', '找到心仪好物') }}</span><h2>{{ lang.text('Shop by category', '按分类选购') }}</h2></div><span class="subtle">{{ lang.text('Good things, in their place.', '每种需要，都有好选择。') }}</span></div>
-    <div class="category-grid">
-      @for (item of categories; track item.slug) {
-        <button class="category-tile" type="button" [class.selected]="category() === item.slug" [attr.aria-pressed]="category() === item.slug" (click)="selectCategory(item.slug)">
-          <span class="category-icon"><app-icon [name]="item.icon" /></span><span><strong>{{ lang.text(item.name, item.nameZh) }}</strong><small>{{ lang.text(item.description, item.descriptionZh) }}</small>
-          @if (count(item.slug) !== undefined) { <small class="category-count">{{ count(item.slug) }} {{ lang.text('products', '件商品') }}</small> }</span><app-icon name="arrow" />
-        </button>
-      }
+  <nav class="category-section category-navigation" [attr.aria-label]="lang.text('Shop by category', '按分类选购')">
+    <label class="category-caption" for="compact-category">{{ lang.text('Shop by category', '按分类选购') }}</label>
+    <div class="category-tabs"><button class="category-tab" [class.selected]="!category()" [attr.aria-pressed]="!category()" (click)="selectCategory('')">{{ lang.text('All', '全部') }}</button>
+      @for (item of categories; track item.slug) { <button type="button" class="category-tab" [class.selected]="category() === item.slug" [attr.aria-pressed]="category() === item.slug" [attr.title]="lang.text(item.name, item.nameZh)" (click)="selectCategory(item.slug)">{{ categoryLabel(item.slug) }}</button> }
     </div>
-  </section>
+    <select id="compact-category" class="category-select" [value]="category()" (change)="selectCategory($any($event.target).value)">
+      <option value="">{{ lang.text('All categories', '全部分类') }}</option>
+      @for (item of categories; track item.slug) { <option [value]="item.slug">{{ lang.text(item.name, item.nameZh) }}</option> }
+    </select>
+  </nav>
   <section class="catalog-section" id="catalog" aria-labelledby="catalog-heading">
-    <div class="section-heading"><div><span class="eyebrow">{{ lang.text('YOUR NEXT EVERYDAY ESSENTIAL', '下一件日常好物') }}</span><h2 id="catalog-heading">{{ categoryName() }}</h2></div>
+    <div class="section-heading"><div><span class="eyebrow">{{ lang.text('YOUR WORKDAY, UPGRADED', '升级你的数码与办公体验') }}</span><h2 id="catalog-heading">{{ !category() && !query() ? lang.text("Daily recommendations", "每日推荐") : categoryName() }}</h2></div>
       @if (category() || query() || sort()) { <button class="text-button" type="button" (click)="reset()">{{ lang.text('Clear filters', '清除筛选') }} <app-icon name="close" /></button> }
     </div>
+    <p class="recommendation-note" [hidden]="!!category() || !!query()">{{ lang.text("Picked from your browsing, purchases and favourite categories. New here? Discover popular picks refreshed each day.", "结合浏览、购买及高评分品类，为你挑选好物。首次到访？从每日更新的热门精选开始。") }}</p>
     <div class="catalog-toolbar">
-      <form class="search-form" (submit)="search($event)"><app-icon name="search" /><input type="search" name="q" [value]="searchInput" (input)="searchInput = $any($event.target).value" [placeholder]="lang.text('Search products or brands', '搜索商品或品牌')" [attr.aria-label]="lang.text('Search products or brands', '搜索商品或品牌')"><button type="submit">{{ lang.text('Search', '搜索') }}</button></form>
-      <label>{{ lang.text('Sort', '排序') }}<select name="sort" [value]="sort()" (change)="changeSort($any($event.target).value)"><option value="">{{ lang.text('Featured', '精选排序') }}</option><option value="price-asc">{{ lang.text('Price: low to high', '价格从低到高') }}</option><option value="price-desc">{{ lang.text('Price: high to low', '价格从高到低') }}</option><option value="name">{{ lang.text('Name', '商品名称') }}</option><option value="newest">{{ lang.text('Newest', '最新上架') }}</option></select></label>
+
+      <label>{{ lang.text('Sort', '排序') }}<select name="sort" [value]="sort()" (change)="changeSort($any($event.target).value)"><option value="">{{ lang.text('Recommended', '推荐排序') }}</option><option value="price-asc">{{ lang.text('Price: low to high', '价格从低到高') }}</option><option value="price-desc">{{ lang.text('Price: high to low', '价格从高到低') }}</option><option value="sales">{{ lang.text('Best selling', '销量从高到低') }}</option><option value="rating">{{ lang.text('Top rated', '评分从高到低') }}</option></select></label>
       <label>{{ lang.text('Per page', '每页') }}<select name="size" [value]="size()" (change)="changeSize(+$any($event.target).value)" [disabled]="loading()"><option value="6">6</option><option value="12">12</option><option value="24">24</option></select></label>
     </div>
     <p class="results-count" aria-live="polite">@if (loading()) { {{ lang.text('Finding your essentials…', '正在查找商品…') }} } @else { {{ totalElements() }} {{ lang.text('products', '件商品') }} @if (query()) { · “{{ query() }}” } }</p>
@@ -47,16 +61,38 @@
               @if (product.imageUrl) { <span class="zoom-hint"><app-icon name="zoom" /></span> }
             </button>
             <div class="product-card-body">
-              <div class="product-meta"><span>{{ product.brand || 'Everyday Market' }}</span><span>{{ categoryName(product.category) }}</span></div>
+              <div class="product-meta"><span>{{ product.brand || 'NEXUS Digital' }}</span><span>{{ categoryName(product.category) }}</span></div>
               <h3>{{ lang.name(product) }}</h3>
               <p class="product-origin">{{ lang.text('Ships from', '发货地') }} {{ lang.origin(product) }}</p>
-              <div class="product-card-bottom"><p class="product-price"><span>SGD</span> {{ product.price.toFixed(2) }}</p><app-add-to-cart [productId]="product.id" [compact]="true" /></div>
+              <div class="product-rating"><span class="rating-stars" [attr.aria-label]="(product.averageRating || 0) + lang.text(' out of 5 stars', '星，满分5星')"><span aria-hidden="true">★★★★★</span><span aria-hidden="true" class="filled" [style.width.%]="(product.averageRating || 0) * 20">★★★★★</span></span><strong>{{ product.totalReviews ? (product.averageRating || 0).toFixed(1) : '—' }}</strong><span>({{ product.totalReviews || 0 }})</span></div>
+              <p class="product-sales">{{ product.salesCount || 0 }} {{ lang.text('sold', '件已售') }} · {{ (product.stockQuantity ?? 99) > 0 ? lang.text('In stock', '有现货') : lang.text('Out of stock', '暂时缺货') }}</p>
+              <div class="product-card-bottom"><div class="price-stack"><p class="product-price"><span>SGD</span> {{ (product.effectivePrice ?? product.price).toFixed(2) }}</p>@if ((product.discountPercent ?? 0) > 0) { <div class="promotion-price"><del>SGD {{ product.price.toFixed(2) }}</del><span class="discount-badge">−{{ product.discountPercent }}%</span></div> }</div><app-add-to-cart [productId]="product.id" [compact]="true" [stockQuantity]="product.stockQuantity ?? 99" /></div>
               <a class="product-details-link" [href]="productUrl(product.id)">{{ lang.text('View details', '查看详情') }}</a>
             </div>
           </li>
         }
       </ul>
-      <nav class="pagination" [attr.aria-label]="lang.text('Product pages', '商品分页')"><p>{{ lang.text('Page', '第') }} <strong>{{ page() + 1 }}</strong> / {{ totalPages() }} {{ lang.text('', '页') }}</p><div><button type="button" [disabled]="page() === 0" (click)="changePage(page() - 1)">{{ lang.text('Previous', '上一页') }}</button><button type="button" [disabled]="page() >= totalPages() - 1" (click)="changePage(page() + 1)">{{ lang.text('Next', '下一页') }}</button></div></nav>
+      <nav class="pagination catalog-pagination" [attr.aria-label]="lang.text('Product pages', '商品分页')">
+        <p class="page-status">{{ lang.text('Page', '第') }} <strong>{{ page() + 1 }}</strong> / {{ totalPages() }} {{ lang.text('', '页') }}</p>
+        <div class="pagination-controls">
+          <button type="button" [disabled]="page() === 0" (click)="changePage(page() - 1)">{{ lang.text('Previous', '上一页') }}</button>
+          <div class="page-numbers">
+            @for (index of pageNumbers(); track $index) {
+              @if (index === null) { <span class="page-ellipsis" aria-hidden="true">…</span> }
+              @else { <button type="button" class="page-number" [class.current]="index === page()" [attr.aria-current]="index === page() ? 'page' : null" [attr.aria-label]="lang.text('Go to page ', '跳转到第 ') + (index + 1) + lang.text('', ' 页')" (click)="changePage(index)">{{ index + 1 }}</button> }
+            }
+          </div>
+          <button type="button" [disabled]="page() >= totalPages() - 1" (click)="changePage(page() + 1)">{{ lang.text('Next', '下一页') }}</button>
+        </div>
+        @if (totalPages() > 1) {
+          <form class="page-jump" (submit)="jumpToPage($event)" novalidate>
+            <label for="catalog-page-number">{{ lang.text('Go to page', '跳转到') }}</label>
+            <input id="catalog-page-number" name="pageNumber" type="number" inputmode="numeric" min="1" [max]="totalPages()" step="1" [value]="pageInput" (input)="pageInput = $any($event.target).value; pageJumpError.set(false)" [attr.aria-invalid]="pageJumpError() ? true : null" [attr.aria-describedby]="pageJumpError() ? 'page-jump-error' : null">
+            <button type="submit">{{ lang.text('Go', '跳转') }}</button>
+          </form>
+          @if (pageJumpError()) { <p id="page-jump-error" class="page-jump-error" role="alert">{{ lang.text('Enter a whole page number from 1 to ', '请输入 1 至 ') + totalPages() + lang.text('.', ' 之间的整数页码。') }}</p> }
+        }
+      </nav>
     }
   </section>
 </main>

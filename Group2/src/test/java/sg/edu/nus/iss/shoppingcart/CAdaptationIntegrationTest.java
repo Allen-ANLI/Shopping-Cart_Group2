@@ -69,6 +69,7 @@ class CAdaptationIntegrationTest {
     @Autowired MockMvc mvc;
     @Autowired UserRepository users;
     @Autowired ProductRepository products;
+    @Autowired sg.edu.nus.iss.shoppingcart.repository.ProductReviewRepository reviews;
     @Autowired OrderRepository orders;
     @MockitoSpyBean OrderItemRepository orderItems;
     @Autowired PasswordEncoder encoder;
@@ -100,6 +101,7 @@ class CAdaptationIntegrationTest {
         orderItems.deleteAllInBatch();
         orders.deleteAllInBatch();
         deliveryAddressRows.deleteAllInBatch();
+        reviews.deleteAllInBatch();
         users.deleteAllInBatch();
         products.deleteAllInBatch();
     }
@@ -158,27 +160,30 @@ class CAdaptationIntegrationTest {
 
         keyboard.setPrice(new BigDecimal("21.10"));
         products.saveAndFlush(keyboard);
-        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", checkoutToken)
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", checkoutToken)
                         .param("totalAmount", "0.01").param("userId", secondUser.getId().toString()))
-                .andExpect(redirectedUrl("/checkout/success?key=" + checkoutToken));
+                .andExpect(redirectedUrlPattern("/orders/*/payment"));
         var saved = orders.findByCheckoutTokenAndUser_Id(checkoutToken, firstUser.getId()).orElseThrow();
-        assertThat(saved.getTotalAmount()).isEqualByComparingTo("82.30");
+        assertThat(saved.getTotalAmount()).isEqualByComparingTo("89.71");
         assertThat(orders.findByCheckoutTokenAndUser_Id(checkoutToken, secondUser.getId())).isEmpty();
         assertThat(orderItems.findByOrder_IdOrderByIdAsc(saved.getId())).hasSize(2);
-        MvcResult success = mvc.perform(get("/checkout/success").session(session).param("key", checkoutToken))
-                .andExpect(status().isOk()).andExpect(view().name("orders/checkout-success"))
-                .andExpect(content().string(containsString("C Keyboard")))
-                .andExpect(content().string(containsString("82.30"))).andReturn();
-        CheckoutReceipt receipt = (CheckoutReceipt) success.getModelAndView().getModel().get("receipt");
-        assertThat(receipt.id()).isEqualTo(saved.getId());
-        assertThat(receipt.items()).extracting(CheckoutReceipt.Line::quantity).containsExactly(3, 2);
-        assertThat(receipt.items().get(0).unitPrice()).isEqualByComparingTo("21.10");
+        mvc.perform(get("/checkout/success").session(session).param("key", checkoutToken))
+                .andExpect(redirectedUrl("/orders/" + saved.getId()));
+        mvc.perform(get("/orders/" + saved.getId()).session(session)).andExpect(status().isOk())
+                .andExpect(content().string(containsString("C Keyboard"))).andExpect(content().string(containsString("89.71")));
+        assertThat(saved.getPaymentStatus()).isEqualTo("PENDING");
+        assertThat(orderItems.findByOrder_IdOrderByIdAsc(saved.getId())).extracting(sg.edu.nus.iss.shoppingcart.entity.OrderItem::getQuantity).containsExactly(3,2);
+        assertThat(orderItems.findByOrder_IdOrderByIdAsc(saved.getId()).get(0).getUnitPrice()).isEqualByComparingTo("21.10");
         mvc.perform(get("/api/cart/form").session(session))
                 .andExpect(jsonPath("$.itemCount").value(0)).andExpect(jsonPath("$.totalQuantity").value(0));
 
         add(session, keyboard, "1", formToken(session));
-        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", checkoutToken))
-                .andExpect(redirectedUrl("/checkout/success?key=" + checkoutToken));
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", checkoutToken))
+                .andExpect(redirectedUrlPattern("/orders/*/payment"));
         assertThat(orders.count()).isEqualTo(1);
         assertThat(cart.readForCheckout(session)).containsEntry(keyboard.getId(), 1);
         mvc.perform(get("/api/cart/form").session(session))
@@ -213,7 +218,9 @@ class CAdaptationIntegrationTest {
                 .andExpect(flash().attributeExists("successMessage"));
         assertThat(cart.getCartItems(session)).isEmpty();
         String emptyToken = checkoutToken(session);
-        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", emptyToken))
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", emptyToken))
                 .andExpect(view().name("orders/checkout"))
                 .andExpect(model().attribute("errorMessage", containsString("Your cart has been kept")));
         assertThat(orders.count()).isZero();
@@ -226,7 +233,9 @@ class CAdaptationIntegrationTest {
         String token = checkoutToken(session);
         keyboard.setActive(false);
         products.saveAndFlush(keyboard);
-        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
                 .andExpect(status().isOk()).andExpect(view().name("orders/checkout"))
                 .andExpect(model().attribute("canCheckout", false))
                 .andExpect(model().attribute("errorMessage", containsString("Your cart has been kept")));
@@ -236,8 +245,10 @@ class CAdaptationIntegrationTest {
 
         keyboard.setActive(true);
         products.saveAndFlush(keyboard);
-        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
-                .andExpect(redirectedUrl("/checkout/success?key=" + token));
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
+                .andExpect(redirectedUrlPattern("/orders/*/payment"));
         assertThat(orders.count()).isEqualTo(1);
         assertThat(cart.getCartItems(session)).isEmpty();
     }
@@ -249,7 +260,9 @@ class CAdaptationIntegrationTest {
         String token = checkoutToken(session);
         doThrow(new IllegalStateException("C integration persistence failure"))
                 .when(orderItems).saveAllAndFlush(any());
-        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
                 .andExpect(status().isOk()).andExpect(view().name("orders/checkout"))
                 .andExpect(model().attribute("errorMessage", containsString("Your cart has been kept")));
         assertThat(orders.count()).isZero();
@@ -258,8 +271,10 @@ class CAdaptationIntegrationTest {
         assertThat(checkoutToken(session)).isEqualTo(token);
 
         reset(orderItems);
-        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
-                .andExpect(redirectedUrl("/checkout/success?key=" + token));
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
+                .andExpect(redirectedUrlPattern("/orders/*/payment"));
         assertThat(orders.count()).isEqualTo(1);
         assertThat(orderItems.count()).isEqualTo(1);
         assertThat(cart.getCartItems(session)).isEmpty();
@@ -281,7 +296,9 @@ class CAdaptationIntegrationTest {
         add(second, mouse, "1", secondFormToken);
         assertThat(cart.readForCheckout(first)).containsExactly(java.util.Map.entry(keyboard.getId(), 2));
         assertThat(cart.readForCheckout(second)).containsExactly(java.util.Map.entry(mouse.getId(), 1));
-        mvc.perform(post("/checkout").session(second).param("addressId", deliveryAddress(second)).param("checkoutToken", oldCheckoutToken))
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(second).param("addressId", deliveryAddress(second)).param("checkoutToken", oldCheckoutToken))
                 .andExpect(view().name("orders/checkout")).andExpect(model().attributeExists("errorMessage"));
 
         MockHttpSession switched = login(secondUser, first);
@@ -344,7 +361,7 @@ class CAdaptationIntegrationTest {
     }
 
     @Test
-    void loginRedirectKeepsSelectedProductQueryAndUsesNewSession() throws Exception {
+    void loginReturnsHomeAndUsesNewSession() throws Exception {
         String selectedUrl = "/cart/products?productId=" + keyboard.getId();
         MvcResult guest = mvc.perform(get(selectedUrl))
                 .andExpect(redirectedUrl("/login?required")).andReturn();
@@ -352,7 +369,7 @@ class CAdaptationIntegrationTest {
         assertThat(previous).isNotNull();
         MvcResult authenticated = mvc.perform(post("/login").session(previous)
                         .param("username", firstUser.getUsername()).param("password", "demo123"))
-                .andExpect(redirectedUrl(selectedUrl)).andReturn();
+                .andExpect(redirectedUrl("/products")).andReturn();
         MockHttpSession session = (MockHttpSession) authenticated.getRequest().getSession(false);
         assertThat(previous.isInvalid()).isTrue();
         assertThat(session.getAttribute("loginUserId")).isEqualTo(firstUser.getId());

@@ -1,8 +1,10 @@
 <!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><head th:fragment="head(title)">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title th:text="${title} + ' | Everyday Market'">Everyday Market</title>
+<title th:text="${title} + ' | NEXUS Digital'">NEXUS Digital</title>
 <link rel="stylesheet" th:href="@{/css/style.css}"><link rel="stylesheet" th:href="@{/store/common.css}">
-<link rel="icon" th:href="@{/products/favicon.svg}" type="image/svg+xml"><script th:src="@{/store/common.js}" defer></script></head><body>
+<link rel="icon" th:href="@{/products/favicon.svg}" type="image/svg+xml"><script th:src="@{/store/common.js}" defer></script><link rel="stylesheet" th:href="@{/store/navigation.css}">
+<link rel="stylesheet" th:href="@{/store/payment-orders.css}">
+</head><body>
 <header th:fragment="navbar" th:replace="~{store/fragments :: navbar}"></header>
 <div th:fragment="alerts" class="store-alerts">
 <p class="alert info" role="status" th:if="${infoMessage}" th:text="${infoMessage}"></p>

@@ -24,15 +24,18 @@ import java.util.List;
 public class ProductRestController {
 
     private final ProductService productService;
+    private final sg.edu.nus.iss.shoppingcart.service.RecommendationService recommendations;
 
-    public ProductRestController(ProductService productService) {
+    public ProductRestController(ProductService productService, sg.edu.nus.iss.shoppingcart.service.RecommendationService recommendations) {
         this.productService = productService;
+        this.recommendations = recommendations;
     }
 
     @GetMapping(params = "!page")
     public List<Product> findAllProducts(@RequestParam(required = false) String category,
                                          @RequestParam(required = false) String q,
-                                         @RequestParam(required = false) String sort) {
+                                         @RequestParam(required = false) String sort, jakarta.servlet.http.HttpServletRequest request) {
+        if ("recommended".equals(sort)) return recommendations.recommend(category, q, request.getSession(false));
         return productService.findAllProducts(category, q, sort);
     }
 
@@ -45,19 +48,21 @@ public class ProductRestController {
             @Min(1) @Max(100) int size,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String q,
-            @RequestParam(required = false) String sort) {
+            @RequestParam(required = false) String sort, jakarta.servlet.http.HttpServletRequest request) {
 
         Page<Product> result =
-                productService.findProductPage(page, size, category, q, sort);
+                "recommended".equals(sort) ? recommendations.page(page, size, category, q, request.getSession(false))
+                        : productService.findProductPage(page, size, category, q, sort);
 
         return new ProductPageResponse(result);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> findProductById(
-            @PathVariable("id") Long id) {
+            @PathVariable("id") Long id, jakarta.servlet.http.HttpServletRequest request) {
 
-        return ResponseEntity.of(
-                productService.findProductById(id));
+        var product = productService.findProductById(id);
+        product.ifPresent(value -> recommendations.remember(request.getSession(), value));
+        return ResponseEntity.of(product);
     }
 }

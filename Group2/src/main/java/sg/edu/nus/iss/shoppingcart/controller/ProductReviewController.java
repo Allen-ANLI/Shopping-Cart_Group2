@@ -24,8 +24,9 @@ public class ProductReviewController {
     }
 
     @GetMapping
-    public ProductReviewService.ReviewSummary read(@PathVariable Long id, HttpServletRequest request) {
-        return reviews.read(id, CurrentUser.getId(request.getSession(false)));
+    public ResponseEntity<ProductReviewService.ReviewSummary> read(@PathVariable Long id, HttpServletRequest request) {
+        return ResponseEntity.ok().cacheControl(org.springframework.http.CacheControl.noStore())
+                .body(reviews.read(id, CurrentUser.getId(request.getSession(false))));
     }
 
     @PostMapping

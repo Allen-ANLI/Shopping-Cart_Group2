@@ -14,6 +14,7 @@ import sg.edu.nus.iss.shoppingcart.form.ProfileForm;
 import sg.edu.nus.iss.shoppingcart.interceptor.LoginInterceptor;
 import sg.edu.nus.iss.shoppingcart.service.AuthService;
 import sg.edu.nus.iss.shoppingcart.service.AccountFormTokens;
+import sg.edu.nus.iss.shoppingcart.exception.BusinessException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -25,13 +26,14 @@ import org.springframework.context.i18n.LocaleContextHolder;
 public class AccountController {
     private final AuthService authService;
     private final MessageSource messages;
-    public AccountController(AuthService authService, MessageSource messages) {
-        this.authService = authService; this.messages = messages;
+    private final sg.edu.nus.iss.shoppingcart.service.AvatarService avatars;
+    public AccountController(AuthService authService, MessageSource messages, sg.edu.nus.iss.shoppingcart.service.AvatarService avatars) {
+        this.authService = authService; this.messages = messages; this.avatars = avatars;
     }
 
     @InitBinder("profileForm")
     public void bindProfile(WebDataBinder binder) {
-        binder.setAllowedFields("displayName", "email", "fullName", "phone", "birthday");
+        binder.setAllowedFields("displayName", "email", "phone", "birthday");
     }
 
     @GetMapping("/account")
@@ -55,7 +57,13 @@ public class AccountController {
                 populate(session, model);
                 return "account/view";
             }
-            authService.updateProfile(userId, form);
+            try {
+                authService.updateProfile(userId, form);
+            } catch (BusinessException ex) {
+                model.addAttribute("errorMessage", ex.getUserMessage());
+                populate(session, model);
+                return "account/view";
+            }
             flash.addFlashAttribute("successMessage", messages.getMessage("account.saved", null, LocaleContextHolder.getLocale()));
             return "redirect:/account";
         }
@@ -66,6 +74,7 @@ public class AccountController {
         User user = authService.findById(userId).orElseThrow(
                 () -> new IllegalArgumentException("The account is no longer available"));
         model.addAttribute("account", AuthenticatedUser.from(user));
+        model.addAttribute("hasAvatar", avatars.exists(userId));
         model.addAttribute("accountFormToken", AccountFormTokens.get(session));
         if (!model.containsAttribute("profileForm")) {
             model.addAttribute("profileForm", ProfileForm.from(user));

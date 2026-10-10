@@ -1,10 +1,10 @@
-<nav class="account-navigation" [attr.aria-label]="lang.text('Store navigation', '商城导航')">
-  <div class="account-links"><a href="/products#catalog" class="catalog-nav">{{ lang.text('All products', '全部商品') }}</a><a href="/cart">{{ lang.text('Cart', '购物车') }} @if (cart.totalQuantity() !== null) { <span class="cart-count" aria-live="polite">{{ cart.totalQuantity() }}</span> }</a><a href="/orders">{{ lang.text('Orders', '订单') }}</a><a href="/account">{{ lang.text('Account', '账户') }}</a>
+<nav class="nexus-navigation account-navigation" [attr.aria-label]="lang.text('Main navigation', '主导航')">
+  <div class="nexus-links account-links"><a href="/products" class="catalog-nav" [class.active]="!dailyDeals" [attr.aria-current]="!dailyDeals ? 'page' : null">{{ lang.text('Home', '首页') }}</a><a href="/deals" [class.active]="dailyDeals" [attr.aria-current]="dailyDeals ? 'page' : null">{{ lang.text('Daily deals', '每日促销') }}</a><a href="/cart">{{ lang.text('Cart', '购物车') }} @if (cart.totalQuantity() !== null) { <span class="nexus-cart-count cart-count" aria-live="polite">{{ cart.totalQuantity() }}</span> }</a><a href="/orders">{{ lang.text('Orders', '订单') }}</a><a href="/account">{{ lang.text('Account', '账户') }}</a>
     @if (state().user?.role === 'ADMIN') { <a href="/admin/products">{{ lang.text('Admin', '管理后台') }}</a> }
   </div>
-  <div class="account-identity" aria-live="polite">
+  <div class="nexus-identity account-identity" aria-live="polite">
     @if (loading()) { <span class="account-status">{{ lang.text('Checking account...', '正在查询账户…') }}</span> }
-    @else if (state().loggedIn && state().user) { <a class="account-name" href="/account">{{ state().user?.displayName }}</a><form action="/logout" method="post"><button type="submit">{{ lang.text('Log out', '退出') }}</button></form> }
+    @else if (state().loggedIn && state().user) { <a class="account-name" href="/account"><span class="nexus-avatar" aria-hidden="true">@if (state().avatarUrl && !avatarFailed()) { <img [src]="state().avatarUrl + '?v=' + avatarVersion()" alt="" (error)="avatarFailed.set(true)"> } @else { {{ state().user?.displayName?.slice(0, 1) }} }</span><span class="account-label">{{ state().user?.displayName }}</span></a><form action="/logout" method="post"><button type="submit">{{ lang.text('Log out', '退出') }}</button></form> }
     @else { <a href="/login">{{ lang.text('Log in', '登录') }}</a><a class="register-link" href="/register">{{ lang.text('Register', '注册') }}</a> }
     @if (unavailable()) { <button class="retry-status" type="button" (click)="refresh()">{{ lang.text('Retry account status', '重新查询账户') }}</button> }
   </div>

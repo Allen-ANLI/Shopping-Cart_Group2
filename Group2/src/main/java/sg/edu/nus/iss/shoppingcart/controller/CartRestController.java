@@ -19,15 +19,32 @@ public class CartRestController {
     public CartRestController(CartService cart) { this.cart = cart; }
     public record AddItem(@NotNull @Min(1) Long productId,
                           @Min(1) @Max(99) int quantity, @NotBlank String cartFormToken) { }
+    public record SetQuantity(@Min(0) @Max(99) int quantity, @NotBlank String cartFormToken) { }
+
+    @PutMapping("/api/cart/items/{productId}")
+    public ResponseEntity<?> update(@PathVariable @Min(1) Long productId,
+                                    @Valid @RequestBody SetQuantity form, HttpSession session) {
+        synchronized (session) {
+            cart.validateFormToken(session, form.cartFormToken());
+            cart.updateQuantity(session, productId, form.quantity());
+            return state(session);
+        }
+    }
+
+    private ResponseEntity<?> state(HttpSession session) {
+        var items = cart.getCartItems(session);
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(Map.of("itemCount", items.size(),
+                "totalQuantity", cart.countTotalQuantity(items), "quantities", items.stream().collect(
+                        java.util.stream.Collectors.toMap(sg.edu.nus.iss.shoppingcart.dto.CartLine::getProductId,
+                                sg.edu.nus.iss.shoppingcart.dto.CartLine::getQuantity))));
+    }
 
     @PostMapping("/api/cart/items")
     public ResponseEntity<?> add(@Valid @RequestBody AddItem form, HttpSession session) {
         synchronized (session) {
             cart.validateFormToken(session, form.cartFormToken());
             cart.addItem(session, form.productId(), form.quantity());
-            var items = cart.getCartItems(session);
-            return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(
-                    Map.of("itemCount", items.size(), "totalQuantity", cart.countTotalQuantity(items)));
+            return state(session);
         }
     }
 }

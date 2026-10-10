@@ -22,6 +22,7 @@ export class ProductService {
   }
 
   getCategories(): Observable<Category[]> { return this.http.get<Category[]>('/api/categories'); }
+  getDailyDeals(): Observable<{date: string; products: Product[]}> { return this.http.get<{date: string; products: Product[]}>('/api/deals'); }
   getReviews(id: string): Observable<ReviewSummary> { return this.http.get<ReviewSummary>(`/api/products/${encodeURIComponent(id)}/reviews`); }
   saveReview(id: string, review: {rating: number; comment: string; cartFormToken: string}): Observable<ReviewSummary> {
     return this.http.post<ReviewSummary>(`/api/products/${encodeURIComponent(id)}/reviews`, review);

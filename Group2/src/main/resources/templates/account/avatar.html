@@ -1,0 +1,21 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="editor" class="avatar-editor" data-avatar-editor th:attr="data-token=${accountFormToken},data-invalid=#{avatar.fileInvalid},data-failed=#{avatar.failed},data-saving=#{avatar.saving},data-save=#{avatar.save}">
+    <div class="account-avatar">
+        <img data-avatar-image th:src="${hasAvatar} ? @{/api/account/avatar} : null" th:hidden="${!hasAvatar}" th:alt="#{avatar.photo}">
+        <span data-avatar-initial th:hidden="${hasAvatar}" aria-hidden="true" th:text="${#strings.substring(account.displayName,0,1)}"></span>
+    </div>
+    <button class="avatar-choose" type="button" data-avatar-choose th:text="#{avatar.choose}"></button>
+    <input type="file" accept="image/jpeg,image/png,image/webp" data-avatar-file hidden th:aria-label="#{avatar.choose}">
+    <p class="avatar-hint" th:text="#{avatar.fileHint}"></p>
+    <p class="avatar-status" data-avatar-status role="status" aria-live="polite"></p>
+    <dialog class="avatar-dialog" aria-labelledby="avatar-heading" aria-describedby="avatar-instructions">
+        <h2 id="avatar-heading" th:text="#{avatar.cropTitle}"></h2>
+        <p id="avatar-instructions" th:text="#{avatar.cropHint}"></p>
+        <canvas class="avatar-canvas" width="600" height="600" tabindex="0" role="img" th:aria-label="#{avatar.cropLabel}"></canvas>
+        <label class="avatar-zoom"><span th:text="#{avatar.zoom}"></span><input type="range" min="1" max="3" step="0.01" value="1" data-avatar-zoom></label>
+        <button class="avatar-reset" type="button" data-avatar-reset th:text="#{avatar.reset}"></button>
+        <p class="avatar-error" data-avatar-error role="alert"></p>
+        <div class="avatar-actions"><button type="button" class="btn btn-secondary" data-avatar-cancel th:text="#{avatar.cancel}"></button><button type="button" class="btn primary" data-avatar-save th:text="#{avatar.save}"></button></div>
+    </dialog>
+</section>
+</body></html>

@@ -12,20 +12,20 @@
         <h1 th:text="${addressId == null} ? #{address.add} : #{address.editTitle}">Add address</h1>
         <p class="muted" th:text="#{address.formHint}">Use the recipient's full name and a phone number for delivery.</p>
         <div th:replace="~{auth/fragments :: alerts}"></div>
-        <form th:action="${addressId == null} ? @{/account/addresses} : @{/account/addresses/{id}(id=${addressId})}" th:object="${addressForm}" method="post">
+        <form th:action="${addressId == null} ? @{/account/addresses} : @{/account/addresses/{id}(id=${addressId})}" th:object="${addressForm}" method="post" novalidate data-localized-form data-form-kind="address">
             <input type="hidden" name="accountFormToken" th:value="${accountFormToken}">
             <input type="hidden" name="returnTo" th:value="${returnTo}">
             <div class="alert error" role="alert" th:if="${#fields.hasAnyErrors()}">
                 <p th:each="message : ${#fields.allErrors()}" th:text="${message}"></p>
             </div>
             <div class="account-form-grid">
-                <div><label for="recipientName" th:text="#{address.recipient}">Recipient name</label><input id="recipientName" th:field="*{recipientName}" maxlength="120" autocomplete="shipping name" required></div>
-                <div><label for="phone" th:text="#{account.phone}">Phone</label><input id="phone" type="tel" th:field="*{phone}" maxlength="30" autocomplete="shipping tel" required></div>
-                <div class="form-wide"><label for="addressLine1" th:text="#{address.line1}">Street address</label><input id="addressLine1" th:field="*{addressLine1}" maxlength="200" autocomplete="shipping address-line1" required></div>
-                <div class="form-wide"><label for="addressLine2" th:text="#{address.line2}">Apartment, unit or building (optional)</label><input id="addressLine2" th:field="*{addressLine2}" maxlength="200" autocomplete="shipping address-line2"></div>
-                <div><label for="city" th:text="#{address.city}">City / region</label><input id="city" th:field="*{city}" maxlength="100" autocomplete="shipping address-level2" required></div>
-                <div><label for="postalCode" th:text="#{address.postal}">Postal code</label><input id="postalCode" th:field="*{postalCode}" maxlength="20" autocomplete="shipping postal-code" required></div>
-                <div class="form-wide"><label for="country" th:text="#{address.country}">Country / region</label><input id="country" th:field="*{country}" maxlength="80" autocomplete="shipping country-name" required></div>
+                <div><label for="recipientName" th:text="#{address.recipient}">Recipient name</label><input id="recipientName" th:field="*{recipientName}" maxlength="120" autocomplete="shipping name" required th:attr="data-required-message=#{address.recipient.required},data-length-message=#{account.fullName.length}"></div>
+                <div><label for="phone" th:text="#{account.phone}">Phone</label><input id="phone" type="tel" th:field="*{phone}" maxlength="30" autocomplete="shipping tel" required th:attr="data-required-message=#{account.phone.required},data-invalid-message=#{account.phone.invalid}"></div>
+                <div class="form-wide"><label for="addressLine1" th:text="#{address.line1}">Street address</label><input id="addressLine1" th:field="*{addressLine1}" maxlength="200" autocomplete="shipping address-line1" required th:attr="data-required-message=#{address.line1.required},data-length-message=#{address.field.tooLong}"></div>
+                <div class="form-wide"><label for="addressLine2" th:text="#{address.line2}">Apartment, unit or building (optional)</label><input id="addressLine2" th:field="*{addressLine2}" maxlength="200" autocomplete="shipping address-line2" th:attr="data-length-message=#{address.field.tooLong}"></div>
+                <div><label for="city" th:text="#{address.city}">City / region</label><input id="city" th:field="*{city}" maxlength="100" autocomplete="shipping address-level2" required th:attr="data-required-message=#{address.city.required},data-length-message=#{address.field.tooLong}"></div>
+                <div><label for="postalCode" th:text="#{address.postal}">Postal code</label><input id="postalCode" th:field="*{postalCode}" maxlength="20" autocomplete="shipping postal-code" required th:attr="data-required-message=#{address.postal.required},data-invalid-message=#{address.postal.invalid},data-length-message=#{address.field.tooLong}"></div>
+                <div class="form-wide"><label for="country" th:text="#{address.country}">Country / region</label><input id="country" th:field="*{country}" maxlength="80" autocomplete="shipping country-name" required th:attr="data-required-message=#{address.country.required},data-length-message=#{address.field.tooLong}"></div>
             </div>
             <label class="account-checkbox"><input type="checkbox" th:field="*{defaultAddress}"><span th:text="#{address.useDefault}">Use as my default shipping address</span></label>
             <p class="muted small" th:text="#{address.defaultHint}">Your first address becomes the default. You can change it later.</p>

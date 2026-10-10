@@ -13,4 +13,5 @@ export interface AuthenticatedUser {
 export interface AuthSessionState {
   loggedIn: boolean;
   user: AuthenticatedUser | null;
+  avatarUrl?: string | null;
 }

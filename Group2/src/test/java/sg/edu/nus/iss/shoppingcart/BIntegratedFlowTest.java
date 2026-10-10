@@ -59,6 +59,7 @@ class BIntegratedFlowTest {
     @Autowired MockMvc mvc;
     @Autowired UserRepository users;
     @Autowired ProductRepository products;
+    @Autowired sg.edu.nus.iss.shoppingcart.repository.ProductReviewRepository reviews;
     @Autowired OrderRepository orders;
     @Autowired OrderItemRepository items;
     @Autowired PasswordEncoder encoder;
@@ -96,6 +97,7 @@ class BIntegratedFlowTest {
         items.deleteAllInBatch();
         orders.deleteAllInBatch();
         deliveryAddressRows.deleteAllInBatch();
+        reviews.deleteAllInBatch();
         users.deleteAllInBatch();
         products.deleteAllInBatch();
     }
@@ -145,7 +147,7 @@ class BIntegratedFlowTest {
         var result = mvc.perform(post("/login").param("username", customer.getUsername())
                         .param("password", "wrong-secret"))
                 .andExpect(status().isOk()).andExpect(view().name("auth/login"))
-                .andExpect(content().string(containsString("Invalid username or password")))
+                .andExpect(content().string(containsString("The login details or password are incorrect.")))
                 .andExpect(content().string(not(containsString("wrong-secret")))).andReturn();
         assertThat(LoginInterceptor.currentUserId((MockHttpSession) result.getRequest().getSession(false))).isNull();
     }
@@ -170,13 +172,15 @@ class BIntegratedFlowTest {
         var guest = mvc.perform(get("/cart/products")).andReturn();
         MockHttpSession session = (MockHttpSession) guest.getRequest().getSession(false);
         mvc.perform(post("/login").session(session).param("username", customer.getUsername()).param("password", "demo123"))
-                .andExpect(redirectedUrl("/cart/products"));
+                .andExpect(redirectedUrl("/products"));
         assertThat(session.isInvalid()).isTrue();
     }
 
     @Test
     void interruptedCheckoutPostIsNotReplayedAfterLogin() throws Exception {
-        var guest = mvc.perform(post("/checkout").param("checkoutToken", "attacker-token")).andReturn();
+        var guest = mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").param("checkoutToken", "attacker-token")).andReturn();
         MockHttpSession session = (MockHttpSession) guest.getRequest().getSession(false);
         var request = post("/login").param("username", customer.getUsername()).param("password", "demo123");
         if (session != null) { request.session(session); }
@@ -202,8 +206,8 @@ class BIntegratedFlowTest {
 
     @Test
     void registrationUsesExistingAppUsersAndCannotGrantRoleOrChooseId() throws Exception {
-        mvc.perform(post("/register").param("username", "NewBUser").param("password", "newpass123")
-                        .param("confirmPassword", "newpass123").param("displayName", "New user")
+        mvc.perform(post("/register").param("username", "NewBUser").param("password", "Newpass123!")
+                        .param("confirmPassword", "Newpass123!").param("displayName", "New user")
                         .param("fullName", "New Customer").param("phone", "+65 9123 4567").param("birthday", "1998-05-12")
                         .param("email", "new@example.test").param("role", "ADMIN")
                         .param("id", admin.getId().toString()).param("passwordHash", "injected"))
@@ -211,18 +215,18 @@ class BIntegratedFlowTest {
         User saved = users.findByUsername("newbuser").orElseThrow();
         assertThat(saved.getId()).isNotEqualTo(admin.getId());
         assertThat(saved.getRole()).isEqualTo(User.Role.CUSTOMER);
-        assertThat(saved.getFullName()).isEqualTo("New Customer");
+        assertThat(saved.getFullName()).isNull();
         assertThat(saved.getPhone()).isEqualTo("+65 9123 4567");
         assertThat(saved.getBirthday()).isEqualTo(java.time.LocalDate.of(1998, 5, 12));
-        assertThat(saved.getPasswordHash()).startsWith("$2").isNotEqualTo("newpass123");
-        assertThat(encoder.matches("newpass123", saved.getPasswordHash())).isTrue();
+        assertThat(saved.getPasswordHash()).startsWith("$2").isNotEqualTo("Newpass123!");
+        assertThat(encoder.matches("Newpass123!", saved.getPasswordHash())).isTrue();
     }
 
     @Test
     void duplicateUsernameCaseIsRejected() throws Exception {
         long count = users.count();
         mvc.perform(post("/register").param("username", customer.getUsername().toUpperCase())
-                        .param("password", "newpass123").param("confirmPassword", "newpass123")
+                        .param("password", "Newpass123!").param("confirmPassword", "Newpass123!")
                         .param("fullName", "Duplicate Customer").param("phone", "+65 9123 4567")
                         .param("displayName", "Duplicated").param("email", "new@example.test"))
                 .andExpect(view().name("auth/register"))
@@ -291,7 +295,7 @@ class BIntegratedFlowTest {
         User saved = users.findById(customer.getId()).orElseThrow();
         assertThat(saved.getDisplayName()).isEqualTo("Updated name");
         assertThat(saved.getEmail()).isEqualTo("updated@example.test");
-        assertThat(saved.getFullName()).isEqualTo("Updated Customer");
+        assertThat(saved.getFullName()).isNull();
         assertThat(saved.getPhone()).isEqualTo("+65 9876 5432");
         assertThat(saved.getBirthday()).isEqualTo(java.time.LocalDate.of(1995, 9, 18));
         assertThat(saved.getRole()).isEqualTo(User.Role.CUSTOMER);
@@ -417,16 +421,18 @@ class BIntegratedFlowTest {
         var checkoutPage = mvc.perform(get("/checkout").session(session))
                 .andExpect(status().isOk()).andReturn();
         String token = (String) checkoutPage.getModelAndView().getModel().get("checkoutToken");
-        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token)
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token)
                         .param("userId", other.getId().toString()).param("totalAmount", "0.01"))
-                .andExpect(redirectedUrl("/checkout/success?key=" + token));
+                .andExpect(redirectedUrlPattern("/orders/*/payment"));
         Order order = orders.findByCheckoutTokenAndUser_Id(token, customer.getId()).orElseThrow();
-        assertThat(order.getTotalAmount()).isEqualByComparingTo("100.00");
+        assertThat(order.getTotalAmount()).isEqualByComparingTo("109.00");
         assertThat(cart.getCartItems(session)).isEmpty();
         mvc.perform(get("/checkout/success").session(session).param("key", token))
-                .andExpect(status().isOk()).andExpect(content().string(containsString("100.00")));
+                .andExpect(redirectedUrl("/orders/" + order.getId()));
         mvc.perform(get("/orders").session(session)).andExpect(status().isOk())
-                .andExpect(content().string(containsString("100.00")));
+                .andExpect(content().string(containsString("109.00")));
         mvc.perform(get("/orders/" + order.getId()).session(session)).andExpect(status().isOk())
                 .andExpect(content().string(containsString("B integration product")));
         mvc.perform(get("/orders/" + order.getId()).session(login(other.getUsername(), null)))
@@ -442,17 +448,23 @@ class BIntegratedFlowTest {
         String token = checkout.prepare(session);
         product.setActive(false);
         products.saveAndFlush(product);
-        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", token))
                 .andExpect(status().isOk()).andExpect(view().name("orders/checkout"));
         assertThat(orders.count()).isZero();
         assertThat(cart.countItems(session)).isEqualTo(1);
         product.setActive(true);
         products.saveAndFlush(product);
         String retryToken = checkout.prepare(session);
-        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", retryToken))
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", retryToken))
                 .andExpect(status().is3xxRedirection());
         cart.addItem(session, product.getId(), 2);
-        mvc.perform(post("/checkout").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", retryToken))
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("addressId", deliveryAddress(session)).param("checkoutToken", retryToken))
                 .andExpect(status().is3xxRedirection());
         assertThat(orders.count()).isEqualTo(1);
         assertThat(cart.readForCheckout(session)).containsEntry(product.getId(), 2);

@@ -18,6 +18,10 @@ import sg.edu.nus.iss.shoppingcart.entity.Product;
  */
 public interface AdminProductQueryRepository extends JpaRepository<Product, Long> {
 
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("select p from Product p where p.id = :id")
+    java.util.Optional<Product> findForUpdate(@Param("id") Long id);
+
     /**
      * 判断某个商品是否已经被订单明细引用。
      *

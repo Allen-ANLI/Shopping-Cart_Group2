@@ -1,1 +1,2 @@
 /* Shared storefront layout and responsive styles live in styles.css. */
+.review-layout { grid-template-columns:1fr; } .reviews-list { grid-template-columns:repeat(2,minmax(0,1fr)); } @media(max-width:700px) { .reviews-list { grid-template-columns:1fr; } }

@@ -34,13 +34,20 @@ public class PurchaseHistoryController {
 
     /** 购买历史服务。 */
     private final PurchaseHistoryService purchaseHistoryService;
+    private final sg.edu.nus.iss.shoppingcart.service.OrderCompletionService completion;
+    private final sg.edu.nus.iss.shoppingcart.service.CartService cart;
+    private final sg.edu.nus.iss.shoppingcart.service.ProductReviewService reviews;
 
     /**
      * 构造方法，注入依赖。
      *
      * @param purchaseHistoryService 购买历史服务
      */
-    public PurchaseHistoryController(PurchaseHistoryService purchaseHistoryService) {
+    public PurchaseHistoryController(PurchaseHistoryService purchaseHistoryService,
+                                     sg.edu.nus.iss.shoppingcart.service.OrderCompletionService completion,
+                                     sg.edu.nus.iss.shoppingcart.service.CartService cart,
+                                     sg.edu.nus.iss.shoppingcart.service.ProductReviewService reviews) {
+        this.completion = completion; this.cart = cart; this.reviews = reviews;
         this.purchaseHistoryService = purchaseHistoryService;
     }
 
@@ -91,7 +98,69 @@ public class PurchaseHistoryController {
         OrderDetailDto order = purchaseHistoryService.findOrderDetailForUser(id, userId);
 
         model.addAttribute("order", order);
+        model.addAttribute("cartFormToken", cart.formToken(session));
+        var ownReviews = new java.util.HashMap<Long, sg.edu.nus.iss.shoppingcart.service.ProductReviewService.OwnReview>();
+        if (order.isReceiptConfirmed()) for (var item : order.getItems()) {
+            var own = reviews.ownReview(item.getProductId(), userId);
+            if (own != null) ownReviews.put(item.getProductId(), own);
+        }
+        model.addAttribute("ownReviews", ownReviews);
 
         return "orders/detail";
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/orders/{id}/confirm")
+    public String confirm(@PathVariable Long id, @RequestParam(required = false) String cartFormToken,
+                          HttpSession session, Model model) {
+        synchronized (session) {
+            requireFormToken(session, cartFormToken);
+            completion.confirm(id, CurrentUser.getId(session));
+        }
+        model.addAttribute("successMessage", sg.edu.nus.iss.shoppingcart.service.PaymentService.localized(
+                "Receipt confirmed. You can now review your products below.", "已确认收货，现在可以在下方评价商品。"));
+        return orderDetail(id, session, model);
+    }
+
+    @GetMapping("/orders/{id}/reviews/{productId}")
+    public String reviewPage(@PathVariable Long id, @PathVariable Long productId, HttpSession session, Model model) {
+        var order=purchaseHistoryService.findOrderDetailForUser(id,CurrentUser.getId(session));
+        if (!order.isReceiptConfirmed()) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN,
+                sg.edu.nus.iss.shoppingcart.service.PaymentService.localized("Please confirm receipt before writing a review.", "请先确认收货，再进行评价。"));
+        var item=order.getItems().stream().filter(i->productId.equals(i.getProductId())).findFirst()
+                .orElseThrow(()->sg.edu.nus.iss.shoppingcart.exception.ResourceNotFoundException.of("Product",productId));
+        var own=reviews.ownReview(productId,CurrentUser.getId(session));
+        model.addAttribute("order",order); model.addAttribute("item",item);
+        model.addAttribute("cartFormToken",cart.formToken(session));
+        if(!model.containsAttribute("reviewDraftRating")) model.addAttribute("reviewDraftRating",own==null?0:own.rating());
+        if(!model.containsAttribute("reviewDraftComment")) model.addAttribute("reviewDraftComment",own==null?"":own.comment());
+        return "orders/review";
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/orders/{id}/reviews/{productId}")
+    public String review(@PathVariable Long id, @PathVariable Long productId,
+                         @RequestParam(required = false) String cartFormToken,
+                         @RequestParam(defaultValue = "0") int rating, @RequestParam(defaultValue = "") String comment,
+                         HttpSession session, Model model) {
+        synchronized (session) {
+            requireFormToken(session, cartFormToken);
+            try {
+                completion.review(id, productId, CurrentUser.getId(session), rating, comment);
+                return "redirect:/orders/" + id + "?reviewed";
+            } catch (IllegalArgumentException ex) {
+                model.addAttribute("errorMessage", ex.getMessage());
+                model.addAttribute("reviewDraftComment", comment);
+                model.addAttribute("reviewDraftRating", rating);
+            }
+        }
+        return reviewPage(id, productId, session, model);
+    }
+
+    private void requireFormToken(HttpSession session, String token) {
+        try {
+            cart.validateFormToken(session, token);
+        } catch (sg.edu.nus.iss.shoppingcart.exception.BusinessException ex) {
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN,
+                    sg.edu.nus.iss.shoppingcart.service.UiText.localize(ex.getMessage()));
+        }
     }
 }

@@ -1,0 +1,41 @@
+.payment-options fieldset{border:0;padding:0;margin:18px 0;min-width:0}.payment-options fieldset[hidden]{display:none}.payment-options legend{font-weight:700;margin-bottom:10px}.payment-options label{display:grid;gap:7px;margin-bottom:14px}.payment-options input,.payment-options select{width:100%;min-width:0;box-sizing:border-box}.payment-field-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.payment-options .btn{font-size:.83rem;white-space:normal}.payment-receipt dd{overflow-wrap:anywhere}.order-status{display:inline-block;padding:6px 12px;border-radius:24px;background:#e5f1ee;color:#145b47;font-size:.85rem;font-weight:650}.shipment-timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0;margin:28px 0;list-style:none;gap:14px}.shipment-timeline li{display:flex;flex-direction:column;gap:8px;position:relative}.shipment-dot{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#185c49;color:white;z-index:1}.shipment-timeline li:not(:last-child):after{content:"";height:2px;position:absolute;left:35px;right:0;top:15px;background:#b8d5ca}.shipment-timeline time,.shipment-timeline li>span:last-child{font-size:.75rem;color:#66786f}.receipt-confirmed{font-weight:650;color:#185c49}.inline-review{padding:20px 0;border-top:1px solid #dce4de;display:grid;gap:12px}.inline-review h3{margin:0 0 2px}.inline-review select{max-width:210px}.inline-review textarea{width:100%;box-sizing:border-box;resize:vertical;padding:12px;font:inherit;border:1px solid #bccfc4;border-radius:8px}.inline-review .btn{justify-self:start}.inline-review label{font-weight:600}.inline-review[aria-busy=true]{opacity:.7}@media(max-width:600px){.shipment-timeline{grid-template-columns:1fr;gap:20px}.shipment-timeline li{padding-left:46px;min-height:52px}.shipment-dot{position:absolute;left:0;top:0}.shipment-timeline li:not(:last-child):after{width:2px;height:auto;left:15px;right:auto;top:36px;bottom:-15px}.payment-field-pair{grid-template-columns:1fr 1fr}}
+
+/* Order pricing and per-item review flow. */
+.order-pricing{max-width:420px;margin:22px 0 0 auto}.order-pricing .summary-row{gap:20px;padding:10px 0}.savings{color:#14804a}.original-price{display:block;color:#7b879a;font-size:.84rem;font-weight:400}.pending{color:#9a5700;background:#fff4d9}.review-action,.reviewed-badge{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:7px 11px;box-sizing:border-box;font-size:13px;line-height:20px;font-weight:550;white-space:nowrap;border-radius:8px}.review-action{color:var(--primary);background:#f1f5ef;border:1px solid #dce5d8;text-decoration:none;transition:background .18s,border-color .18s}.review-action:hover{background:#e4eddf;border-color:#b8ccb0;text-decoration:none}.review-action-icon{width:16px;height:16px;flex:0 0 16px}.reviewed-badge{color:#65786c;background:#f5f7f3;border:1px solid transparent}.order-product-link{color:var(--primary);font-weight:550;text-decoration:underline;text-decoration-color:#b8cdbd;text-underline-offset:4px}.order-product-link:hover{text-decoration-color:currentColor}@media(prefers-reduced-motion:reduce){.review-action{transition:none}}.review-page{max-width:760px}.review-page textarea{display:block;width:100%;box-sizing:border-box;margin:10px 0 22px;padding:14px;font:inherit;border:1px solid #cbd5e1;border-radius:12px;resize:vertical}.rating-picker{border:0;padding:0;margin:24px 0}.rating-picker legend{font-weight:700}.rating-stars{display:flex;gap:8px;margin:12px 0}.rating-stars label{position:relative;margin:0;cursor:pointer}.rating-stars input{position:absolute;inset:0;opacity:0;cursor:pointer}.rating-stars span{font-size:44px;line-height:1.2;color:#cbd2dc;transition:color .15s,transform .15s;display:block}.rating-stars .filled span{color:#f5a623}.rating-stars label:hover span{transform:scale(1.1)}.rating-stars label:focus-within{outline:3px solid #84b8ff;outline-offset:4px;border-radius:6px}.receipt-download{margin-bottom:16px}.payment-options>label{display:block;margin:18px 0}.payment-options>button{margin-top:20px}.review-page .card{padding:32px}@media(max-width:600px){.review-page .card{padding:20px}.order-pricing{max-width:none}.rating-stars span{font-size:40px}}
+
+.payment-page .checkout-layout{display:grid}.payment-page .payment-options{display:block;padding:28px}.payment-page .payment-options>label{display:grid;margin:20px 0}.payment-page .payment-options h2{margin-top:0}.payment-page .payment-options>.btn{display:block;width:100%;padding:14px;font-size:15px;font-weight:650}.payment-page aside .order-pricing{max-width:none;margin-top:16px}.payment-page .payment-field-pair label{margin-bottom:0}@media(max-width:600px){.payment-page .payment-options{padding:20px}}
+
+/* Keep each product and its review action together on narrow screens. */
+@media (max-width: 600px) {
+    .order-products-table, .order-products-table tbody { display: block; }
+    .order-products-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+    .order-products-table tbody tr {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px 12px;
+        padding: 16px 0;
+        border-bottom: 1px solid #dce4de;
+    }
+    .order-products-table tbody tr:last-child { border-bottom: 0; }
+    .order-products-table td { display: block; padding: 0; border: 0; min-width: 0; }
+    .order-product-name, .order-product-review { grid-column: 1 / -1; }
+    .order-products-table .order-product-name { padding-bottom: 2px; }
+    .order-products-table .order-product-link { overflow-wrap: anywhere; }
+    .order-product-amount::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 7px;
+        color: #66786f;
+        font-size: 12px;
+        font-weight: 400;
+    }
+    .order-product-review { text-align: right; }
+}

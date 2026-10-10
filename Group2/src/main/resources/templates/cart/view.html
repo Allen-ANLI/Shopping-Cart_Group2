@@ -61,7 +61,7 @@
         <aside class="card cart-summary" th:attr="aria-label=#{cart.summary}">
             <h2 th:text="#{cart.summary}">Order summary</h2>
             <div class="summary-row"><span th:text="#{items}">Items</span><span th:text="${totalQuantity}">0</span></div>
-            <div class="summary-row summary-total"><span th:text="#{total}">Total</span><span th:text="'S$' + ${cartTotal}">S$0.00</span></div>
+            <div th:replace="~{store/fragments :: pricing(${pricing})}"></div>
             <p class="form-hint" th:text="#{cart.priceHint}">Prices are checked again when you place the order.</p>
             <a th:if="${canCheckout}" th:href="@{/checkout}" class="btn btn-block btn-lg" th:text="#{cart.checkout}">Proceed to checkout</a>
             <div th:unless="${canCheckout}">

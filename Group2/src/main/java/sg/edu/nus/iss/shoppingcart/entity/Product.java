@@ -49,6 +49,28 @@ public class Product {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 
+    @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    private int discountPercent;
+
+    // SQL expression keeps paged price ordering aligned with the price paid at checkout.
+    @org.hibernate.annotations.Formula("greatest(round(price * (100 - discount_percent) / 100.0, 2), 0.01)")
+    private BigDecimal effectivePriceValue;
+
+    public int getDiscountPercent() { return discountPercent; }
+    public void setDiscountPercent(int discountPercent) {
+        if (discountPercent < 0 || discountPercent > 99) {
+            throw new IllegalArgumentException("Discount must be between 0 and 99 percent");
+        }
+        this.discountPercent = discountPercent;
+    }
+    public BigDecimal getOriginalPrice() { return price; }
+    public BigDecimal getEffectivePrice() {
+        if (price == null) return null;
+        return price.multiply(BigDecimal.valueOf(100 - discountPercent))
+                .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP).max(new BigDecimal("0.01"));
+    }
+    public boolean isOnSale() { return discountPercent > 0; }
+
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
@@ -57,6 +79,29 @@ public class Product {
             columnDefinition = "BOOLEAN DEFAULT TRUE"
     )
     private boolean active = true;
+
+    @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 100")
+    private int stockQuantity = 100;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean hideWhenOutOfStock;
+
+    // Derived from persisted reviews/orders, so edits and purchases cannot drift from the catalogue.
+    @org.hibernate.annotations.Formula("(select coalesce(avg(1.0 * r.rating), 0) from product_reviews r where r.product_id = id)")
+    private double averageRating;
+    @org.hibernate.annotations.Formula("(select count(*) from product_reviews r where r.product_id = id)")
+    private long totalReviews;
+    @org.hibernate.annotations.Formula("(select coalesce(sum(i.quantity), 0) from order_items i join orders o on o.id = i.order_id where i.product_id = id and (o.payment_status = 'PAID' or o.payment_status is null))")
+    private long salesCount;
+
+    public int getStockQuantity() { return stockQuantity; }
+    public void setStockQuantity(int stockQuantity) { this.stockQuantity = stockQuantity; }
+    public boolean isHideWhenOutOfStock() { return hideWhenOutOfStock; }
+    public void setHideWhenOutOfStock(boolean value) { hideWhenOutOfStock = value; }
+    public boolean isVisible() { return active && (!hideWhenOutOfStock || stockQuantity > 0); }
+    public double getAverageRating() { return Math.round(averageRating * 10) / 10.0; }
+    public long getTotalReviews() { return totalReviews; }
+    public long getSalesCount() { return salesCount; }
 
     public Product() {
     }
@@ -111,7 +156,7 @@ public class Product {
 
     public String getCategory() { return fallback(category, "workspace"); }
     public void setCategory(String category) { this.category = category; }
-    public String getBrand() { return fallback(brand, "Group2 Essentials"); }
+    public String getBrand() { return fallback(brand, "NEXUS Essentials"); }
     public void setBrand(String brand) { this.brand = brand; }
     public String getOrigin() { return fallback(origin, "Singapore"); }
     public void setOrigin(String origin) { this.origin = origin; }

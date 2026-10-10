@@ -1,9 +1,8 @@
-<a class="skip-link" [href]="skipUrl">{{ lang.text('Skip to content', '跳转到正文') }}</a>
-<div class="utility-bar"><div class="store-container utility-inner"><span>{{ lang.text('Everyday essentials. Thoughtfully selected.', '用心挑选，日常好物。') }}</span><span>{{ lang.text('Singapore', '新加坡') }} · SGD</span></div></div>
-<header class="store-container store-header">
-  <a class="brand" href="/products" [attr.aria-label]="lang.text('Everyday Market home', 'Everyday Market 首页')"><span class="brand-mark"><app-icon name="bag" /></span><span><strong>Everyday Market<span class="brand-dot">.</span></strong><small>{{ lang.text('SMALL THINGS. BETTER DAYS.', '小小好物，美好日常。') }}</small></span></a>
-  <button type="button" class="language-switch" (click)="lang.toggle()" [attr.aria-label]="lang.text('Switch to Chinese', '切换到英文')"><app-icon name="globe" /><span>{{ lang.text('中文', 'English') }}</span></button>
+<header class="nexus-header">
+  <a class="nexus-skip" [href]="skipUrl">{{ lang.text('Skip to content', '跳至主要内容') }}</a>
+  <div class="nexus-topline"><div class="nexus-container"><span>{{ lang.text('Tech for work. Space for ideas.', '数码助力办公，灵感自在发生。') }}</span><span>SGD · {{ lang.text('Singapore', '新加坡') }}</span></div></div>
+  <div class="nexus-container nexus-brand-row"><a class="nexus-brand" href="/products"><span class="nexus-mark">N<span>↗</span></span><span><strong>NEXUS<span> Digital</span></strong><small>{{ lang.text('TECH & OFFICE ESSENTIALS', '数码 · 办公 · 灵感') }}</small></span></a><button class="nexus-language" type="button" (click)="lang.toggle()" [attr.aria-label]="lang.text('Switch language', '切换语言')">◎ {{ lang.text('中文 / ZH', 'EN / English') }}</button></div>
+  <div class="nexus-nav-band"><div class="nexus-container"><app-auth-navigation /></div></div>
 </header>
-<div class="nav-band"><div class="store-container"><app-auth-navigation /></div></div>
 <ng-content />
-<footer class="store-container store-footer"><div><a class="footer-brand" href="/products">Everyday Market.</a><p>{{ lang.text('A little upgrade for your everyday.', '为日常，添一点美好。') }}</p></div><nav [attr.aria-label]="lang.text('Footer navigation', '页脚导航')"><a href="/products#catalog">{{ lang.text('Collection', '商品系列') }}</a><a href="/account">{{ lang.text('My account', '我的账户') }}</a><a href="/account/addresses">{{ lang.text('Delivery addresses', '收货地址') }}</a></nav><span>{{ lang.text('All prices in SGD', '所有价格均为新加坡元') }}</span></footer>
+<footer class="nexus-container nexus-footer"><div><a href="/products">NEXUS Digital</a><p>{{ lang.text('Tech for work. Space for ideas.', '数码助力办公，灵感自在发生。') }}</p></div><span>{{ lang.text('All prices in SGD', '所有价格均为新加坡元') }}</span></footer>

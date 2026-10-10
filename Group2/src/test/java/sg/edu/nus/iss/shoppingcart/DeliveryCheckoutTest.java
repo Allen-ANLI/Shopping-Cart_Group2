@@ -52,9 +52,13 @@ class DeliveryCheckoutTest {
         cart.addItem(session, product().getId(), 1); String token = checkout.prepare(session);
         mvc.perform(get("/checkout").session(session)).andExpect(status().isOk())
                 .andExpect(content().string(containsString("Add a delivery address")));
-        mvc.perform(post("/checkout").session(session).param("checkoutToken", token))
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("checkoutToken", token))
                 .andExpect(view().name("orders/checkout")).andExpect(model().attributeExists("errorMessage"));
-        mvc.perform(post("/checkout").session(session).param("checkoutToken", token).param("addressId", foreign.getId().toString()))
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("checkoutToken", token).param("addressId", foreign.getId().toString()))
                 .andExpect(view().name("orders/checkout")).andExpect(model().attributeExists("errorMessage"));
         assertThat(orders.findByCheckoutTokenAndUser_Id(token, (Long)session.getAttribute("loginUserId"))).isEmpty();
         assertThat(cart.countItems(session)).isEqualTo(1);
@@ -63,19 +67,23 @@ class DeliveryCheckoutTest {
         var session = customer(); var address = address(session, "Original street 12");
         Long owner = (Long)session.getAttribute("loginUserId");
         cart.addItem(session, product().getId(), 2); String token = checkout.prepare(session);
-        mvc.perform(post("/checkout").session(session).param("checkoutToken", token).param("addressId", address.getId().toString()))
-                .andExpect(redirectedUrl("/checkout/success?key=" + token));
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("checkoutToken", token).param("addressId", address.getId().toString()))
+                .andExpect(redirectedUrlPattern("/orders/*/payment"));
         var order = orders.findByCheckoutTokenAndUser_Id(token, owner).orElseThrow();
         var edit = ShippingAddressForm.from(address); edit.setAddressLine1("Changed street 99");
         addresses.saveForUser(owner, address.getId(), edit); addresses.deleteForUser(owner, address.getId());
         mvc.perform(get("/orders/" + order.getId()).session(session)).andExpect(status().isOk())
                 .andExpect(content().string(containsString("Original street 12")));
-        mvc.perform(post("/checkout").session(session).param("checkoutToken", token).param("addressId", address.getId().toString()))
-                .andExpect(redirectedUrl("/checkout/success?key=" + token));
+        mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")
+                .param("cardNumber", "4242424242424242").param("cardExpiry", "12/99")
+                .param("cardSecurityCode", "123").param("paymentPin", "123456").session(session).param("checkoutToken", token).param("addressId", address.getId().toString()))
+                .andExpect(redirectedUrlPattern("/orders/*/payment"));
         assertThat(orders.findByCheckoutTokenAndUser_Id(token, owner).orElseThrow().getId()).isEqualTo(order.getId());
         assertThat(cart.countItems(session)).isZero();
         mvc.perform(get("/checkout/success").session(session).param("key", token))
-                .andExpect(content().string(containsString("Original street 12")));
+                .andExpect(redirectedUrl("/orders/" + order.getId()));
     }
     @Test void quickAddIsJsonValidatedAndDoesNotNavigateAway() throws Exception {
         var session = customer(); var product = product(); String token = cart.formToken(session);

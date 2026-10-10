@@ -50,11 +50,19 @@ public class CheckoutCoordinator {
         }
     }
 
+    public Long placeOrder(HttpSession session, String token, Long addressId) {
+        return submit(session, token, addressId, null);
+    }
+
     public Long submit(HttpSession session, String token) {
         return submit(session, token, null);
     }
 
     public Long submit(HttpSession session, String token, Long addressId) {
+        return submit(session, token, addressId, PaymentService.Request.success());
+    }
+
+    public Long submit(HttpSession session, String token, Long addressId, PaymentService.Request payment) {
         synchronized (session) {
             Long userId = cartService.requireUserId(session);
             State state = state(session);
@@ -66,7 +74,7 @@ public class CheckoutCoordinator {
                 throw new BusinessException("Your cart changed or this checkout form expired. Review it and try again.");
             }
             // 调用的是 Spring 代理，返回时数据库事务已经完成；异常时下方清空不会执行。
-            Order order = checkoutService.checkout(userId, cartService.readForCheckout(session), token, addressId);
+            Order order = checkoutService.checkout(userId, cartService.readForCheckout(session), token, addressId, payment);
             cartService.clearCart(session);
             state.completed.put(token, order.getId());
             while (state.completed.size() > 5) {

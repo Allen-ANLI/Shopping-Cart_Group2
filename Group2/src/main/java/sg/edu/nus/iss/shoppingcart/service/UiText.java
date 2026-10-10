@@ -8,6 +8,11 @@ import java.util.Map;
 @Component("uiText")
 public class UiText {
     private static final Map<String,String> CHINESE = Map.ofEntries(
+        Map.entry("Discount must be between 0 and 99 percent", "折扣优惠必须为 0 至 99。"),
+        Map.entry("Only customers who purchased this product can review it.", "仅购买过此商品的用户可以评分和评价。"),
+        Map.entry("Not enough stock. Please reduce the quantity.", "库存不足，请减少购买数量。"),
+        Map.entry("Select a valid simulated payment option.", "请选择有效的模拟支付选项。"),
+        Map.entry("Payment declined. Choose a successful simulation and try again.", "模拟支付失败，请选择支付成功后重试。"),
         Map.entry("Product added to your cart", "商品已加入购物车"),
         Map.entry("Cart updated", "购物车已更新"), Map.entry("Product removed", "商品已移除"),
         Map.entry("Cart cleared", "购物车已清空"), Map.entry("Order not found", "找不到此订单"),

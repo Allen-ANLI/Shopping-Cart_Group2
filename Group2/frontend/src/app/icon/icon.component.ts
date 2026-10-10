@@ -1,6 +1,11 @@
 import { Component, computed, input } from '@angular/core';
 
 const iconPaths = {
+  storage: ['M4 4h16v16H4Z', 'M4 14h16M7 17h.01M10 17h.01'],
+  power: ['M9 2v5M15 2v5M7 7h10v5a5 5 0 0 1-10 0V7Z', 'M12 17v5'],
+  wifi: ['M3 8a15 15 0 0 1 18 0M6 12a10 10 0 0 1 12 0M9 16a5 5 0 0 1 6 0M12 20h.01'],
+  printer: ['M7 8V3h10v5M7 16H3V8h18v8h-4M7 13h10v8H7Z', 'M17 10h.01'],
+  phone: ['M7 2h10v20H7Z', 'M10 18h4'],
   bag: ['M6 7h12l1 14H5L6 7Z', 'M9 8V6a3 3 0 0 1 6 0v2'],
   arrow: ['M5 12h14', 'm14 7 5 5-5 5'],
   heart: ['M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z'],

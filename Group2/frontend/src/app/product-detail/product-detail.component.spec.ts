@@ -57,32 +57,42 @@ describe('Product detail and persistent customer reviews', () => {
   it('cancels a pending request on destruction', () => {
     const request = http.expectOne('/api/products/1'); fixture.destroy(); expect(request.cancelled).toBe(true);
   });
-  it('asks anonymous visitors to log in and returns them to the same product', () => {
-    load(false);
-    expect(element.querySelector('.review-form')).toBeNull();
-    expect(element.querySelector('.review-form-panel a')?.getAttribute('href')).toBe('/login?returnTo=%2Fproducts%3Fcategory%3Dtyping%26page%3D2%26id%3D1');
-  });
-  it('submits an authenticated review with a fresh session token and renders the saved result as text', () => {
-    load();
-    const comment = element.querySelector<HTMLTextAreaElement>('textarea')!;
-    comment.value = '<script>alert(1)</script> Comfortable keys.'; comment.dispatchEvent(new Event('input'));
-    const rating = element.querySelector<HTMLSelectElement>('#review-rating')!; rating.value = '4'; rating.dispatchEvent(new Event('change'));
-    element.querySelector('.review-form')!.dispatchEvent(new Event('submit', { cancelable: true })); render();
-    expect(element.querySelector<HTMLButtonElement>('.review-form button')!.disabled).toBe(true);
-    http.expectOne('/api/cart/form').flush({ cartFormToken: 'review-token', itemCount: 1, totalQuantity: 2 });
-    const save = http.expectOne('/api/products/1/reviews'); expect(save.request.method).toBe('POST');
-    expect(save.request.body).toEqual({ rating: 4, comment: comment.value, cartFormToken: 'review-token' });
-    save.flush({ ...summary(), totalReviews: 1, averageRating: 4, reviews: [{ id: 7, displayName: 'Alice', rating: 4, comment: comment.value, createdAt: '2026-10-10T10:30:00' }] }); render();
-    expect(element.querySelector('.review-comment')?.textContent).toContain('<script>alert(1)</script>');
-    expect(element.querySelector('script')).toBeNull();
-    expect(element.querySelector('[role="status"]')?.textContent).toContain('Your review has been saved.');
-    expect(element.querySelector('.rating-summary')?.textContent).toContain('4.0');
-  });
-  it('prefills an existing review so resubmission edits the same review', () => {
+  for (const purchased of [false, true]) {
+    it('keeps product details display-only for ' + (purchased ? 'purchasers' : 'guests'), () => {
+      load(purchased);
+      expect(element.querySelector('.review-form')).toBeNull();
+      expect(element.querySelector('.review-form-panel')).toBeNull();
+      expect(element.textContent).not.toContain('Share your experience');
+      http.expectNone('/api/cart/form');
+    });
+  }
+  it('paginates a large review history and safely renders customer content', () => {
     http.expectOne('/api/products/1').flush(keyboard); render();
-    http.expectOne('/api/products/1/reviews').flush({ ...summary(), ownReview: { rating: 3, comment: 'Comfortable but a little noisy.' } }); render();
-    expect(element.querySelector<HTMLTextAreaElement>('textarea')!.value).toBe('Comfortable but a little noisy.');
-    expect(element.querySelector<HTMLSelectElement>('#review-rating')!.value).toBe('3');
+    const reviews = Array.from({length: 12}, (_, i) => ({id: i, displayName:'Customer ' + i, rating: 4, comment: '<script>test</script> Review ' + i, createdAt:'2026-10-10T10:30:00'}));
+    http.expectOne('/api/products/1/reviews').flush({...summary(), reviews, totalReviews:12, averageRating:4}); render();
+    expect(element.querySelectorAll('.review-card')).toHaveLength(8);
+    expect(element.querySelector('.review-comment')?.textContent).toContain('<script>test</script>');
+    expect(element.querySelector('script')).toBeNull();
+    const next = Array.from(element.querySelectorAll<HTMLButtonElement>('.pagination button')).find(b => b.textContent?.trim() === 'Next')!;
+    next.click(); render();
+    expect(element.querySelectorAll('.review-card')).toHaveLength(4);
+    expect(element.querySelector('.review-comment')?.textContent).toContain('Review 8');
+  });
+  it('refreshes reviews and rating when returning to an already-open product page', () => {
+    load();
+    window.dispatchEvent(new PageTransitionEvent('pageshow', {persisted:true}));
+    const published = {id:10, displayName:'Buyer', rating:5, comment:'New review from my order', createdAt:'2026-10-10T10:30:00'};
+    http.expectOne('/api/products/1/reviews').flush({...summary(), reviews:[published], totalReviews:1, averageRating:5}); render();
+    expect(element.querySelector('.review-comment')?.textContent).toBe(published.comment);
+    expect(element.querySelector('.detail-rating')?.textContent).toContain('5.0 / 5');
+    document.dispatchEvent(new Event('visibilitychange'));
+    http.expectOne('/api/products/1/reviews').flush({...summary(), reviews:[{...published, rating:4}], totalReviews:1, averageRating:4}); render();
+    expect(element.querySelector('.detail-rating')?.textContent).toContain('4.0 / 5');
+    http.expectNone('/api/products/1');
+    fixture.destroy();
+    document.dispatchEvent(new Event('visibilitychange'));
+    window.dispatchEvent(new PageTransitionEvent('pageshow', {persisted:true}));
+    http.expectNone('/api/products/1/reviews');
   });
   it('keeps product shopping available when reviews fail and supports retry', () => {
     http.expectOne('/api/products/1').flush(keyboard); render();
@@ -91,9 +101,5 @@ describe('Product detail and persistent customer reviews', () => {
     element.querySelector<HTMLButtonElement>('.reviews-list button')!.click(); render();
     http.expectOne('/api/products/1/reviews').flush(summary()); render();
     expect(element.querySelector('.reviews-list [role="alert"]')).toBeNull();
-  });
-  it('rejects a short review without sending a request', () => {
-    load(); fixture.componentInstance.comment = 'bad'; fixture.componentInstance.saveReview(new Event('submit'));
-    http.expectNone('/api/cart/form'); expect(fixture.componentInstance.savingReview()).toBe(false);
   });
 });

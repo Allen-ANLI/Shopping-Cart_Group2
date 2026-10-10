@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import sg.edu.nus.iss.shoppingcart.dto.AuthenticatedUser;
 import sg.edu.nus.iss.shoppingcart.interceptor.LoginInterceptor;
 import sg.edu.nus.iss.shoppingcart.service.AuthService;
+import sg.edu.nus.iss.shoppingcart.service.AvatarService;
 
 /**
  * 给 Angular 提供安全的登录状态；不返回 passwordHash 或 User 实体。
@@ -15,15 +16,18 @@ import sg.edu.nus.iss.shoppingcart.service.AuthService;
 @RestController
 public class AuthSessionController {
     private final AuthService authService;
-    public AuthSessionController(AuthService authService) { this.authService = authService; }
+    private final AvatarService avatars;
+    public AuthSessionController(AuthService authService, AvatarService avatars) {
+        this.authService = authService; this.avatars = avatars;
+    }
 
-    public record LoginState(boolean loggedIn, AuthenticatedUser user) {}
+    public record LoginState(boolean loggedIn, AuthenticatedUser user, String avatarUrl) {}
 
     @GetMapping("/api/auth/session")
     public LoginState session(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Cache-Control", "no-store");
         Long id = LoginInterceptor.currentUserId(request.getSession(false));
         var user = authService.findById(id).map(AuthenticatedUser::from).orElse(null);
-        return new LoginState(user != null, user);
+        return new LoginState(user != null, user, user != null && avatars.exists(user.id()) ? "/api/account/avatar" : null);
     }
 }

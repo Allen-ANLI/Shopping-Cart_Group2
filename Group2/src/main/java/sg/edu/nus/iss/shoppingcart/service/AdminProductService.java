@@ -133,6 +133,8 @@ public class AdminProductService {
     }
 
     private void requireMetadata(ProductForm form) {
+        if (form.getDiscountPercent() < 0 || form.getDiscountPercent() > 99) throw new BusinessException("Discount must be between 0 and 99 percent");
+        if (form.getStockQuantity() < 0 || form.getStockQuantity() > 1000000) throw new BusinessException("Stock must be between 0 and 1000000");
         if (!CatalogCategory.isValid(form.getCategory())) throw new BusinessException("Select a valid product category");
         checkLength(form.getBrand(), 80); checkLength(form.getOrigin(), 100);
         checkLength(form.getOriginZh(), 100); checkLength(form.getNameZh(), 100);
@@ -144,6 +146,9 @@ public class AdminProductService {
     }
 
     private void applyMetadata(Product product, ProductForm form) {
+        product.setDiscountPercent(form.getDiscountPercent());
+        product.setStockQuantity(form.getStockQuantity());
+        product.setHideWhenOutOfStock(form.isHideWhenOutOfStock());
         product.setCategory(form.getCategory()); product.setBrand(trimToNull(form.getBrand()));
         product.setOrigin(trimToNull(form.getOrigin())); product.setOriginZh(trimToNull(form.getOriginZh()));
         product.setNameZh(trimToNull(form.getNameZh())); product.setDescriptionZh(trimToNull(form.getDescriptionZh()));
@@ -170,7 +175,7 @@ public class AdminProductService {
         requireValidName(name);
         requireValidPrice(price);
 
-        Product product = findById(id);
+        Product product = findForUpdate(id);
         product.setName(name.trim());
         product.setDescription(trimToNull(description));
         product.setPrice(price);
@@ -190,7 +195,7 @@ public class AdminProductService {
      * @return 切换后的商品
      */
     public Product toggleActive(Long id) {
-        Product product = findById(id);
+        Product product = findForUpdate(id);
         product.setActive(!product.isActive());
         return productRepository.save(product);
     }
@@ -206,7 +211,7 @@ public class AdminProductService {
      * @throws BusinessException 商品已被订单引用时抛出
      */
     public void deleteIfUnreferenced(Long id) {
-        Product product = findById(id);
+        Product product = findForUpdate(id);
 
         if (productRepository.isReferencedByAnyOrder(id) || productRepository.isReferencedByAnyReview(id)) {
             throw new BusinessException(
@@ -236,11 +241,15 @@ public class AdminProductService {
     public long countInactive() {
         return productRepository.findAll()
                 .stream()
-                .filter(product -> !product.isActive())
+                .filter(product -> !product.isVisible())
                 .count();
     }
 
     // ---------- 内部校验 ----------
+
+    private Product findForUpdate(Long id) {
+        return productRepository.findForUpdate(id).orElseThrow(() -> ResourceNotFoundException.of("Product", id));
+    }
 
     /**
      * 商品名称不能为空，也不能超长。

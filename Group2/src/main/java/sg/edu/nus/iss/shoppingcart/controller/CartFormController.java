@@ -34,7 +34,9 @@ public class CartFormController {
                 return ResponseEntity.ok().cacheControl(CacheControl.noStore())
                         .header(HttpHeaders.VARY, "Cookie")
                         .body(new CartFormState(cart.formToken(session), items.size(),
-                                cart.countTotalQuantity(items)));
+                                cart.countTotalQuantity(items), items.stream().collect(java.util.stream.Collectors.toMap(
+                                        sg.edu.nus.iss.shoppingcart.dto.CartLine::getProductId,
+                                        sg.edu.nus.iss.shoppingcart.dto.CartLine::getQuantity))));
             } catch (NotAuthenticatedException | IllegalStateException ex) {
                 return loginRequired();
             }
