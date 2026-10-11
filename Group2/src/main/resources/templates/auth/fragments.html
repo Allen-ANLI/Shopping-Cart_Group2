@@ -14,4 +14,8 @@
 <p class="alert alert-success" th:if="${param.updated}" th:text="#{alert.updated}"></p>
 <p class="alert alert-success" th:if="${param.toggled}" th:text="#{alert.toggled}"></p>
 <p class="alert alert-success" th:if="${param.deleted}" th:text="#{alert.deleted}"></p>
-</div><footer th:fragment="footer" th:replace="~{store/fragments :: footer}"></footer></body></html>
+</div><footer th:fragment="footer" th:replace="~{store/fragments :: footer}"></footer>
+<button th:fragment="passwordToggle(fieldId)" type="button" class="password-eye" aria-pressed="false"
+        th:attr="data-password-target=${fieldId},aria-controls=${fieldId},aria-label=#{auth.password.show},data-show=#{auth.password.show},data-hide=#{auth.password.hide}">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m3 3 18 18"/></svg>
+</button></body></html>

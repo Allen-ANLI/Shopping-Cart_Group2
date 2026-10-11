@@ -37,7 +37,7 @@
             <label for="password" th:text="#{auth.password}">Password</label>
             <!-- Never echo a password through th:field/value after a failed request. -->
             <div class="password-input"><input id="password" name="password" type="password" maxlength="72"
-                   autocomplete="current-password" required th:attr="data-required-message=#{auth.password.required}"><button type="button" class="password-eye" data-password-target="password" aria-pressed="false" th:attr="aria-label=#{auth.password.show},data-show=#{auth.password.show},data-hide=#{auth.password.hide}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m3 3 18 18"/></svg></button></div>
+                   autocomplete="current-password" required th:attr="data-required-message=#{auth.password.required}"><button th:replace="~{auth/fragments :: passwordToggle('password')}"></button></div>
             <button class="btn primary full" type="submit" th:text="#{auth.login.title}">Log in</button>
         </form>
         <p class="small muted"><span th:text="#{auth.login.new}">New here?</span> <a th:href="@{/register}" th:text="#{auth.register.title}">Create an account</a></p>

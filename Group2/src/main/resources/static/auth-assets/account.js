@@ -26,12 +26,14 @@
         if (Number.isNaN(birthday.valueOf()) || birthday >= today) return field.dataset.invalidMessage;
       }
       if (field.id === 'postalCode' && !/^[\p{L}\p{N} -]+$/u.test(value)) return field.dataset.invalidMessage;
-      if (form.dataset.formKind === 'register') {
-        if (field.name === 'password') {
+      if (form.dataset.formKind === 'register' || form.dataset.formKind === 'password-change') {
+        const passwordName = form.dataset.formKind === 'register' ? 'password' : 'newPassword';
+        if (field.name === passwordName) {
           if (!/[A-Z]/.test(value) || !/[a-z]/.test(value) || !/[\p{P}\p{S}]/u.test(value)) return field.dataset.invalidMessage;
           if (new TextEncoder().encode(value).length > 72) return field.dataset.bytesMessage;
         }
-        if (field.name === 'confirmPassword' && value !== form.elements.password.value) return field.dataset.invalidMessage;
+        if (field.name === 'currentPassword' && new TextEncoder().encode(value).length > 72) return field.dataset.bytesMessage;
+        if (field.name === 'confirmPassword' && value !== form.elements[passwordName].value) return field.dataset.invalidMessage;
       }
       return null;
     };

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sg.edu.nus.iss.shoppingcart.entity.User;
 import sg.edu.nus.iss.shoppingcart.exception.BusinessException;
 import sg.edu.nus.iss.shoppingcart.form.ProfileForm;
+import sg.edu.nus.iss.shoppingcart.form.PasswordChangeForm;
 import sg.edu.nus.iss.shoppingcart.form.RegisterForm;
 import sg.edu.nus.iss.shoppingcart.repository.UserRepository;
 
@@ -94,13 +95,29 @@ public class AuthService {
     @Transactional
     public void updateProfile(Long currentUserId, ProfileForm form) {
         validate(form);
-        User user = findById(currentUserId)
+        User user = userRepository.lockById(currentUserId)
                 .orElseThrow(() -> new BusinessException(message("account.unavailable")));
         requireAvailableContact(form.getEmail(), form.getPhone(), currentUserId);
         user.setDisplayName(form.getDisplayName());
         user.setEmail(form.getEmail());
         user.setPhone(form.getPhone());
         user.setBirthday(form.getBirthday());
+        userRepository.saveAndFlush(user);
+    }
+
+    @Transactional
+    public void changePassword(Long currentUserId, PasswordChangeForm form) {
+        validate(form);
+        User user = userRepository.lockById(currentUserId)
+                .orElseThrow(() -> new BusinessException(message("account.unavailable")));
+        if (user.getPasswordHash() == null
+                || !passwordEncoder.matches(form.getCurrentPassword(), user.getPasswordHash())) {
+            throw new BusinessException(message("account.password.current.invalid"));
+        }
+        if (form.getCurrentPassword().equals(form.getNewPassword())) {
+            throw new BusinessException(message("account.password.different"));
+        }
+        user.setPasswordHash(passwordEncoder.encode(form.getNewPassword()));
         userRepository.saveAndFlush(user);
     }
 

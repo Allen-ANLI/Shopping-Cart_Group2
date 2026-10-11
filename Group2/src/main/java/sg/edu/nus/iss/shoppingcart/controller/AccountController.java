@@ -1,6 +1,7 @@
 package sg.edu.nus.iss.shoppingcart.controller;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sg.edu.nus.iss.shoppingcart.dto.AuthenticatedUser;
 import sg.edu.nus.iss.shoppingcart.entity.User;
 import sg.edu.nus.iss.shoppingcart.form.ProfileForm;
+import sg.edu.nus.iss.shoppingcart.form.PasswordChangeForm;
 import sg.edu.nus.iss.shoppingcart.interceptor.LoginInterceptor;
 import sg.edu.nus.iss.shoppingcart.service.AuthService;
 import sg.edu.nus.iss.shoppingcart.service.AccountFormTokens;
@@ -34,6 +36,11 @@ public class AccountController {
     @InitBinder("profileForm")
     public void bindProfile(WebDataBinder binder) {
         binder.setAllowedFields("displayName", "email", "phone", "birthday");
+    }
+
+    @InitBinder("passwordChangeForm")
+    public void bindPasswordChange(WebDataBinder binder) {
+        binder.setAllowedFields("currentPassword", "newPassword", "confirmPassword");
     }
 
     @GetMapping("/account")
@@ -69,6 +76,33 @@ public class AccountController {
         }
     }
 
+    @PostMapping("/account/password")
+    public String changePassword(@Valid @ModelAttribute("passwordChangeForm") PasswordChangeForm form,
+                                 BindingResult result, HttpServletRequest request, HttpSession session,
+                                 Model model, RedirectAttributes flash,
+                                 @RequestParam(required = false) String accountFormToken) {
+        synchronized (session) {
+            Long userId = LoginInterceptor.currentUserId(session);
+            if (userId == null) { return "redirect:/login?required"; }
+            AccountFormTokens.require(session, accountFormToken);
+            if (!result.hasErrors()) {
+                try {
+                    authService.changePassword(userId, form);
+                } catch (BusinessException ex) {
+                    result.reject("account.password.change.failed", ex.getUserMessage());
+                }
+            }
+            if (result.hasErrors()) {
+                populate(session, model);
+                return "account/view";
+            }
+            // Rotate the session identifier while retaining the current account and cart.
+            request.changeSessionId();
+            flash.addFlashAttribute("passwordChanged", true);
+            return "redirect:/account#password-settings";
+        }
+    }
+
     private void populate(HttpSession session, Model model) {
         Long userId = LoginInterceptor.currentUserId(session);
         User user = authService.findById(userId).orElseThrow(
@@ -78,6 +112,9 @@ public class AccountController {
         model.addAttribute("accountFormToken", AccountFormTokens.get(session));
         if (!model.containsAttribute("profileForm")) {
             model.addAttribute("profileForm", ProfileForm.from(user));
+        }
+        if (!model.containsAttribute("passwordChangeForm")) {
+            model.addAttribute("passwordChangeForm", new PasswordChangeForm());
         }
     }
 }

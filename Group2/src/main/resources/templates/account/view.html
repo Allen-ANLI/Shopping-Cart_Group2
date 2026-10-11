@@ -15,6 +15,7 @@
         </dl>
         <nav class="account-menu" th:aria-label="#{account.navigation}">
             <a class="active" th:href="@{/account}" aria-current="page" th:text="#{account.personal}">Personal details</a>
+            <a href="#password-settings" th:text="#{account.password.title}">Change password</a>
             <a th:href="@{/account/addresses}" th:text="#{address.title}">Shipping addresses</a>
             <a th:href="@{/orders}" th:text="#{account.orders}">Order history</a>
             <a th:href="@{/products}" data-continue-shopping th:text="#{account.continueShopping}">Continue shopping</a>
@@ -54,6 +55,7 @@
             <p class="muted" th:text="#{account.addressHint}">Save delivery addresses and choose a default for faster checkout.</p>
             <a th:href="@{/account/addresses}" th:text="#{address.manage}">Manage addresses →</a>
         </section>
+        <section th:replace="~{account/password :: settings}"></section>
     </section>
 </main>
 <footer th:replace="~{auth/fragments :: footer}"></footer>

@@ -34,11 +34,11 @@
             </div>
             <label for="password" th:text="#{auth.password}">Password</label>
             <div class="password-input"><input id="password" name="password" type="password" minlength="8" maxlength="50"
-                   autocomplete="new-password" required th:attr="data-required-message=#{auth.password.required},data-invalid-message=#{auth.password.strength},data-length-message=#{auth.password.length},data-bytes-message=#{auth.password.bytes}"><button type="button" class="password-eye" data-password-target="password" aria-pressed="false" th:attr="aria-label=#{auth.password.show},data-show=#{auth.password.show},data-hide=#{auth.password.hide}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m3 3 18 18"/></svg></button></div>
+                   autocomplete="new-password" required th:attr="data-required-message=#{auth.password.required},data-invalid-message=#{auth.password.strength},data-length-message=#{auth.password.length},data-bytes-message=#{auth.password.bytes}"><button th:replace="~{auth/fragments :: passwordToggle('password')}"></button></div>
             <p class="hint" th:text="#{auth.password.hint}">8–50 characters, including uppercase, lowercase and a special character.</p>
             <label for="confirmPassword" th:text="#{auth.password.confirm}">Confirm password</label>
             <div class="password-input"><input id="confirmPassword" name="confirmPassword" type="password" maxlength="50"
-                   autocomplete="new-password" required th:attr="data-required-message=#{auth.password.confirm.required},data-invalid-message=#{auth.password.mismatch},data-length-message=#{auth.password.confirm.length}"><button type="button" class="password-eye" data-password-target="confirmPassword" aria-pressed="false" th:attr="aria-label=#{auth.password.show},data-show=#{auth.password.show},data-hide=#{auth.password.hide}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m3 3 18 18"/></svg></button></div>
+                   autocomplete="new-password" required th:attr="data-required-message=#{auth.password.confirm.required},data-invalid-message=#{auth.password.mismatch},data-length-message=#{auth.password.confirm.length}"><button th:replace="~{auth/fragments :: passwordToggle('confirmPassword')}"></button></div>
             <button class="btn primary full" type="submit" th:text="#{auth.register.title}">Create account</button>
         </form>
     </section>
