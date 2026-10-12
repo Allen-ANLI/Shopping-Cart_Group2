@@ -62,7 +62,7 @@ public class ProductReviewService {
     @Transactional(readOnly = true)
     public OwnReview ownReview(Long productId, Long userId) {
         return reviews.findByProductIdAndUserId(productId, userId)
-                .map(review -> new OwnReview(review.getRating(), review.getComment())).orElse(null);
+                .map(review -> new OwnReview(review.getId(), review.getRating(), review.getComment())).orElse(null);
     }
 
     private Product requireProduct(Long id) {
@@ -75,14 +75,14 @@ public class ProductReviewService {
         List<ReviewItem> items = stored.stream().map(review -> new ReviewItem(review.getId(),
                 review.getUser().getDisplayName(), review.getRating(), review.getComment(), review.getCreatedAt(), review.isSample())).toList();
         OwnReview own = stored.stream().filter(review -> review.getUser().getId().equals(userId))
-                .map(review -> new OwnReview(review.getRating(), review.getComment())).findFirst().orElse(null);
+                .map(review -> new OwnReview(review.getId(), review.getRating(), review.getComment())).findFirst().orElse(null);
         double average = Math.round(stored.stream().mapToInt(ProductReview::getRating).average().orElse(0) * 10) / 10.0;
         boolean loggedIn = userId != null && users.existsById(userId);
         return new ReviewSummary(items, average, items.size(), loggedIn && purchases.hasConfirmedPurchase(userId, productId), own, loggedIn);
     }
 
     public record ReviewItem(Long id, String displayName, int rating, String comment, LocalDateTime createdAt, boolean sample) {}
-    public record OwnReview(int rating, String comment) {}
+    public record OwnReview(Long id, int rating, String comment) {}
     public record ReviewSummary(List<ReviewItem> reviews, double averageRating, long totalReviews,
                                 boolean canReview, OwnReview ownReview, boolean loggedIn) {}
 }

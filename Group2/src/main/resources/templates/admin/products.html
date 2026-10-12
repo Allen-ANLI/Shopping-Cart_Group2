@@ -2,7 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
 <head th:replace="~{fragments :: head(#{catalog.admin.title})}"></head>
 <body><header th:replace="~{fragments :: navbar}"></header>
-<main class="container" id="main-content">
+<div class="container admin-layout"><aside th:replace="~{admin/fragments :: sidebar}"></aside>
+<main class="admin-content" id="main-content">
 <div class="page-header"><div><h1 th:text="#{catalog.admin.title}"></h1><p class="muted small" th:text="#{catalog.admin.subtitle}"></p></div><a th:href="@{/admin/products/new}" class="btn" th:text="#{catalog.add}"></a></div>
 <div th:replace="~{fragments :: alerts}"></div>
 <div class="stat-grid"><div class="stat-box"><div class="stat-value" th:text="${totalProducts}"></div><div class="stat-label" th:text="#{catalog.total}"></div></div><div class="stat-box"><div class="stat-value" th:text="${inactiveProducts}"></div><div class="stat-label" th:text="#{catalog.hiddenCount}"></div></div></div>
@@ -21,4 +22,4 @@
 <a class="page-link" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active'" th:attr="aria-current=${i == currentPage ? 'page' : null}" th:href="@{/admin/products(page=${i})}" th:text="${i}"></a>
 <a class="page-link" th:if="${currentPage < totalPages}" th:href="@{/admin/products(page=${currentPage + 1})}" th:text="#{catalog.next}"></a>
 </nav><p class="muted small" th:text="#{catalog.visibilityHint}"></p>
-</main><footer th:replace="~{fragments :: footer}"></footer></body></html>
+</main></div><footer th:replace="~{fragments :: footer}"></footer></body></html>

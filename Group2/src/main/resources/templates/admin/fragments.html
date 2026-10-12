@@ -1,0 +1,9 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<aside th:fragment="sidebar" class="admin-sidebar">
+  <p class="eyebrow" th:text="#{nav.admin}">Admin</p>
+  <nav th:attr="aria-label=#{admin.navigation}">
+    <a th:href="@{/admin/products}" th:classappend="${adminSection == 'products' ? 'active' : ''}" th:attr="aria-current=${adminSection == 'products' ? 'page' : null}"><span class="admin-icon" aria-hidden="true">▦</span><span th:text="#{admin.products}">Product management</span></a>
+    <a th:href="@{/admin/dashboard}" th:classappend="${adminSection == 'dashboard' ? 'active' : ''}" th:attr="aria-current=${adminSection == 'dashboard' ? 'page' : null}"><span class="admin-icon" aria-hidden="true">▥</span><span th:text="#{admin.dashboard.title}">Sales dashboard</span></a>
+  </nav>
+</aside>
+</body></html>

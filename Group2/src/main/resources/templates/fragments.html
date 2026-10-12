@@ -4,6 +4,7 @@
 <link rel="stylesheet" th:href="@{/css/style.css}"><link rel="stylesheet" th:href="@{/store/common.css}">
 <link rel="icon" th:href="@{/products/favicon.svg}" type="image/svg+xml"><script th:src="@{/store/common.js}" defer></script><link rel="stylesheet" th:href="@{/store/navigation.css}">
 <link rel="stylesheet" th:href="@{/store/payment-orders.css}">
+<link th:if="${adminSection != null}" rel="stylesheet" th:href="@{/store/admin.css}">
 </head><body>
 <header th:fragment="navbar" th:replace="~{store/fragments :: navbar}"></header>
 <div th:fragment="alerts" class="store-alerts">

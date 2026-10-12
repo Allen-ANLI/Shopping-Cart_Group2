@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sg.edu.nus.iss.shoppingcart.entity.OrderItem;
+import sg.edu.nus.iss.shoppingcart.dto.AdminProductSalesDto;
 
 import java.util.List;
 
@@ -40,4 +41,17 @@ public interface OrderItemQueryRepository extends JpaRepository<OrderItem, Long>
      */
     @Query("SELECT COALESCE(SUM(i.quantity), 0) FROM OrderItem i WHERE i.order.id = :orderId")
     long sumQuantityByOrderId(@Param("orderId") Long orderId);
+
+    @Query("SELECT COALESCE(SUM(i.quantity), 0) FROM OrderItem i "
+            + "WHERE i.order.paymentStatus = 'PAID' OR i.order.paymentStatus IS NULL")
+    long sumPaidQuantity();
+
+    @Query("SELECT new sg.edu.nus.iss.shoppingcart.dto.AdminProductSalesDto("
+            + "i.product.id, i.product.name, i.product.nameZh, i.unitPrice, SUM(i.quantity), "
+            + "SUM(i.unitPrice * i.quantity)) "
+            + "FROM OrderItem i "
+            + "WHERE i.order.paymentStatus = 'PAID' OR i.order.paymentStatus IS NULL "
+            + "GROUP BY i.product.id, i.product.name, i.product.nameZh, i.unitPrice "
+            + "ORDER BY SUM(i.quantity) DESC, SUM(i.unitPrice * i.quantity) DESC, i.product.id ASC, i.unitPrice ASC")
+    List<AdminProductSalesDto> findPaidProductSales();
 }

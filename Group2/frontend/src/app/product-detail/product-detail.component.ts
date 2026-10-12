@@ -24,7 +24,9 @@ export class ProductDetailComponent implements OnChanges, OnDestroy, OnInit {
   readonly reviewsError = signal(false);
   readonly locationSearch = window.location.search;
   readonly reviewPage = signal(0);
+  readonly highlightedReviewId = signal<number | null>(null);
   readonly reviewPageSize = 8;
+  private readonly requestedReviewId = Number(new URLSearchParams(window.location.search).get('reviewId') || 0);
   visibleReviews() { return (this.reviews()?.reviews ?? []).slice(this.reviewPage() * this.reviewPageSize, (this.reviewPage() + 1) * this.reviewPageSize); }
   reviewPages() { return Math.ceil((this.reviews()?.reviews.length ?? 0) / this.reviewPageSize); }
   get listUrl(): string {
@@ -59,7 +61,10 @@ export class ProductDetailComponent implements OnChanges, OnDestroy, OnInit {
     this.reviewRequest = this.productService.getReviews(this.productId).subscribe({
       next: result => {
         this.reviews.set(result);
-        this.reviewPage.set(0);
+        const index = this.requestedReviewId > 0 ? result.reviews.findIndex(review => review.id === this.requestedReviewId) : -1;
+        this.reviewPage.set(index >= 0 ? Math.floor(index / this.reviewPageSize) : 0);
+        this.highlightedReviewId.set(index >= 0 ? this.requestedReviewId : null);
+        if (index >= 0) setTimeout(() => document.getElementById('review-' + this.requestedReviewId)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 0);
       },
       error: () => this.reviewsError.set(true),
     });

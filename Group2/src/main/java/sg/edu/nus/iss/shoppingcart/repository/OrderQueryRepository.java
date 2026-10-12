@@ -93,4 +93,12 @@ public interface OrderQueryRepository extends JpaRepository<Order, Long> {
     @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o "
             + "WHERE o.user.id = :userId AND (o.paymentStatus = 'PAID' OR o.paymentStatus IS NULL)")
     java.math.BigDecimal sumTotalAmountByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o "
+            + "WHERE o.paymentStatus = 'PAID' OR o.paymentStatus IS NULL")
+    java.math.BigDecimal sumPaidTotalAmount();
+
+    @Query("SELECT COUNT(o) FROM Order o "
+            + "WHERE o.paymentStatus = 'PAID' OR o.paymentStatus IS NULL")
+    long countPaidOrders();
 }

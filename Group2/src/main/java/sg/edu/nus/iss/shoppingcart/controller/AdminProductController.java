@@ -5,6 +5,8 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.http.CacheControl;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import sg.edu.nus.iss.shoppingcart.dto.ProductForm;
 import sg.edu.nus.iss.shoppingcart.entity.Product;
 import sg.edu.nus.iss.shoppingcart.service.AdminProductService;
+import sg.edu.nus.iss.shoppingcart.service.AdminDashboardService;
 import sg.edu.nus.iss.shoppingcart.model.CatalogCategory;
 import java.util.List;
 
@@ -36,18 +39,37 @@ public class AdminProductController {
 
     /** 管理员商品服务。 */
     private final AdminProductService adminProductService;
+    private final AdminDashboardService dashboardService;
 
     /**
      * 构造方法，注入依赖。
      *
      * @param adminProductService 管理员商品服务
      */
-    public AdminProductController(AdminProductService adminProductService) {
+    public AdminProductController(AdminProductService adminProductService,
+                                  AdminDashboardService dashboardService) {
         this.adminProductService = adminProductService;
+        this.dashboardService = dashboardService;
     }
 
     @ModelAttribute("catalogCategories")
     public List<CatalogCategory> categories() { return CatalogCategory.ALL; }
+
+    @ModelAttribute("adminSection")
+    public String adminSection() { return "products"; }
+
+    @GetMapping("/admin/dashboard")
+    public String dashboard(Model model) {
+        model.addAttribute("dashboard", dashboardService.read());
+        model.addAttribute("adminSection", "dashboard");
+        model.addAttribute("activeNav", "admin");
+        return "admin/dashboard";
+    }
+
+    @GetMapping("/api/admin/dashboard")
+    public ResponseEntity<AdminDashboardService.Dashboard> dashboardData() {
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(dashboardService.read());
+    }
 
     /**
      * 后台商品列表，含已下架商品。
@@ -66,6 +88,7 @@ public class AdminProductController {
         model.addAttribute("totalPages", productPage.getTotalPages());
         model.addAttribute("totalProducts", adminProductService.countAll());
         model.addAttribute("inactiveProducts", adminProductService.countInactive());
+        model.addAttribute("activeNav", "admin");
 
         return "admin/products";
     }

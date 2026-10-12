@@ -3,7 +3,8 @@
 <head th:replace="~{fragments :: head(#{catalog.admin.product})}"></head>
 <body>
 <header th:replace="~{fragments :: navbar}"></header>
-<main class="container" id="main-content"><div class="form-wrapper">
+<div class="container admin-layout"><aside th:replace="~{admin/fragments :: sidebar}"></aside>
+<main class="admin-content" id="main-content"><div class="form-wrapper">
 <p class="small back-link"><a th:href="@{/admin/products}" th:text="#{catalog.back}">Back to product list</a></p>
 <div class="card">
 <h1 class="form-title" th:text="${productForm.id == null} ? #{catalog.add} : #{catalog.edit}">Product</h1>
@@ -26,6 +27,6 @@
 <div class="form-group"><label for="stockQuantity" th:text="#{catalog.stock}"></label><input type="number" id="stockQuantity" th:field="*{stockQuantity}" class="form-control" min="0" max="1000000" step="1" required></div>
 <div class="form-group"><label class="checkbox-label"><input type="checkbox" th:field="*{hideWhenOutOfStock}"><span th:text="#{catalog.hideEmpty}"></span></label><p class="form-hint" th:text="#{catalog.stockHint}"></p></div>
 <div class="form-actions"><button type="submit" class="btn btn-lg" th:text="#{catalog.save}"></button><a th:href="@{/admin/products}" class="btn btn-lg btn-secondary" th:text="#{catalog.cancel}"></a></div>
-</form></div></div></main>
+</form></div></div></main></div>
 <footer th:replace="~{fragments :: footer}"></footer>
 </body></html>

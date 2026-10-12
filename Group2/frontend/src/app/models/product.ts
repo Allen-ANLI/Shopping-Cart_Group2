@@ -23,7 +23,7 @@ export interface Product {
   stockQuantity?: number;
 }
 export interface ProductReview { id: number; displayName: string; rating: number; comment: string; createdAt: string; sample?: boolean; }
-export interface ReviewSummary { reviews: ProductReview[]; averageRating: number; totalReviews: number; canReview: boolean; loggedIn?: boolean; ownReview?: {rating: number; comment: string} | null; }
+  export interface ReviewSummary { reviews: ProductReview[]; averageRating: number; totalReviews: number; canReview: boolean; loggedIn?: boolean; ownReview?: {id?: number; rating: number; comment: string} | null; }
 export const CATEGORIES = [
   { slug: 'computing', name: 'Computing', nameZh: '电脑与配件' },
   { slug: 'typing', name: 'Keyboards & mice', nameZh: '键盘与鼠标' },

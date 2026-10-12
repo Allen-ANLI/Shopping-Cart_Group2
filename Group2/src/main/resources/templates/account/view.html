@@ -4,24 +4,11 @@
 <body>
 <header th:replace="~{auth/fragments :: navbar}"></header>
 <main id="main-content" class="container account-layout account-dashboard">
-    <aside class="intro account-sidebar">
-        <p class="eyebrow" th:text="#{account.eyebrow}">MY ACCOUNT</p>
-        <section th:replace="~{account/avatar :: editor}"></section>
-        <h1 th:text="${account.displayName}">My account</h1>
-        <dl class="summary">
-            <dt th:text="#{auth.username}">Username</dt><dd th:text="${account.username}"></dd>
-            <dt th:text="#{account.membership}">Membership</dt>
-            <dd th:text="${account.admin} ? #{account.admin} : #{account.customer}">Customer</dd>
-        </dl>
-        <nav class="account-menu" th:aria-label="#{account.navigation}">
-            <a class="active" th:href="@{/account}" aria-current="page" th:text="#{account.personal}">Personal details</a>
-            <a href="#password-settings" th:text="#{account.password.title}">Change password</a>
-            <a th:href="@{/account/addresses}" th:text="#{address.title}">Shipping addresses</a>
-            <a th:href="@{/orders}" th:text="#{account.orders}">Order history</a>
-            <a th:href="@{/products}" data-continue-shopping th:text="#{account.continueShopping}">Continue shopping</a>
-        </nav>
-    </aside>
-    <section class="card">
+    <section class="card account-card">
+        <div class="account-heading">
+            <div><p class="eyebrow" th:text="#{account.eyebrow}">MY ACCOUNT</p><h1 th:text="${account.displayName}">My account</h1><p class="muted" th:text="${account.username}">username</p><span class="account-role" th:if="${account.admin}" th:text="#{account.admin}">Administrator</span></div>
+            <section th:replace="~{account/avatar :: editor}"></section>
+        </div>
         <h2 th:text="#{account.personal}">Personal details</h2>
         <p class="muted" th:text="#{account.description}">Your details are saved to your account and available when you sign in again.</p>
         <div th:replace="~{auth/fragments :: alerts}"></div>

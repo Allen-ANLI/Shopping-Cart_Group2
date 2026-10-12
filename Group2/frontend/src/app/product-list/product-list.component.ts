@@ -16,7 +16,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
   readonly lang = inject(LanguageService);
   private request?: Subscription;
   readonly categories = CATEGORIES;
+  // Put today's strongest offer in the first banner position.
   readonly campaign = signal(0);
+  readonly visualCampaign = signal(2);
   private scrollToCatalog = false;
   readonly featuredDeal = signal<Product | null>(null);
   private dealRequest?: Subscription;
@@ -52,11 +54,17 @@ export class ProductListComponent implements OnInit, OnDestroy {
     clearTimeout(this.campaignTimer);
     if (this.campaignHover || this.campaignFocus || document.hidden || this.reducedMotion?.matches) return;
     this.campaignTimer = setTimeout(() => {
-      if (!this.category() && !this.query()) this.campaign.update(index => (index + 1) % 3);
+      if (!this.category() && !this.query()) {
+        const next = (this.campaign() + 1) % 3;
+        this.campaign.set(next); this.visualCampaign.set(next);
+      }
       this.scheduleCampaign();
     }, 6000);
   };
-  showCampaign(index: number): void { this.campaign.set(((index % 3) + 3) % 3); this.scheduleCampaign(); }
+  showCampaign(index: number): void {
+    const next = ((index % 3) + 3) % 3;
+    this.campaign.set(next); this.visualCampaign.set(next); this.scheduleCampaign();
+  }
   setCampaignHover(value: boolean): void { this.campaignHover = value; this.scheduleCampaign(); }
   setCampaignFocus(value: boolean): void { this.campaignFocus = value; this.scheduleCampaign(); }
   campaignBlur(event: FocusEvent): void {

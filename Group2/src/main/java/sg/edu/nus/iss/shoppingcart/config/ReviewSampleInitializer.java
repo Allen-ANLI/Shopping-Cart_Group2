@@ -17,9 +17,11 @@ import java.util.stream.Collectors;
 @Component
 @Order(20)
 public class ReviewSampleInitializer implements CommandLineRunner {
-    public static final String VERSION = "sample-purchase-reviews-v3";
-    private static final int[] SALES = {5, 20, 65, 180, 550, 1400, 4200, 9600};
-    private static final int[] REVIEW_COUNTS = {5, 8, 12, 20, 35, 50, 80, 120};
+    public static final String VERSION = "sample-purchase-reviews-v5";
+    private static final int[] SALES_MIN = {5, 20, 65, 180, 550, 1400, 4200, 8000};
+    private static final int[] SALES_MAX = {17, 54, 149, 430, 1150, 3500, 7600, 11000};
+    private static final int[] REVIEWS_MIN = {3, 6, 10, 16, 25, 42, 70, 100};
+    private static final int[] REVIEWS_MAX = {5, 10, 18, 30, 48, 65, 100, 120};
     private static final int[] RATING_TENTHS = {46, 48, 45, 50, 42, 47, 44, 49, 36, 18};
     private final ProductRepository products;
     private final UserRepository users;
@@ -57,17 +59,26 @@ public class ReviewSampleInitializer implements CommandLineRunner {
         }
         var existing = products.findAll().stream().collect(Collectors.toMap(Product::getName, p -> p, (first, second) -> first));
         List<Product> seed = CatalogSeedProducts.all();
+        Set<Integer> assignedSales = new HashSet<>();
         for (int index = 0; index < seed.size(); index++) {
             Product product = existing.get(seed.get(index).getName());
             if (product == null) continue; // Do not restore products removed by an administrator.
-            int band = index % SALES.length;
-            int count = REVIEW_COUNTS[band];
-            int targetRating = RATING_TENTHS[(index * 3 + index / SALES.length) % RATING_TENTHS.length];
+            // Varied per-product history, reproducible across restarts and upgrades.
+            Random random = new Random(0x4e45585553L + product.getName().hashCode());
+            int band = random.nextInt(SALES_MIN.length);
+            int sales = SALES_MIN[band] + random.nextInt(SALES_MAX[band] - SALES_MIN[band] + 1);
+            while (!assignedSales.add(sales)) {
+                sales = sales == SALES_MAX[band] ? SALES_MIN[band] : sales + 1;
+            }
+            int count = REVIEWS_MIN[band] + random.nextInt(REVIEWS_MAX[band] - REVIEWS_MIN[band] + 1);
+            // Each historical order stays within the 99-item checkout limit.
+            count = Math.min(sales, Math.max(count, (sales + 98) / 99));
+            int targetRating = RATING_TENTHS[(index * 3 + index / SALES_MIN.length) % RATING_TENTHS.length];
             int lowerRating = targetRating / 10;
             int higherCount = (int) Math.round(count * (targetRating % 10) / 10.0);
             for (int n = 0; n < count; n++) {
                 // Every review belongs to a distinct confirmed order; quantity is 1..99.
-                int quantity = SALES[band] / count + (n < SALES[band] % count ? 1 : 0);
+                int quantity = sales / count + (n < sales % count ? 1 : 0);
                 var order = new sg.edu.nus.iss.shoppingcart.entity.Order(reviewers[n],
                         product.getEffectivePrice().multiply(BigDecimal.valueOf(quantity)), UUID.randomUUID().toString());
                 order.recordPayment("SAMPLE_PURCHASE", "SAMPLE-" + UUID.randomUUID());

@@ -1,26 +1,26 @@
 <main id="main-content" class="store-container">
   <section class="top-search">      <form class="search-form" (submit)="search($event)"><app-icon name="search" /><input type="search" name="q" [value]="searchInput" (input)="searchInput = $any($event.target).value" [placeholder]="lang.text('Search products or brands', '搜索商品或品牌')" [attr.aria-label]="lang.text('Search products or brands', '搜索商品或品牌')"><button type="submit">{{ lang.text('Search', '搜索') }}</button></form><p>{{ lang.text("Find your next tech or office upgrade.", "寻找你的下一件数码与办公装备。") }}</p></section>
   @if (!category() && !query()) {
-    <section class="campaign" (mouseenter)="setCampaignHover(true)" (mouseleave)="setCampaignHover(false)" (focusin)="setCampaignFocus(true)" (focusout)="campaignBlur($event)" [attr.aria-roledescription]="lang.text('carousel', '轮播')" [class.promotion]="campaign() !== 0" [class.best-deal]="campaign() === 2" [attr.aria-label]="lang.text('Brand advertisements and events', '品牌广告与促销活动')">
+    <section class="campaign" (mouseenter)="setCampaignHover(true)" (mouseleave)="setCampaignHover(false)" (focusin)="setCampaignFocus(true)" (focusout)="campaignBlur($event)" [attr.aria-roledescription]="lang.text('carousel', '轮播')" [class.promotion]="visualCampaign() !== 0" [class.best-deal]="visualCampaign() === 2" [attr.aria-label]="lang.text('Brand advertisements and events', '品牌广告与促销活动')">
       <div class="campaign-copy" aria-live="off">
-        @if (campaign() === 2 && featuredDeal(); as deal) {
+        @if (visualCampaign() === 2 && featuredDeal(); as deal) {
           <span class="campaign-label">{{ lang.text('DAILY SPECIAL · BIGGEST SAVING', '每日特惠 · 今日最高折扣') }}</span>
           <h1>{{ lang.text('Save ', '立省 ') }}{{ deal.discountPercent }}%<br><em class="campaign-featured-name">{{ lang.name(deal) }}</em></h1>
           <p class="campaign-deal-price"><strong>SGD {{ (deal.effectivePrice ?? deal.price).toFixed(2) }}</strong><del>SGD {{ deal.price.toFixed(2) }}</del></p>
           <a class="button-primary campaign-featured-link" [href]="'/products?id=' + deal.id">{{ lang.text('View today’s top deal', '查看今日最佳优惠') }} <app-icon name="arrow" /></a>
         } @else {
-          <span class="campaign-label">{{ campaign() === 0 ? lang.text('BRAND SPOTLIGHT · KEYCRAFT', '品牌广告 · KEYCRAFT') : lang.text('DAILY DEALS', '每日促销') }}</span>
-          <h1>{{ campaign() === 0 ? lang.text('A better day,', '美好一天，') : lang.text('Your daily dose', '每日精选，') }}<br><em>{{ campaign() === 0 ? lang.text('at your fingertips.', '从指尖开始。') : lang.text('of better deals.', '优惠正当时。') }}</em></h1>
-          <p>{{ campaign() === 0 ? lang.text('Discover Keycraft. Considered keyboards for your everyday work and play.', '探索 Keycraft 键盘系列，让每一次工作与娱乐都舒适自如。') : lang.text('Explore today’s tech and office offers, with our biggest discount picked for you.', '探索今日数码办公优惠，为你精选当前折扣力度最大的好物。') }}</p>
-          <a class="button-primary" [href]="campaign() === 0 ? '/products?category=typing&q=Keycraft#catalog' : '/deals'">{{ campaign() === 0 ? lang.text('Discover Keycraft', '探索 Keycraft') : lang.text('Explore daily deals', '查看每日促销') }} <app-icon name="arrow" /></a>
+          <span class="campaign-label">{{ visualCampaign() === 0 ? lang.text('BRAND SPOTLIGHT · KEYCRAFT', '品牌广告 · KEYCRAFT') : lang.text('DAILY DEALS', '每日促销') }}</span>
+          <h1>{{ visualCampaign() === 0 ? lang.text('A better day,', '美好一天，') : lang.text('Your daily dose', '每日精选，') }}<br><em>{{ visualCampaign() === 0 ? lang.text('at your fingertips.', '从指尖开始。') : lang.text('of better deals.', '优惠正当时。') }}</em></h1>
+          <p>{{ visualCampaign() === 0 ? lang.text('Discover Keycraft. Considered keyboards for your everyday work and play.', '探索 Keycraft 键盘系列，让每一次工作与娱乐都舒适自如。') : lang.text('Explore today’s tech and office offers, with our biggest discount picked for you.', '探索今日数码办公优惠，为你精选当前折扣力度最大的好物。') }}</p>
+          <a class="button-primary" [href]="visualCampaign() === 0 ? '/products?category=typing&q=Keycraft#catalog' : '/deals'">{{ visualCampaign() === 0 ? lang.text('Discover Keycraft', '探索 Keycraft') : lang.text('Explore daily deals', '查看每日促销') }} <app-icon name="arrow" /></a>
         }
         <div class="campaign-controls" [attr.aria-label]="lang.text('Choose advertisement', '选择广告')">
-          <button type="button" [class.active]="campaign() === 0" [attr.aria-pressed]="campaign() === 0" (click)="showCampaign(0)">01 <span>{{ lang.text('Keycraft', '品牌精选') }}</span></button>
-          <button type="button" [class.active]="campaign() === 1" [attr.aria-pressed]="campaign() === 1" (click)="showCampaign(1)">02 <span>{{ lang.text('Daily deals', '每日促销') }}</span></button>
-          <button type="button" [class.active]="campaign() === 2" [attr.aria-pressed]="campaign() === 2" (click)="showCampaign(2)">03 <span>{{ lang.text('Top deal', '今日特惠') }}</span></button>
+          <button type="button" [class.active]="visualCampaign() === 2" [attr.aria-pressed]="visualCampaign() === 2" (click)="showCampaign(2)">01 <span>{{ lang.text('Top deal', '今日特惠') }}</span></button>
+          <button type="button" [class.active]="visualCampaign() === 1" [attr.aria-pressed]="visualCampaign() === 1" (click)="showCampaign(1)">02 <span>{{ lang.text('Daily deals', '每日促销') }}</span></button>
+          <button type="button" [class.active]="visualCampaign() === 0" [attr.aria-pressed]="visualCampaign() === 0" (click)="showCampaign(0)">03 <span>{{ lang.text('Keycraft', '品牌精选') }}</span></button>
         </div>
       </div>
-      <div class="campaign-art" aria-hidden="true"><span class="campaign-orbit"></span><img [src]="campaign() === 0 ? '/images/keyboard.png' : campaign() === 2 && featuredDeal()?.imageUrl ? featuredDeal()!.imageUrl : '/images/desk-lamp.svg'" alt=""><span class="campaign-stamp">{{ campaign() === 0 ? 'KEYCRAFT' : campaign() === 2 && featuredDeal() ? featuredDeal()!.brand : 'NEXUS WORKSPACE' }}<small>{{ lang.text('TECH FOR WORK & PLAY', '科技相伴，高效每一天') }}</small></span></div>
+      <div class="campaign-art" aria-hidden="true"><span class="campaign-orbit"></span><img [src]="visualCampaign() === 0 ? '/images/keyboard.png' : visualCampaign() === 2 && featuredDeal()?.imageUrl ? featuredDeal()!.imageUrl : '/images/desk-lamp.svg'" alt=""><span class="campaign-stamp">{{ visualCampaign() === 0 ? 'KEYCRAFT' : visualCampaign() === 2 && featuredDeal() ? featuredDeal()!.brand : 'NEXUS WORKSPACE' }}<small>{{ lang.text('TECH FOR WORK & PLAY', '科技相伴，高效每一天') }}</small></span></div>
       <button class="campaign-arrow previous" type="button" (click)="showCampaign(campaign() - 1)" [attr.aria-label]="lang.text('Previous banner', '上一张横幅')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
       <button class="campaign-arrow next" type="button" (click)="showCampaign(campaign() + 1)" [attr.aria-label]="lang.text('Next banner', '下一张横幅')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
     </section>
