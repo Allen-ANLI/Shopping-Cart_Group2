@@ -1,121 +1,30 @@
 package sg.edu.nus.iss.shoppingcart.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sg.edu.nus.iss.shoppingcart.entity.Product;
-import sg.edu.nus.iss.shoppingcart.repository.ProductRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import jakarta.persistence.criteria.Predicate;
-import java.util.ArrayList;
-import java.util.Locale;
-import sg.edu.nus.iss.shoppingcart.model.CatalogCategory;
-
+import sg.edu.nus.iss.shoppingcart.entity.Product;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * 组织上架商品查询、分页排序和只读事务，供商品接口及其他模块调用。
+ * Product operations following the classroom CourseService / CourseServiceImpl pattern.
  * @author 王重一
  */
-@Service
-public class ProductService {
+public interface ProductService {
+    List<Product> findAllProducts();
 
-    private final ProductRepository productRepository;
+    Page<Product> findProductPage(int page, int size);
 
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
+    Page<Product> findProductPage(int page, int size, String category, String query, String order);
 
-    @Transactional(readOnly = true)
-    public List<Product> findAllProducts() {
-        return findAllProducts(null, null, "featured");
-    }
+    List<Product> findAllProducts(String category, String query, String order);
 
-    @Transactional(readOnly = true)
-    public Page<Product> findProductPage(int page, int size) {
-        Sort sort = Sort.by("id").ascending();
+    List<Product> dailyDeals();
 
-        Pageable pageable = PageRequest.of(page, size, sort);
+    List<CategorySummary> categories();
 
-        return productRepository.findAll(filters(null, null), pageable);
-    }
+    Optional<Product> findProductById(Long id);
 
-    @Transactional(readOnly = true)
-    public Page<Product> findProductPage(int page, int size, String category, String query, String order) {
-        return productRepository.findAll(filters(category, query), PageRequest.of(page, size, sort(order)));
-    }
+    Optional<Product> findForCheckout(Long id);
 
-    @Transactional(readOnly = true)
-    public List<Product> findAllProducts(String category, String query, String order) {
-        return productRepository.findAll(filters(category, query), sort(order));
-    }
-
-    @Transactional(readOnly = true)
-    public List<Product> dailyDeals() {
-        Specification<Product> promoted = (root, query, builder) -> builder.and(
-                builder.greaterThan(root.get("discountPercent"), 0), builder.greaterThan(root.get("stockQuantity"), 0));
-        return productRepository.findAll(filters(null, null).and(promoted),
-                Sort.by("discountPercent").descending().and(Sort.by("salesCount").descending()).and(Sort.by("id")));
-    }
-
-    @Transactional(readOnly = true)
-    public List<CategorySummary> categories() {
-        return CatalogCategory.ALL.stream().map(category -> new CategorySummary(category.slug(), category.name(),
-                category.nameZh(), productRepository.count(filters(category.slug(), null)))).toList();
-    }
-
-    private Specification<Product> filters(String category, String query) {
-        if (category != null && !category.isBlank() && !CatalogCategory.isValid(category)) {
-            throw new IllegalArgumentException("Unknown product category");
-        }
-        if (query != null && query.length() > 100) throw new IllegalArgumentException("Search is too long");
-        return (root, criteria, builder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(builder.isTrue(root.get("active")));
-            predicates.add(builder.or(builder.isFalse(root.get("hideWhenOutOfStock")),
-                    builder.greaterThan(root.get("stockQuantity"), 0)));
-            if (category != null && !category.isBlank()) {
-                predicates.add(builder.equal(builder.coalesce(root.<String>get("category"), "workspace"), category));
-            }
-            if (query != null && !query.isBlank()) {
-                String escaped = query.trim().toLowerCase(Locale.ROOT).replace("\\", "\\\\")
-                        .replace("%", "\\%").replace("_", "\\_");
-                String pattern = "%" + escaped + "%";
-                predicates.add(builder.or(builder.like(builder.lower(root.get("name")), pattern, '\\'),
-                        builder.like(builder.lower(root.get("nameZh")), pattern, '\\'),
-                        builder.like(builder.lower(root.get("description")), pattern, '\\'),
-                        builder.like(builder.lower(root.get("descriptionZh")), pattern, '\\'),
-                        builder.like(builder.lower(root.get("brand")), pattern, '\\')));
-            }
-            return builder.and(predicates.toArray(Predicate[]::new));
-        };
-    }
-
-    private Sort sort(String order) {
-        String selected = order == null || order.isBlank() ? "featured" : order;
-        return switch (selected) {
-            case "featured" -> Sort.by("id").ascending();
-            case "price-asc" -> Sort.by("effectivePriceValue").ascending().and(Sort.by("id"));
-            case "price-desc" -> Sort.by("effectivePriceValue").descending().and(Sort.by("id"));
-            case "sales" -> Sort.by("salesCount").descending().and(Sort.by("id"));
-            case "rating" -> Sort.by("averageRating").descending().and(Sort.by("totalReviews").descending()).and(Sort.by("id"));
-            default -> throw new IllegalArgumentException("Unknown product sort order");
-        };
-    }
-
-    public record CategorySummary(String slug, String name, String nameZh, long count) {}
-
-    @Transactional(readOnly = true)
-    public Optional<Product> findProductById(Long id) {
-        return productRepository.findByIdAndActiveTrue(id).filter(Product::isVisible);
-    }
-
-    @Transactional
-    public Optional<Product> findForCheckout(Long id) {
-        return productRepository.findForUpdate(id).filter(Product::isActive);
-    }
+    record CategorySummary(String slug, String name, String nameZh, long count) { }
 }

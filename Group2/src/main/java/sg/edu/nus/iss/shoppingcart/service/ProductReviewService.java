@@ -1,7 +1,5 @@
 package sg.edu.nus.iss.shoppingcart.service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.edu.nus.iss.shoppingcart.entity.Product;
@@ -20,13 +18,12 @@ public class ProductReviewService {
     private final ProductRepository products;
     private final ProductReviewRepository reviews;
     private final UserRepository users;
-    private final EntityManager entityManager;
     private final sg.edu.nus.iss.shoppingcart.repository.OrderItemRepository purchases;
 
     public ProductReviewService(ProductRepository products, ProductReviewRepository reviews,
-                                UserRepository users, EntityManager entityManager,
+                                UserRepository users,
                                 sg.edu.nus.iss.shoppingcart.repository.OrderItemRepository purchases) {
-        this.products = products; this.reviews = reviews; this.users = users; this.entityManager = entityManager;
+        this.products = products; this.reviews = reviews; this.users = users;
         this.purchases = purchases;
     }
 
@@ -42,8 +39,7 @@ public class ProductReviewService {
         if (rating < 1 || rating > 5 || comment == null || comment.trim().length() < 5
                 || comment.trim().length() > 1000) throw new IllegalArgumentException(PaymentService.localized("Choose 1–5 stars and write a review of 5–1000 characters.", "请选择 1–5 星，并填写 5–1000 个字符的评价。"));
         // Serialise reviews by the same account even when it uses more than one session.
-        User user = entityManager.find(User.class, userId, LockModeType.PESSIMISTIC_WRITE);
-        if (user == null) throw new NotAuthenticatedException();
+        User user = users.lockById(userId).orElseThrow(NotAuthenticatedException::new);
         Product product = products.findById(productId).orElseThrow(() -> ResourceNotFoundException.of("Product", productId));
         if (!purchases.hasConfirmedPurchase(userId, productId)) {
             throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN,

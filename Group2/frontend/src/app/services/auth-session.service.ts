@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { AuthSessionState } from '../models/auth-session';
 
 /**
@@ -9,8 +10,9 @@ import { AuthSessionState } from '../models/auth-session';
 @Injectable({ providedIn: 'root' })
 export class AuthSessionService {
   private readonly http = inject(HttpClient);
+  private readonly baseUrl = '/api/auth/session';
 
-  getSession() {
-    return this.http.get<AuthSessionState>('/api/auth/session');
+  getSession(): Observable<AuthSessionState> {
+    return this.http.get<AuthSessionState>(this.baseUrl);
   }
 }

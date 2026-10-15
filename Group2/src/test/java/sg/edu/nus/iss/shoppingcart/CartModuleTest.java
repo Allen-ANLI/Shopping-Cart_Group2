@@ -7,6 +7,7 @@ import sg.edu.nus.iss.shoppingcart.entity.Product;
 import sg.edu.nus.iss.shoppingcart.model.SessionCart;
 import sg.edu.nus.iss.shoppingcart.repository.ProductRepository;
 import sg.edu.nus.iss.shoppingcart.service.CartService;
+import sg.edu.nus.iss.shoppingcart.service.CartServiceImpl;
 import sg.edu.nus.iss.shoppingcart.exception.BusinessException;
 import sg.edu.nus.iss.shoppingcart.exception.NotAuthenticatedException;
 import java.math.BigDecimal;
@@ -31,7 +32,7 @@ class CartModuleTest {
         keyboard.setPrice(new BigDecimal("50.00"));
         when(products.findById(1L)).thenReturn(Optional.of(keyboard));
         when(products.findByIdAndActiveTrue(1L)).thenReturn(Optional.of(keyboard));
-        cart=new CartService(products);
+        cart=new CartServiceImpl(products);
         session=new MockHttpSession(); session.setAttribute("loginUserId",1L);
     }
     @Test void mergesQuantitiesAndCalculatesDisplayAmount() {

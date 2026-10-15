@@ -1,0 +1,11 @@
+.git
+.idea
+.local
+runtime
+target
+frontend/node_modules
+frontend/dist
+frontend/.angular
+*.log
+*.cmd
+*.ps1

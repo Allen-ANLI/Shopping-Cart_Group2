@@ -11,7 +11,7 @@ if (-not [int]::TryParse((Get-Content -LiteralPath $pidFile -Raw).Trim(), [ref]$
     throw 'Invalid recorded demo launcher PID.'
 }
 $allowedJars = @(
-    (Join-Path $projectPath 'runtime\shopping-cart.jar'),
+    (Join-Path $projectPath 'runtime\nexus-shopping-cart.jar')
     (Join-Path $projectPath 'target\shopping-cart-0.0.1-SNAPSHOT.jar')
 )
 $demoProcesses = @(Get-CimInstance Win32_Process -Filter "ParentProcessId=$launcherPid AND Name='java.exe'" | Where-Object {
@@ -29,3 +29,4 @@ foreach ($demoProcess in $demoProcesses) {
     Write-Host "Stopped this project's review demo: PID $($demoProcess.ProcessId)."
 }
 if ($demoProcesses.Count -eq 0) { Write-Host 'The recorded background demo is no longer running.' }
+

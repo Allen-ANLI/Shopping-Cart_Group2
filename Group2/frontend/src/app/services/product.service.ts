@@ -10,17 +10,25 @@ import { Product, ProductPage, ReviewSummary } from '../models/product';
 @Injectable({ providedIn: 'root' })
 export class ProductService {
   private readonly http = inject(HttpClient);
+  private readonly baseUrl = '/api/products';
 
   getPage(page: number, size: number, filters: {category?: string; q?: string; sort?: string} = {}): Observable<ProductPage> {
     let params = new HttpParams().set('page', page).set('size', size);
-    for (const [key, value] of Object.entries(filters)) if (value) params = params.set(key, value);
-    return this.http.get<ProductPage>('/api/products', { params });
+    if (filters.category) params = params.set('category', filters.category);
+    if (filters.q) params = params.set('q', filters.q);
+    if (filters.sort) params = params.set('sort', filters.sort);
+    return this.http.get<ProductPage>(this.baseUrl, { params });
   }
 
   getProduct(id: string): Observable<Product> {
-    return this.http.get<Product>(`/api/products/${encodeURIComponent(id)}`);
+    return this.http.get<Product>(`${this.baseUrl}/${encodeURIComponent(id)}`);
   }
 
-  getDailyDeals(): Observable<{date: string; products: Product[]}> { return this.http.get<{date: string; products: Product[]}>('/api/deals'); }
-  getReviews(id: string): Observable<ReviewSummary> { return this.http.get<ReviewSummary>(`/api/products/${encodeURIComponent(id)}/reviews`); }
+  getDailyDeals(): Observable<{date: string; products: Product[]}> {
+    return this.http.get<{date: string; products: Product[]}>('/api/deals');
+  }
+
+  getReviews(id: string): Observable<ReviewSummary> {
+    return this.http.get<ReviewSummary>(`${this.baseUrl}/${encodeURIComponent(id)}/reviews`);
+  }
 }
