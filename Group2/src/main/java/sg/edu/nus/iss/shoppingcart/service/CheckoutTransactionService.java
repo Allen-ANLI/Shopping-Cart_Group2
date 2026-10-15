@@ -81,7 +81,7 @@ public class CheckoutTransactionService {
             Integer quantity = entry.getValue();
 
             if (productId == null || productId <= 0
-                    || quantity == null || quantity <= 0 || quantity > CartService.MAX_QUANTITY) {
+                    || quantity == null || quantity <= 0) {
                 throw new IllegalArgumentException("商品 ID 和购买数量必须为正数");
             }
 

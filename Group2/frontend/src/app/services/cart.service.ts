@@ -29,8 +29,9 @@ export class CartService {
     tap(state => this.accept(state)));
   }
   setQuantity(productId: number, quantity: number): Observable<CartState> {
-    return this.prepare().pipe(switchMap(state => this.http.put<CartState>(
-      `${this.baseUrl}/items/${productId}`, { quantity, cartFormToken: state.cartFormToken })),
+    return this.prepare().pipe(switchMap(state => quantity === 0
+      ? this.http.delete<CartState>(`${this.baseUrl}/items/${productId}`, { body: { cartFormToken: state.cartFormToken } })
+      : this.http.put<CartState>(`${this.baseUrl}/items/${productId}`, { quantity, cartFormToken: state.cartFormToken })),
       tap(state => this.accept(state)));
   }
 }

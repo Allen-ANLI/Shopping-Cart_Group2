@@ -2,7 +2,7 @@
   @if (!compact) { <p class="cart-quantity-label">{{ lang.text('In your cart', '购物车中的数量') }}</p> }
     <div class="quantity-stepper" [attr.aria-label]="lang.text('Cart quantity', '购物车数量')" [attr.aria-busy]="submitting()">
       <button type="button" (click)="changeQuantity(inCart > maxQuantity ? maxQuantity : inCart - 1)" [disabled]="submitting()" [attr.aria-label]="lang.text('Decrease quantity', '减少数量')">−</button>
-      <input type="number" min="0" [max]="maxQuantity" [value]="inCart" (change)="changeQuantity(+$any($event.target).value); $any($event.target).value = inCart" [disabled]="submitting()" [attr.aria-label]="lang.text('Quantity in cart', '购物车中的数量')">
+      <input type="number" min="1" [max]="maxQuantity" step="1" [value]="inCart" (change)="changeInput($any($event.target))" [disabled]="submitting()" [attr.aria-label]="lang.text('Quantity in cart', '购物车中的数量')">
       <button type="button" (click)="changeQuantity(inCart + 1)" [disabled]="submitting() || inCart >= maxQuantity" [attr.aria-label]="lang.text('Increase quantity', '增加数量')">+</button>
     </div>
 } @else if (compact) {
@@ -17,5 +17,5 @@
 }
 @if (added() && !compact) { <p class="cart-feedback success" role="status">{{ lang.text('Added to cart.', '已加入购物车。') }} <a href="/cart">{{ lang.text('View cart', '查看购物车') }}</a></p> }
 @if (error() === 'login') { <p class="cart-feedback" role="alert"><a [href]="loginUrl">{{ lang.text('Log in to add to cart', '登录后加入购物车') }}</a></p> }
-@if (error() === 'limit') { <p class="cart-feedback" role="alert">{{ lang.text('Check quantity (maximum 99 per product) or availability.', '请检查数量（每件商品最多99件）或商品是否在售。') }}</p> }
+@if (error() === 'limit') { <p class="cart-feedback" role="alert">{{ lang.text('Enter a positive whole number up to available stock: ', '请输入大于 0 的整数，库存上限：') }}{{ maxQuantity }}</p> }
 @if (error() === 'failed') { <p class="cart-feedback" role="alert">{{ lang.text('Could not add this item. Please try again.', '添加失败，请重试。') }}</p> }

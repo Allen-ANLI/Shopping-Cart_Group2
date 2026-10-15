@@ -205,17 +205,22 @@ class CAdaptationIntegrationTest {
     }
 
     @Test
-    void mergedQuantityLimitAndZeroUpdateRemainServerValidated() throws Exception {
+    void stockIsTheQuantityLimitAndZeroUpdateCannotRemoveItems() throws Exception {
         MockHttpSession session = login(firstUser, null);
         String token = formToken(session);
-        add(session, keyboard, "99", token);
+        keyboard.setStockQuantity(250); products.saveAndFlush(keyboard);
+        add(session, keyboard, "200", token);
+        add(session, keyboard, "50", token);
         mvc.perform(post("/cart/add").session(session).param("productId", keyboard.getId().toString())
                         .param("quantity", "1").param("cartFormToken", token))
                 .andExpect(flash().attributeExists("errorMessage"));
-        assertThat(cart.readForCheckout(session)).containsEntry(keyboard.getId(), 99);
+        assertThat(cart.readForCheckout(session)).containsEntry(keyboard.getId(), 250);
         mvc.perform(post("/cart/update").session(session).param("productId", keyboard.getId().toString())
                         .param("quantity", "0").param("cartFormToken", token))
-                .andExpect(flash().attributeExists("successMessage"));
+                .andExpect(flash().attributeExists("errorMessage"));
+        assertThat(cart.readForCheckout(session)).containsEntry(keyboard.getId(), 250);
+        mvc.perform(post("/cart/remove").session(session).param("productId", keyboard.getId().toString())
+                        .param("cartFormToken", token)).andExpect(flash().attributeExists("successMessage"));
         assertThat(cart.getCartItems(session)).isEmpty();
         String emptyToken = checkoutToken(session);
         mvc.perform(post("/checkout").param("paymentMethod", "VISA").param("cardholderName", "Demo Customer")

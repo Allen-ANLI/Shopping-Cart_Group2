@@ -15,11 +15,11 @@
       <div class="detail-content"><a class="eyebrow" [href]="'/products?category=' + (item.category || '') + '#catalog'">{{ categoryName(item) }}</a><h1>{{ lang.name(item) }}</h1>
         <p class="detail-brand">{{ item.brand || 'NEXUS Digital' }}</p>
         <a class="detail-rating" [href]="'/products' + locationSearch + '#reviews-heading'"><span class="rating-stars"><span aria-hidden="true">★★★★★</span><span aria-hidden="true" class="filled" [style.width.%]="(reviews()?.averageRating ?? item.averageRating ?? 0) * 20">★★★★★</span></span><strong>{{ (reviews()?.averageRating ?? item.averageRating ?? 0).toFixed(1) }} / 5</strong><span>({{ reviews()?.totalReviews ?? item.totalReviews ?? 0 }} {{ lang.text('reviews', '条评价') }})</span></a>
-        <p class="detail-sales">{{ item.salesCount || 0 }} {{ lang.text('sold', '件已售') }} · {{ item.stockQuantity ?? 99 }} {{ lang.text('in stock', '件库存') }}</p>
+            <p class="detail-sales">{{ item.salesCount || 0 }} {{ lang.text('sold', '件已售') }} · {{ item.stockQuantity ?? 0 }} {{ lang.text('in stock', '件库存') }}</p>
         <div class="detail-price"><span>SGD</span> {{ (item.effectivePrice ?? item.price).toFixed(2) }}@if ((item.discountPercent ?? 0) > 0) { <div class="promotion-price"><del>SGD {{ item.price.toFixed(2) }}</del><span class="discount-badge">−{{ item.discountPercent }}%</span></div> }<small>{{ lang.text('Price in Singapore dollars', '价格以新加坡元计算') }}</small></div>
         <section class="detail-description"><h2>{{ lang.text('Built for work and play', '为工作与娱乐而设计') }}</h2><p>{{ lang.description(item) }}</p></section>
         <dl class="product-specs"><div><dt>{{ lang.text('Brand', '品牌') }}</dt><dd>{{ item.brand || 'NEXUS Digital' }}</dd></div><div><dt>{{ lang.text('Ships from', '发货地') }}</dt><dd>{{ lang.origin(item) }}</dd></div><div><dt>{{ lang.text('Category', '分类') }}</dt><dd>{{ categoryName(item) }}</dd></div></dl>
-        <app-add-to-cart [productId]="item.id" [stockQuantity]="item.stockQuantity ?? 99" />
+            <app-add-to-cart [productId]="item.id" [stockQuantity]="item.stockQuantity ?? 0" />
         <p class="detail-note"><app-icon name="check" />{{ lang.text('Choose your delivery address at checkout.', '结账时选择收货地址。') }}</p>
         <a class="detail-back text-button" [href]="listUrl">{{ lang.text('Continue browsing', '继续选购') }}<app-icon name="arrow" /></a>
       </div>

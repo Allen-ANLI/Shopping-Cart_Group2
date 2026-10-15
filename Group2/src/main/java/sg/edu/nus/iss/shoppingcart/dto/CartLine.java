@@ -17,6 +17,7 @@ public final class CartLine {
     public BigDecimal getOriginalUnitPrice() { return originalUnitPrice; }
     public BigDecimal getOriginalSubtotal() { return originalUnitPrice.multiply(BigDecimal.valueOf(quantity)); }
     private final String problem;
+    private final int stockQuantity;
 
     public CartLine(Long productId, int quantity, Product product) {
         this.productId = productId;
@@ -26,14 +27,17 @@ public final class CartLine {
                 : chinese && product.getNameZh() != null && !product.getNameZh().isBlank() ? product.getNameZh() : product.getName();
         this.originalUnitPrice = product == null ? BigDecimal.ZERO : product.getPrice();
         this.unitPrice = product == null ? BigDecimal.ZERO : product.getEffectivePrice();
+        this.stockQuantity = product == null ? 0 : Math.max(0, product.getStockQuantity());
         this.problem = product == null ? "This product has been removed. Please remove it from your cart."
                 : !product.isActive() ? "This product is no longer for sale. Please remove it."
+                : quantity < 1 ? "Quantity must be a positive whole number"
                 : quantity > product.getStockQuantity() ? "Not enough stock. Please reduce the quantity."
                     : null;
     }
 
     public Long getProductId() { return productId; }
     public int getQuantity() { return quantity; }
+    public int getStockQuantity() { return stockQuantity; }
     public String getProductName() { return productName; }
     public BigDecimal getUnitPrice() { return unitPrice; }
     public BigDecimal getSubtotal() { return unitPrice.multiply(BigDecimal.valueOf(quantity)); }

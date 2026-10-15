@@ -21,13 +21,13 @@ describe('Cart actions stay on the selected product or collection', () => {
     history.replaceState(null, '', '/products?category=typing&id=12');
     await TestBed.configureTestingModule({ imports: [AddToCartComponent], providers: [provideHttpClient(), provideHttpClientTesting()] }).compileComponents();
     fixture = TestBed.createComponent(AddToCartComponent); http = TestBed.inject(HttpTestingController);
-    element = fixture.nativeElement; fixture.componentRef.setInput('productId', 12); render();
+    element = fixture.nativeElement; fixture.componentRef.setInput('productId', 12); fixture.componentRef.setInput('stockQuantity', 250); render();
   });
   afterEach(() => { fixture.destroy(); http.verify(); history.replaceState(null, '', '/'); });
   it('does not request one cart token per visible product on initial render', () => {
     http.expectNone('/api/cart/form');
     expect(element.querySelector('input')?.getAttribute('min')).toBe('1');
-    expect(element.querySelector('input')?.getAttribute('max')).toBe('99');
+    expect(element.querySelector('input')?.getAttribute('max')).toBe('250');
   });
   it('posts product, chosen quantity and a fresh session token without navigating', () => {
     const input = element.querySelector('input')!; input.value = '3'; input.dispatchEvent(new Event('input'));
@@ -59,7 +59,7 @@ describe('Cart actions stay on the selected product or collection', () => {
     element.querySelector<HTMLButtonElement>('[aria-label="Decrease quantity"]')!.click();
     http.expectOne('/api/cart/form').flush({ cartFormToken: 'fresh-token', itemCount: 1, totalQuantity: 1, quantities: {12: 1} });
     const update = http.expectOne('/api/cart/items/12');
-    expect(update.request.method).toBe('PUT'); expect(update.request.body.quantity).toBe(0);
+    expect(update.request.method).toBe('DELETE'); expect(update.request.body).toEqual({cartFormToken: 'fresh-token'});
     update.flush({ itemCount: 0, totalQuantity: 0, quantities: {} }); render();
     expect(element.querySelector('.quantity-stepper')).toBeNull();
     expect(element.querySelector('[aria-label="Quick add to cart"]')).not.toBeNull();
@@ -92,7 +92,7 @@ describe('Cart actions stay on the selected product or collection', () => {
     http.expectOne('/api/cart/items').flush({ itemCount: 1, totalQuantity: 1 }); render();
     expect(element.querySelector('button')!.disabled).toBe(false);
   });
-  it.each(['0', '100', '1.5', ''])('rejects invalid quantity %s before requesting a token', value => {
+  it.each(['0', '251', '1.5', ''])('rejects invalid quantity %s before requesting a token', value => {
     const input = element.querySelector('input')!; input.value = value; input.dispatchEvent(new Event('input'));
     submit(); http.expectNone('/api/cart/form'); expect(element.querySelector('button')!.disabled).toBe(false);
   });
@@ -108,7 +108,22 @@ describe('Cart actions stay on the selected product or collection', () => {
   });
   it('shows quantity and availability validation returned by the server', () => {
     submit(); prepare(); http.expectOne('/api/cart/items').flush({}, { status: 400, statusText: 'Bad Request' }); render();
-    expect(element.querySelector('[role="alert"]')?.textContent).toContain('maximum 99');
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain('available stock: 250');
+  });
+  it('accepts quantities greater than 99 up to stock', () => {
+    const input = element.querySelector('input')!; input.value = '200'; input.dispatchEvent(new Event('input'));
+    submit(); prepare();
+    const request = http.expectOne('/api/cart/items'); expect(request.request.body.quantity).toBe(200);
+    request.flush({itemCount: 1, totalQuantity: 200, quantities: {12: 200}}); render();
+    expect(element.querySelector<HTMLInputElement>('input')!.value).toBe('200');
+  });
+  it.each(['0', '-1', '251', '1.5', ''])('restores invalid typed cart quantity %s instead of removing the item', value => {
+    TestBed.inject(CartService).quantities.set({12: 3}); render();
+    const input = element.querySelector<HTMLInputElement>('input')!;
+    input.value = value; input.dispatchEvent(new Event('change')); render();
+    expect(input.value).toBe('3');
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain('available stock: 250');
+    http.expectNone('/api/cart/form');
   });
   it('fetches a new token on retry after a network error', () => {
     submit(); http.expectOne('/api/cart/form').error(new ProgressEvent('error')); render();

@@ -5,8 +5,49 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7df0f11e-403b-4df7-b3dd-28d3b88567c6" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/Group2/frontend/scripts/cart-page.test.mjs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Group2/src/main/resources/static/cart-assets/cart.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a9d34576-4ac3-44c5-89db-9f5124e0f7ea.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a9d34576-4ac3-44c5-89db-9f5124e0f7ea.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DEPLOY_AWS.md" beforeDir="false" afterPath="$PROJECT_DIR$/DEPLOY_AWS.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/add-to-cart/add-to-cart.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/add-to-cart/add-to-cart.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/add-to-cart/add-to-cart.component.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/add-to-cart/add-to-cart.component.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/add-to-cart/add-to-cart.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/add-to-cart/add-to-cart.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/app.component.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/app.component.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/daily-deals/daily-deals.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/daily-deals/daily-deals.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/product-detail/product-detail.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/product-detail/product-detail.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/product-list/product-list.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/product-list/product-list.component.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/product-list/product-list.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/product-list/product-list.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/product-list/product-list.component.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/product-list/product-list.component.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/product-list/product-list.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/product-list/product-list.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/services/cart.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/services/cart.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/testing/product-fixtures.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/testing/product-fixtures.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/runtime/nexus-shopping-cart.jar" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/runtime/nexus-shopping-cart.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/controller/CartController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/controller/CartController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/controller/CartRestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/controller/CartRestController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/dto/CartLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/dto/CartLine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/dto/CartQuantityForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/dto/CartQuantityForm.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/repository/ProductRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/repository/ProductRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/CartService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/CartService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/CartServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/CartServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/CheckoutTransactionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/CheckoutTransactionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/ProductServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/ProductServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/UiText.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/UiText.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/resources/messages.properties" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/resources/messages.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/resources/messages_zh.properties" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/resources/messages_zh.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/resources/static/cart-assets/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/resources/static/cart-assets/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/resources/static/products/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/resources/static/products/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/resources/static/products/main-S554AIWY.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/resources/templates/cart/products.html" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/resources/templates/cart/products.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/resources/templates/cart/view.html" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/resources/templates/cart/view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/main/resources/templates/store/fragments.html" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/resources/templates/store/fragments.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/test/java/sg/edu/nus/iss/shoppingcart/CAdaptationIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/test/java/sg/edu/nus/iss/shoppingcart/CAdaptationIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/test/java/sg/edu/nus/iss/shoppingcart/CartModuleTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/test/java/sg/edu/nus/iss/shoppingcart/CartModuleTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/test/java/sg/edu/nus/iss/shoppingcart/CatalogReviewIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/test/java/sg/edu/nus/iss/shoppingcart/CatalogReviewIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Group2/src/test/java/sg/edu/nus/iss/shoppingcart/MarketplaceIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/test/java/sg/edu/nus/iss/shoppingcart/MarketplaceIntegrationTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,61 +78,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="2.0019518147721485" />
-      <entry key="MS500" value="3.4180697822195296" />
-      <entry key="S2" value="6.458918677069838" />
-      <entry key="S5" value="9.254236486073768" />
-      <entry key="S10" value="10.861314986375469" />
-      <entry key="S30" value="13.348303369684825" />
-      <entry key="S60" value="16.76526819347727" />
-      <entry key="M2" value="21.748355064541165" />
-      <entry key="M5" value="27.695384636932307" />
-      <entry key="M10" value="30.545837661430454" />
-      <entry key="M15" value="31.63342273416144" />
-      <entry key="M30" value="33.35255580949803" />
-      <entry key="H1" value="38.72341997499949" />
-      <entry key="H2" value="51.24356552377388" />
-      <entry key="H4" value="71.90488812965027" />
-      <entry key="D1" value="271.71040395459397" />
-      <entry key="W1" value="717.3041401376497" />
+      <entry key="MS100" value="1.000000000052768" />
+      <entry key="MS500" value="1.0138209957441042" />
+      <entry key="S2" value="1.852286491812029" />
+      <entry key="S5" value="3.12616807418268" />
+      <entry key="S10" value="3.909515454146369" />
+      <entry key="S30" value="4.595460070025737" />
+      <entry key="S60" value="4.79497685164846" />
+      <entry key="M2" value="5.245171909912118" />
+      <entry key="M5" value="11.433430357877665" />
+      <entry key="M10" value="22.62180580874283" />
+      <entry key="M15" value="30.87929761890133" />
+      <entry key="M30" value="49.26826224193735" />
+      <entry key="H1" value="73.9167159882051" />
+      <entry key="H2" value="100.30909175062101" />
+      <entry key="H4" value="129.86907174274418" />
+      <entry key="D1" value="340.4012647112611" />
+      <entry key="W1" value="830.516715468998" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
       <entry key="MS500" value="0.0" />
       <entry key="S2" value="0.0" />
       <entry key="S5" value="0.0" />
-      <entry key="S10" value="0.0" />
-      <entry key="S30" value="0.0" />
-      <entry key="S60" value="0.0" />
-      <entry key="M2" value="0.0" />
-      <entry key="M5" value="0.0" />
-      <entry key="M10" value="0.0" />
-      <entry key="M15" value="0.0" />
-      <entry key="M30" value="0.0" />
-      <entry key="H1" value="0.0" />
-      <entry key="H2" value="0.0" />
-      <entry key="H4" value="0.0" />
-      <entry key="D1" value="0.0" />
-      <entry key="W1" value="0.0" />
+      <entry key="S10" value="4.9E-324" />
+      <entry key="S30" value="1.5324792940067128E-108" />
+      <entry key="S60" value="1.2379334772138263E-54" />
+      <entry key="M2" value="1.1126245895241673E-27" />
+      <entry key="M5" value="1.6540150675882317E-11" />
+      <entry key="M10" value="4.066958405969051E-6" />
+      <entry key="M15" value="2.5478849911513983E-4" />
+      <entry key="M30" value="0.015962095699347867" />
+      <entry key="H1" value="0.12634118766003383" />
+      <entry key="H2" value="0.3554450557540981" />
+      <entry key="H4" value="0.5961921298994953" />
+      <entry key="D1" value="0.9174119083348006" />
+      <entry key="W1" value="0.987761405961867" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.931384158643155" />
-      <entry key="MS500" value="3.3872637963429306" />
-      <entry key="S2" value="6.428025572415357" />
-      <entry key="S5" value="9.234429946526461" />
-      <entry key="S10" value="10.849504443728513" />
-      <entry key="S30" value="13.343003917636075" />
-      <entry key="S60" value="16.760840946596083" />
-      <entry key="M2" value="21.744520282475545" />
-      <entry key="M5" value="27.69300789066518" />
-      <entry key="M10" value="30.544440794872518" />
-      <entry key="M15" value="31.63243836501151" />
-      <entry key="M30" value="33.35203380147469" />
-      <entry key="H1" value="38.723145768342846" />
-      <entry key="H2" value="51.24341897737852" />
-      <entry key="H4" value="71.90480697999571" />
-      <entry key="D1" value="271.7103747243171" />
-      <entry key="W1" value="717.3041306127841" />
+      <entry key="MS100" value="0.9726549474632493" />
+      <entry key="MS500" value="1.0081909152225441" />
+      <entry key="S2" value="1.8493525643102748" />
+      <entry key="S5" value="3.1240678327541085" />
+      <entry key="S10" value="3.9081800861032474" />
+      <entry key="S30" value="4.594931619091418" />
+      <entry key="S60" value="4.7947004997603155" />
+      <entry key="M2" value="5.245019847122825" />
+      <entry key="M5" value="11.433292386967864" />
+      <entry key="M10" value="22.621668245050145" />
+      <entry key="M15" value="30.879414460484043" />
+      <entry key="M30" value="49.284037658271394" />
+      <entry key="H1" value="74.0427111779405" />
+      <entry key="H2" value="100.66412113278281" />
+      <entry key="H4" value="130.46492256157177" />
+      <entry key="D1" value="341.3185735208623" />
+      <entry key="W1" value="831.5044552816323" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{

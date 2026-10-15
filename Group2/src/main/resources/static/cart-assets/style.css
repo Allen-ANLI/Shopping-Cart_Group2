@@ -280,6 +280,9 @@ tr:last-child td { border-bottom: none; }
 /* ---------------- 购物车 ---------------- */
 .qty-form { display: flex; gap: 8px; align-items: center; }
 .qty-form input { width: 78px; }
+.quantity-error { max-width: 260px; font-size: 12px; }
+[data-cart-page] [aria-invalid="true"] { border-color: #a13e21; }
+[data-cart-page] [hidden] { display: none !important; }
 .summary-row {
     display: flex;
     justify-content: space-between;

@@ -29,8 +29,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             AND (:search IS NULL
                 OR LOWER(p.name) LIKE :search ESCAPE '\\'
                 OR LOWER(p.nameZh) LIKE :search ESCAPE '\\'
-                OR LOWER(p.description) LIKE :search ESCAPE '\\'
-                OR LOWER(p.descriptionZh) LIKE :search ESCAPE '\\'
                 OR LOWER(p.brand) LIKE :search ESCAPE '\\')
             """;
 

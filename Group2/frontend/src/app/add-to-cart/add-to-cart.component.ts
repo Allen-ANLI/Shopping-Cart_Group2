@@ -9,7 +9,7 @@ import { IconComponent } from '../icon/icon.component';
 export class AddToCartComponent implements OnDestroy {
   @Input({ required: true }) productId!: number;
   @Input() compact = false;
-  @Input() stockQuantity = 99;
+  @Input() stockQuantity = 0;
   readonly lang = inject(LanguageService);
   private readonly cart = inject(CartService);
   private pending?: Subscription;
@@ -18,7 +18,16 @@ export class AddToCartComponent implements OnDestroy {
   readonly error = signal<'login' | 'failed' | 'limit' | null>(null);
   quantity = 1;
   get inCart(): number { return this.cart.quantities()[this.productId] || 0; }
-  get maxQuantity(): number { return Math.min(99, this.stockQuantity); }
+  get maxQuantity(): number { return this.stockQuantity; }
+  changeInput(input: HTMLInputElement): void {
+    const value = input.value;
+    if (!/^\d+$/.test(value) || Number(value) < 1 || Number(value) > this.maxQuantity) {
+      this.error.set('limit');
+    } else {
+      this.changeQuantity(Number(value));
+    }
+    input.value = String(this.inCart);
+  }
   changeQuantity(quantity: number): void {
     if (this.submitting() || !Number.isInteger(quantity) || quantity < 0 || quantity > this.maxQuantity) return;
     this.submitting.set(true); this.error.set(null); this.added.set(false);

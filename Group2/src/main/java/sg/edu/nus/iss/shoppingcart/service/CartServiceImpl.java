@@ -98,10 +98,11 @@ public class CartServiceImpl implements CartService {
     @Override
     public void addItem(HttpSession session, Long productId, int quantity) {
         synchronized (session) {
-            validateQuantity(quantity, false);
+            validateQuantity(quantity);
             SessionCart cart = state(session);
-            int combined = cart.getQuantities().getOrDefault(productId, 0) + quantity;
-            validateQuantity(combined, false);
+            long requested = (long) cart.getQuantities().getOrDefault(productId, 0) + quantity;
+            if (requested > Integer.MAX_VALUE) throw new BusinessException("Not enough stock. Please reduce the quantity.");
+            int combined = (int) requested;
             purchasable(productId, combined);
             cart.put(productId, combined);
             session.setAttribute(CART_ATTRIBUTE, cart);
@@ -111,17 +112,13 @@ public class CartServiceImpl implements CartService {
     @Override
     public void updateQuantity(HttpSession session, Long productId, int quantity) {
         synchronized (session) {
-            validateQuantity(quantity, true);
+            validateQuantity(quantity);
             SessionCart cart = state(session);
             if (!cart.getQuantities().containsKey(productId)) {
                 throw new BusinessException("This product is not in your cart");
             }
-            if (quantity == 0) {
-                cart.remove(productId);
-            } else {
-                purchasable(productId, quantity);
-                cart.put(productId, quantity);
-            }
+            purchasable(productId, quantity);
+            cart.put(productId, quantity);
             session.setAttribute(CART_ATTRIBUTE, cart);
         }
     }
@@ -156,7 +153,7 @@ public class CartServiceImpl implements CartService {
             Map<Long, Integer> result = new LinkedHashMap<>();
             quantities.entrySet().stream().sorted(Map.Entry.comparingByKey())
                     .forEach(entry -> {
-                        validateQuantity(entry.getValue(), false);
+                        validateQuantity(entry.getValue());
                         purchasable(entry.getKey(), entry.getValue());
                         result.put(entry.getKey(), entry.getValue());
                     });
@@ -174,12 +171,8 @@ public class CartServiceImpl implements CartService {
         return product;
     }
 
-    private void validateQuantity(int quantity, boolean allowZero) {
-        if (quantity < (allowZero ? 0 : 1) || quantity > MAX_QUANTITY) {
-            throw new BusinessException(allowZero
-                    ? "Quantity must be between 0 and 99; use 0 to remove an item"
-                    : "Quantity must be between 1 and 99");
-        }
+    private void validateQuantity(int quantity) {
+        if (quantity < 1) throw new BusinessException("Quantity must be a positive whole number");
     }
 
     @Override

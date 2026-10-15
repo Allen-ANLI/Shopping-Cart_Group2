@@ -31,9 +31,9 @@
 <div th:if="${payment.paidAt != null}"><dt th:text="#{payment.time}"></dt><dd th:text="${#temporals.format(payment.paidAt, 'yyyy-MM-dd HH:mm')}"></dd></div>
 </dl></section>
 <div th:fragment="pricing(pricing)" class="order-pricing">
-<div class="summary-row"><span th:text="#{pricing.original}"></span><span th:text="'S$' + ${pricing.originalSubtotal}"></span></div>
-<div class="summary-row savings"><span th:text="#{pricing.discount}"></span><span th:text="'-S$' + ${pricing.discountAmount}"></span></div>
-<div class="summary-row"><span th:text="#{pricing.subtotal}"></span><strong th:text="'S$' + ${pricing.subtotal}"></strong></div>
-<div class="summary-row"><span th:text="#{pricing.gst}"></span><span th:text="'S$' + ${pricing.gstAmount}"></span></div>
-<div class="summary-row summary-total"><span th:text="#{total}"></span><strong th:text="'S$' + ${pricing.total}"></strong></div>
+<div class="summary-row"><span th:text="#{pricing.original}"></span><span data-price="originalSubtotal" th:text="'S$' + ${pricing.originalSubtotal}"></span></div>
+<div class="summary-row savings"><span th:text="#{pricing.discount}"></span><span data-price="discountAmount" th:text="'-S$' + ${pricing.discountAmount}"></span></div>
+<div class="summary-row"><span th:text="#{pricing.subtotal}"></span><strong data-price="subtotal" th:text="'S$' + ${pricing.subtotal}"></strong></div>
+<div class="summary-row"><span th:text="#{pricing.gst}"></span><span data-price="gstAmount" th:text="'S$' + ${pricing.gstAmount}"></span></div>
+<div class="summary-row summary-total"><span th:text="#{total}"></span><strong data-price="total" th:text="'S$' + ${pricing.total}"></strong></div>
 </div></body></html>

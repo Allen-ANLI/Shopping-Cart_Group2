@@ -22,8 +22,9 @@ npm run dev
 | `npm run dev` | 启动 Angular 开发服务器。 |
 | `npm run check` | 检查 TypeScript、HTML 模板和测试代码。 |
 | `npm run test` | 执行 Angular 测试。 |
+| `npm run test:cart` | 验证购物车数量离开输入框后的校验、范围修正、自动保存及结账拦截。 |
 | `npm run build` | 构建生产资源。 |
-| `npm run deploy` | 检查、测试、构建并部署到 Spring Boot 静态目录。 |
+| `npm run deploy` | 检查、运行 Angular 与购物车脚本测试、构建并部署到 Spring Boot 静态目录。 |
 
 修改 Angular 源码后，运行 `npm run deploy`，再重新打包后端，确保 JAR 中包含最新页面。
 

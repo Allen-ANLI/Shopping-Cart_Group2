@@ -2,6 +2,8 @@ package sg.edu.nus.iss.shoppingcart;
 
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
@@ -73,6 +75,55 @@ class CatalogReviewIntegrationTest extends ModuleETestBase {
                 .andExpect(status().isBadRequest()).andExpect(jsonPath("$.status").value(400));
         mvc.perform(get("/api/products").param("page", "0").param("sort", "passwordHash"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test void searchesOnlyProductNamesAndBrandsInBothLanguages() throws Exception {
+        String marker = UUID.randomUUID().toString();
+        Product target = product(marker + " Keyboard", "typing", "25.00", true);
+        target.setNameZh("专用键盘" + marker);
+        target.setBrand("Brand-" + marker);
+        products.saveAndFlush(target);
+        Product unrelated = product("Unrelated display", "displays", "40.00", true);
+        unrelated.setDescription("Connect this display to the " + marker + " keyboard.");
+        unrelated.setDescriptionZh("可连接专用键盘" + marker);
+        products.saveAndFlush(unrelated);
+        for (String query : new String[]{"  " + marker.toUpperCase() + "  ", "专用键盘" + marker, "brand-" + marker}) {
+            for (String sort : new String[]{"featured", "recommended", "price-asc", "rating"}) {
+                mvc.perform(get("/api/products").param("page", "0").param("q", query).param("sort", sort))
+                        .andExpect(status().isOk()).andExpect(jsonPath("$.totalElements").value(1))
+                        .andExpect(jsonPath("$.content[0].id").value(target.getId()));
+                mvc.perform(get("/api/products").param("q", query).param("sort", sort))
+                        .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)))
+                        .andExpect(jsonPath("$[0].id").value(target.getId()));
+            }
+        }
+    }
+
+    @Test void searchesWithNoNameOrBrandMatchStayEmptyInsteadOfReturningRecommendations() throws Exception {
+        String missing = UUID.randomUUID().toString();
+        Product unrelated = product("A different product", "workspace", "20.00", true);
+        unrelated.setDescription(missing); unrelated.setDescriptionZh(missing);
+        products.saveAndFlush(unrelated);
+        for (String sort : new String[]{"featured", "recommended", "price-desc", "sales"}) {
+            mvc.perform(get("/api/products").param("page", "0").param("q", missing).param("sort", sort))
+                    .andExpect(status().isOk()).andExpect(jsonPath("$.totalElements").value(0))
+                    .andExpect(jsonPath("$.totalPages").value(0)).andExpect(jsonPath("$.content", hasSize(0)));
+            mvc.perform(get("/api/products").param("q", missing).param("sort", sort))
+                    .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   ", "\t", "\u3000"})
+    void blankSearchIsRejectedWhileBrowsingWithoutASearchTermStillWorks(String query) throws Exception {
+        for (String sort : new String[]{"featured", "recommended"}) {
+            mvc.perform(get("/api/products").param("page", "0").param("q", query).param("sort", sort)
+                            .cookie(new jakarta.servlet.http.Cookie("store_lang", "zh")))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").value("请输入搜索内容。"));
+            mvc.perform(get("/api/products").param("q", query).param("sort", sort))
+                    .andExpect(status().isBadRequest());
+        }
+        mvc.perform(get("/api/products").param("page", "0")).andExpect(status().isOk());
     }
 
     @Test void anonymousCanReadReviewsButCannotWriteOrImpersonateAUser() throws Exception {

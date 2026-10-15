@@ -6,8 +6,9 @@
     "dev": "ng serve --host 127.0.0.1 --port 4200 --proxy-config proxy.conf.json",
     "check": "ngc -p tsconfig.app.json --noEmit && ngc -p tsconfig.spec.json --noEmit",
     "test": "ng test --watch=false",
+    "test:cart": "node --test scripts/cart-page.test.mjs",
     "build": "ng build --configuration production --base-href=/products/",
-    "deploy": "npm run check && npm run test && npm run build && node scripts/deploy.mjs"
+    "deploy": "npm run check && npm run test && npm run test:cart && npm run build && node scripts/deploy.mjs"
   },
   "dependencies": {
     "@angular/common": "22.2.1",

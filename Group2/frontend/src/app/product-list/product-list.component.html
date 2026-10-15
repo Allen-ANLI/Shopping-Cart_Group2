@@ -1,26 +1,54 @@
 <main id="main-content" class="store-container">
-  <section class="top-search">      <form class="search-form" (submit)="search($event)"><app-icon name="search" /><input type="search" name="q" [value]="searchInput" (input)="searchInput = $any($event.target).value" [placeholder]="lang.text('Search products or brands', '搜索商品或品牌')" [attr.aria-label]="lang.text('Search products or brands', '搜索商品或品牌')"><button type="submit">{{ lang.text('Search', '搜索') }}</button></form><p>{{ lang.text("Find your next tech or office upgrade.", "寻找你的下一件数码与办公装备。") }}</p></section>
+  <section class="top-search">
+    <form class="search-form" (submit)="search($event)"><app-icon name="search" /><input type="search" name="q" [value]="searchInput" (input)="updateSearchInput($any($event.target).value)" [placeholder]="lang.text('Search products or brands', '搜索商品或品牌')" [attr.aria-label]="lang.text('Search products or brands', '搜索商品或品牌')" [attr.aria-invalid]="searchError() ? true : null" [attr.aria-describedby]="searchError() ? 'catalog-search-error' : null"><button type="submit">{{ lang.text('Search', '搜索') }}</button></form>
+    @if (searchError()) { <p id="catalog-search-error" class="search-error" role="alert">{{ lang.text('Please enter a search term.', '请输入搜索内容。') }}</p> }
+    @else { <p>{{ lang.text("Find your next tech or office upgrade.", "寻找你的下一件数码与办公装备。") }}</p> }
+  </section>
   @if (!category() && !query()) {
-    <section class="campaign" (mouseenter)="setCampaignHover(true)" (mouseleave)="setCampaignHover(false)" (focusin)="setCampaignFocus(true)" (focusout)="campaignBlur($event)" [attr.aria-roledescription]="lang.text('carousel', '轮播')" [class.promotion]="visualCampaign() !== 0" [class.best-deal]="visualCampaign() === 2" [attr.aria-label]="lang.text('Brand advertisements and events', '品牌广告与促销活动')">
+    <section class="campaign promotion" (mouseenter)="setCampaignHover(true)" (mouseleave)="setCampaignHover(false)" (focusin)="setCampaignFocus(true)" (focusout)="campaignBlur($event)" [attr.aria-roledescription]="lang.text('carousel', '轮播')" [class.best-deal]="campaign() === 0" [class.product-spotlight]="campaign() === 1" [class.advertising]="campaign() === 2" [attr.aria-label]="lang.text('Featured offers, products and advertisements', '精选优惠、商品推荐与广告')">
       <div class="campaign-copy" aria-live="off">
-        @if (visualCampaign() === 2 && featuredDeal(); as deal) {
-          <span class="campaign-label">{{ lang.text('DAILY SPECIAL · BIGGEST SAVING', '每日特惠 · 今日最高折扣') }}</span>
-          <h1>{{ lang.text('Save ', '立省 ') }}{{ deal.discountPercent }}%<br><em class="campaign-featured-name">{{ lang.name(deal) }}</em></h1>
-          <p class="campaign-deal-price"><strong>SGD {{ (deal.effectivePrice ?? deal.price).toFixed(2) }}</strong><del>SGD {{ deal.price.toFixed(2) }}</del></p>
-          <a class="button-primary campaign-featured-link" [href]="'/products?id=' + deal.id">{{ lang.text('View today’s top deal', '查看今日最佳优惠') }} <app-icon name="arrow" /></a>
+        @if (campaign() === 0) {
+          @if (featuredDeal(); as deal) {
+            <span class="campaign-label">{{ lang.text('DAILY SPECIAL · BIGGEST SAVING', '每日特惠 · 今日最高折扣') }}</span>
+            <h1>{{ lang.text('Save ', '立省 ') }}{{ deal.discountPercent }}%<br><em class="campaign-featured-name">{{ lang.name(deal) }}</em></h1>
+            <p class="campaign-deal-price"><strong>SGD {{ (deal.effectivePrice ?? deal.price).toFixed(2) }}</strong><del>SGD {{ deal.price.toFixed(2) }}</del></p>
+            <a class="button-primary campaign-featured-link" [href]="'/products?id=' + deal.id">{{ lang.text('View today’s top deal', '查看今日最佳优惠') }} <app-icon name="arrow" /></a>
+          } @else {
+            <span class="campaign-label">{{ lang.text('DAILY DEALS', '每日促销') }}</span>
+            <h1>{{ lang.text('Your daily dose', '每日精选，') }}<br><em>{{ lang.text('of better deals.', '优惠正当时。') }}</em></h1>
+            <p>{{ lang.text('Explore today’s tech and office offers, with our biggest discount picked for you.', '探索今日数码办公优惠，为你精选当前折扣力度最大的好物。') }}</p>
+            <a class="button-primary" href="/deals">{{ lang.text('Explore daily deals', '查看每日促销') }} <app-icon name="arrow" /></a>
+          }
+        } @else if (campaign() === 1) {
+          <span class="campaign-label">{{ lang.text('PRODUCT SPOTLIGHT · PICKED FOR YOU', '商品推荐 · 为你精选') }}</span>
+          @if (recommendedProduct(); as product) {
+            <h1 class="campaign-product-name">{{ lang.name(product) }}</h1>
+            <p class="campaign-product-description">{{ lang.description(product) }}</p>
+            <a class="button-primary campaign-product-link" [href]="'/products?id=' + product.id">{{ lang.text('Discover this product', '查看这款商品') }} <app-icon name="arrow" /></a>
+          } @else {
+            <h1>{{ lang.text('Your next', '下一件好物，') }}<br><em>{{ lang.text('everyday favourite.', '为你精选。') }}</em></h1>
+            <p>{{ lang.text('Our next product spotlight is on its way. Discover more essentials in the catalogue below.', '推荐好物即将登场，欢迎先浏览下方商品。') }}</p>
+          }
         } @else {
-          <span class="campaign-label">{{ visualCampaign() === 0 ? lang.text('BRAND SPOTLIGHT · KEYCRAFT', '品牌广告 · KEYCRAFT') : lang.text('DAILY DEALS', '每日促销') }}</span>
-          <h1>{{ visualCampaign() === 0 ? lang.text('A better day,', '美好一天，') : lang.text('Your daily dose', '每日精选，') }}<br><em>{{ visualCampaign() === 0 ? lang.text('at your fingertips.', '从指尖开始。') : lang.text('of better deals.', '优惠正当时。') }}</em></h1>
-          <p>{{ visualCampaign() === 0 ? lang.text('Discover Keycraft. Considered keyboards for your everyday work and play.', '探索 Keycraft 键盘系列，让每一次工作与娱乐都舒适自如。') : lang.text('Explore today’s tech and office offers, with our biggest discount picked for you.', '探索今日数码办公优惠，为你精选当前折扣力度最大的好物。') }}</p>
-          <a class="button-primary" [href]="visualCampaign() === 0 ? '/products?category=typing&q=Keycraft#catalog' : '/deals'">{{ visualCampaign() === 0 ? lang.text('Discover Keycraft', '探索 Keycraft') : lang.text('Explore daily deals', '查看每日促销') }} <app-icon name="arrow" /></a>
+          <span class="campaign-label">{{ lang.text('NEXUS · ADVERTISING SPACE', 'NEXUS · 品牌展示空间') }}</span>
+          <h1>{{ lang.text('Advertise', '广告位') }}<br><em>{{ lang.text('here.', '招租') }}</em></h1>
+          <p>{{ lang.text('Put your brand in the spotlight. This banner space is available for advertising.', '广告位招租，让更多人看见你的品牌。') }}</p>
         }
         <div class="campaign-controls" [attr.aria-label]="lang.text('Choose advertisement', '选择广告')">
-          <button type="button" [class.active]="visualCampaign() === 2" [attr.aria-pressed]="visualCampaign() === 2" (click)="showCampaign(2)">01 <span>{{ lang.text('Top deal', '今日特惠') }}</span></button>
-          <button type="button" [class.active]="visualCampaign() === 1" [attr.aria-pressed]="visualCampaign() === 1" (click)="showCampaign(1)">02 <span>{{ lang.text('Daily deals', '每日促销') }}</span></button>
-          <button type="button" [class.active]="visualCampaign() === 0" [attr.aria-pressed]="visualCampaign() === 0" (click)="showCampaign(0)">03 <span>{{ lang.text('Keycraft', '品牌精选') }}</span></button>
+          <button type="button" [class.active]="campaign() === 0" [attr.aria-pressed]="campaign() === 0" (click)="showCampaign(0)">01 <span>{{ lang.text('Top deal', '今日特惠') }}</span></button>
+          <button type="button" [class.active]="campaign() === 1" [attr.aria-pressed]="campaign() === 1" (click)="showCampaign(1)">02 <span>{{ lang.text('Product pick', '商品推荐') }}</span></button>
+          <button type="button" [class.active]="campaign() === 2" [attr.aria-pressed]="campaign() === 2" (click)="showCampaign(2)">03 <span>{{ lang.text('Ad space', '广告招租') }}</span></button>
         </div>
       </div>
-      <div class="campaign-art" aria-hidden="true"><span class="campaign-orbit"></span><img [src]="visualCampaign() === 0 ? '/images/keyboard.png' : visualCampaign() === 2 && featuredDeal()?.imageUrl ? featuredDeal()!.imageUrl : '/images/desk-lamp.svg'" alt=""><span class="campaign-stamp">{{ visualCampaign() === 0 ? 'KEYCRAFT' : visualCampaign() === 2 && featuredDeal() ? featuredDeal()!.brand : 'NEXUS WORKSPACE' }}<small>{{ lang.text('TECH FOR WORK & PLAY', '科技相伴，高效每一天') }}</small></span></div>
+      <div class="campaign-art" aria-hidden="true">
+        <span class="campaign-orbit"></span>
+        @if (campaign() === 2) {
+          <div class="campaign-ad-board"><span>NEXUS</span><strong>{{ lang.text('YOUR BRAND', '你的品牌') }}</strong><span>{{ lang.text('AD SPACE AVAILABLE', '广告位招租') }}</span></div>
+        } @else {
+          <img [src]="(campaign() === 0 ? featuredDeal()?.imageUrl : recommendedProduct()?.imageUrl) || '/images/desk-lamp.svg'" alt="">
+        }
+        <span class="campaign-stamp">{{ (campaign() === 0 ? featuredDeal()?.brand : campaign() === 1 ? recommendedProduct()?.brand : '') || 'NEXUS' }}<small>{{ lang.text('TECH FOR WORK & PLAY', '科技相伴，高效每一天') }}</small></span>
+      </div>
       <button class="campaign-arrow previous" type="button" (click)="showCampaign(campaign() - 1)" [attr.aria-label]="lang.text('Previous banner', '上一张横幅')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
       <button class="campaign-arrow next" type="button" (click)="showCampaign(campaign() + 1)" [attr.aria-label]="lang.text('Next banner', '下一张横幅')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
     </section>
@@ -36,7 +64,7 @@
     </select>
   </nav>
   <section class="catalog-section" id="catalog" aria-labelledby="catalog-heading">
-    <div class="section-heading"><div><span class="eyebrow">{{ lang.text('YOUR WORKDAY, UPGRADED', '升级你的数码与办公体验') }}</span><h2 id="catalog-heading">{{ !category() && !query() ? lang.text("Daily recommendations", "每日推荐") : categoryName() }}</h2></div>
+    <div class="section-heading"><div><span class="eyebrow">{{ lang.text('YOUR WORKDAY, UPGRADED', '升级你的数码与办公体验') }}</span><h2 id="catalog-heading">{{ query() ? lang.text('Search results', '搜索结果') : !category() ? lang.text("Daily recommendations", "每日推荐") : categoryName() }}</h2></div>
       @if (category() || query() || sort()) { <button class="text-button" type="button" (click)="reset()">{{ lang.text('Clear filters', '清除筛选') }} <app-icon name="close" /></button> }
     </div>
     <p class="recommendation-note" [hidden]="!!category() || !!query()">{{ lang.text("Picked from your browsing, purchases and favourite categories. New here? Discover popular picks refreshed each day.", "结合浏览、购买及高评分品类，为你挑选好物。首次到访？从每日更新的热门精选开始。") }}</p>
@@ -51,7 +79,7 @@
     } @else if (error()) {
       <div class="state-panel" role="alert"><app-icon name="bag" /><h3>{{ lang.text('Unable to load products.', '暂时无法加载商品。') }}</h3><p>{{ lang.text('Please try again in a moment.', '请稍后重试。') }}</p><button type="button" class="button-primary" (click)="retry()">{{ lang.text('Try again', '重试') }}</button></div>
     } @else if (products().length === 0) {
-      <div class="state-panel"><app-icon name="search" /><h3>{{ lang.text('No matching products.', '暂无符合条件的商品。') }}</h3><p>{{ lang.text('Try a different search or explore another category.', '试试其他关键词或商品分类。') }}</p><button class="button-primary" type="button" (click)="reset()">{{ lang.text('Browse all products', '浏览全部商品') }}</button></div>
+      <div class="state-panel" role="status"><app-icon name="search" /><h3>{{ query() ? lang.text('No related products found.', '没有找到相关商品。') : lang.text('No matching products.', '暂无符合条件的商品。') }}</h3><p>{{ query() ? lang.text('No products match “', '没有找到与“') + query() + lang.text('”. Try another product name or brand.', '”相关的商品，请尝试其他商品名称或品牌。') : lang.text('Try a different search or explore another category.', '试试其他关键词或商品分类。') }}</p><button class="button-primary" type="button" (click)="reset()">{{ lang.text('Browse all products', '浏览全部商品') }}</button></div>
     } @else {
       <ul class="product-grid">
         @for (product of products(); track product.id) {
@@ -65,8 +93,8 @@
               <h3>{{ lang.name(product) }}</h3>
               <p class="product-origin">{{ lang.text('Ships from', '发货地') }} {{ lang.origin(product) }}</p>
               <div class="product-rating"><span class="rating-stars" [attr.aria-label]="(product.averageRating || 0) + lang.text(' out of 5 stars', '星，满分5星')"><span aria-hidden="true">★★★★★</span><span aria-hidden="true" class="filled" [style.width.%]="(product.averageRating || 0) * 20">★★★★★</span></span><strong>{{ product.totalReviews ? (product.averageRating || 0).toFixed(1) : '—' }}</strong><span>({{ product.totalReviews || 0 }})</span></div>
-              <p class="product-sales">{{ product.salesCount || 0 }} {{ lang.text('sold', '件已售') }} · {{ (product.stockQuantity ?? 99) > 0 ? lang.text('In stock', '有现货') : lang.text('Out of stock', '暂时缺货') }}</p>
-              <div class="product-card-bottom"><div class="price-stack"><p class="product-price"><span>SGD</span> {{ (product.effectivePrice ?? product.price).toFixed(2) }}</p>@if ((product.discountPercent ?? 0) > 0) { <div class="promotion-price"><del>SGD {{ product.price.toFixed(2) }}</del><span class="discount-badge">−{{ product.discountPercent }}%</span></div> }</div><app-add-to-cart [productId]="product.id" [compact]="true" [stockQuantity]="product.stockQuantity ?? 99" /></div>
+              <p class="product-sales">{{ product.salesCount || 0 }} {{ lang.text('sold', '件已售') }} · {{ (product.stockQuantity ?? 0) > 0 ? lang.text('In stock', '有现货') : lang.text('Out of stock', '暂时缺货') }}</p>
+              <div class="product-card-bottom"><div class="price-stack"><p class="product-price"><span>SGD</span> {{ (product.effectivePrice ?? product.price).toFixed(2) }}</p>@if ((product.discountPercent ?? 0) > 0) { <div class="promotion-price"><del>SGD {{ product.price.toFixed(2) }}</del><span class="discount-badge">−{{ product.discountPercent }}%</span></div> }</div><app-add-to-cart [productId]="product.id" [compact]="true" [stockQuantity]="product.stockQuantity ?? 0" /></div>
               <a class="product-details-link" [href]="productUrl(product.id)">{{ lang.text('View details', '查看详情') }}</a>
             </div>
           </li>

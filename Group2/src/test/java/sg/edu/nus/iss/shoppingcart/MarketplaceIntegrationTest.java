@@ -31,6 +31,7 @@ class MarketplaceIntegrationTest {
     @Autowired ProductReviewService reviewService;
     @Autowired CartService cart;
     @Autowired CheckoutCoordinator checkout;
+    @Autowired OrderPaymentService payments;
     @Autowired AdminProductService admin;
     @Autowired RecommendationService recommendations;
     @Autowired sg.edu.nus.iss.shoppingcart.config.ReviewSampleInitializer samples;
@@ -106,22 +107,52 @@ class MarketplaceIntegrationTest {
         } finally { pool.shutdownNow(); }
     }
 
-    @Test void quantityApiPersistsChangesRejectsInvalidInputAndZeroRemoves() throws Exception {
+    @Test void quantityApiPersistsChangesAndRejectsInvalidInputWithoutRemovingItems() throws Exception {
         var session = customer(); var product = product("typing", 5); cart.addItem(session, product.getId(), 1);
         String token = cart.formToken(session);
-        for (int quantity : new int[]{3, 2, 0}) {
+        for (int quantity : new int[]{3, 2}) {
             mvc.perform(put("/api/cart/items/{id}", product.getId()).session(session).contentType(MediaType.APPLICATION_JSON)
                     .content("{\"quantity\":" + quantity + ",\"cartFormToken\":\"" + token + "\"}"))
                     .andExpect(status().isOk()).andExpect(jsonPath("$.totalQuantity").value(quantity));
             mvc.perform(get("/api/cart/form").session(session)).andExpect(jsonPath("$.totalQuantity").value(quantity));
         }
-        assertThat(cart.countItems(session)).isZero();
-        cart.addItem(session, product.getId(), 1);
-        for (String body : List.of("{\"quantity\":6,\"cartFormToken\":\"" + token + "\"}", "{\"quantity\":0,\"cartFormToken\":\"wrong\"}")) {
+        for (String value : List.of("0", "-1", "6", "1.5", "null", "2147483648", "\"abc\"")) {
             mvc.perform(put("/api/cart/items/{id}", product.getId()).session(session).contentType(MediaType.APPLICATION_JSON)
-                    .content(body)).andExpect(status().isBadRequest());
+                    .content("{\"quantity\":" + value + ",\"cartFormToken\":\"" + token + "\"}"))
+                    .andExpect(status().isBadRequest());
+            assertThat(cart.readForCheckout(session)).containsEntry(product.getId(), 2);
         }
-        assertThat(cart.readForCheckout(session)).containsEntry(product.getId(), 1);
+        mvc.perform(delete("/api/cart/items/{id}", product.getId()).session(session).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"cartFormToken\":\"wrong\"}")).andExpect(status().isBadRequest());
+        assertThat(cart.readForCheckout(session)).containsEntry(product.getId(), 2);
+        mvc.perform(delete("/api/cart/items/{id}", product.getId()).session(session).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"cartFormToken\":\"" + token + "\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalQuantity").value(0));
+        assertThat(cart.countItems(session)).isZero();
+    }
+
+    @Test void quantitiesAbove99CanBeAddedUpdatedAndCheckedOutWithinStock() throws Exception {
+        var session = customer(); var product = product("typing", 250); String token = cart.formToken(session);
+        mvc.perform(post("/api/cart/items").session(session).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"productId\":" + product.getId() + ",\"quantity\":100,\"cartFormToken\":\"" + token + "\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalQuantity").value(100));
+        mvc.perform(put("/api/cart/items/{id}", product.getId()).session(session).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"quantity\":200,\"cartFormToken\":\"" + token + "\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalQuantity").value(200))
+                .andExpect(jsonPath("$.items[0].stockQuantity").value(250))
+                .andExpect(jsonPath("$.items[0].subtotal").value(2500))
+                .andExpect(jsonPath("$.pricing.total").value(2725))
+                .andExpect(jsonPath("$.canCheckout").value(true));
+        mvc.perform(get("/cart").session(session)).andExpect(status().isOk())
+                .andExpect(content().string(containsString("max=\"250\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(containsString(">Update</button>"))))
+                .andExpect(content().string(containsString("/cart-assets/cart.js")));
+        var order = orders.findById(checkout.placeOrder(session, checkout.prepare(session), null)).orElseThrow();
+        assertThat(order.getTotalAmount()).isEqualByComparingTo("2725.00");
+        assertThat(order.isPendingPayment()).isTrue();
+        assertThat(products.findById(product.getId()).orElseThrow().getStockQuantity()).isEqualTo(250);
+        payments.pay(order.getId(), owner(session), PaymentService.Request.success());
+        assertThat(products.findById(product.getId()).orElseThrow().getStockQuantity()).isEqualTo(50);
     }
 
     @Test void administratorsManageStockAndAutoHideRestoresOnRestock() throws Exception {

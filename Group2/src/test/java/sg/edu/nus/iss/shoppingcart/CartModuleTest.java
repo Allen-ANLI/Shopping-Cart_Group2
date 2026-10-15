@@ -30,6 +30,7 @@ class CartModuleTest {
         products=mock(ProductRepository.class);
         keyboard=new Product(); keyboard.setId(1L); keyboard.setName("Keyboard");
         keyboard.setPrice(new BigDecimal("50.00"));
+        keyboard.setStockQuantity(250);
         when(products.findById(1L)).thenReturn(Optional.of(keyboard));
         when(products.findByIdAndActiveTrue(1L)).thenReturn(Optional.of(keyboard));
         cart=new CartServiceImpl(products);
@@ -41,8 +42,8 @@ class CartModuleTest {
         assertThat(cart.calculateTotal(cart.getCartItems(session))).isEqualByComparingTo("150.00");
         assertThat(cart.countTotalQuantity(cart.getCartItems(session))).isEqualTo(3);
     }
-    @Test void quantityZeroRemovesAndExplicitClearWorks() {
-        cart.addItem(session,1L,1); cart.updateQuantity(session,1L,0);
+    @Test void removingItemsUsesTheExplicitRemoveActionAndClearStillWorks() {
+        cart.addItem(session,1L,1); cart.removeItem(session,1L);
         assertThat(cart.getCartItems(session)).isEmpty();
         cart.addItem(session,1L,2); cart.clearCart(session);
         assertThat(cart.getCartItems(session)).isEmpty();
@@ -51,10 +52,32 @@ class CartModuleTest {
     @Test void invalidQuantitiesDoNotModifyState() {
         assertThatThrownBy(()->cart.addItem(session,1L,0)).isInstanceOf(BusinessException.class);
         assertThatThrownBy(()->cart.addItem(session,1L,-1)).isInstanceOf(BusinessException.class);
-        assertThatThrownBy(()->cart.addItem(session,1L,100)).isInstanceOf(BusinessException.class);
-        cart.addItem(session,1L,99);
+        assertThatThrownBy(()->cart.addItem(session,1L,251)).isInstanceOf(BusinessException.class);
+        cart.addItem(session,1L,100); cart.addItem(session,1L,150);
         assertThatThrownBy(()->cart.addItem(session,1L,1)).isInstanceOf(BusinessException.class);
-        assertThat(cart.readForCheckout(session)).containsEntry(1L,99);
+        for (int quantity : new int[]{0, -1, 251}) {
+            assertThatThrownBy(()->cart.updateQuantity(session,1L,quantity)).isInstanceOf(BusinessException.class);
+            assertThat(cart.readForCheckout(session)).containsEntry(1L,250);
+        }
+        cart.updateQuantity(session,1L,125);
+        assertThat(cart.readForCheckout(session)).containsEntry(1L,125);
+    }
+    @Test void stockChangesAndInvalidStoredQuantitiesBlockCheckout() {
+        cart.addItem(session,1L,200); keyboard.setStockQuantity(150);
+        assertThat(cart.getCartItems(session).get(0).getStockQuantity()).isEqualTo(150);
+        assertThat(cart.canCheckout(cart.getCartItems(session))).isFalse();
+        assertThatThrownBy(()->cart.readForCheckout(session)).isInstanceOf(BusinessException.class);
+        cart.updateQuantity(session,1L,150);
+        assertThat(cart.canCheckout(cart.getCartItems(session))).isTrue();
+        ((SessionCart)session.getAttribute("cart")).put(1L,0);
+        assertThat(cart.canCheckout(cart.getCartItems(session))).isFalse();
+        assertThatThrownBy(()->cart.readForCheckout(session)).isInstanceOf(BusinessException.class);
+    }
+    @Test void addingLargeQuantitiesCannotOverflowIntoANegativeQuantity() {
+        keyboard.setStockQuantity(Integer.MAX_VALUE);
+        cart.addItem(session,1L,Integer.MAX_VALUE);
+        assertThatThrownBy(()->cart.addItem(session,1L,1)).isInstanceOf(BusinessException.class);
+        assertThat(cart.readForCheckout(session)).containsEntry(1L,Integer.MAX_VALUE);
     }
     @Test void snapshotContainsOnlyIdsAndQuantities() {
         cart.addItem(session,1L,2);

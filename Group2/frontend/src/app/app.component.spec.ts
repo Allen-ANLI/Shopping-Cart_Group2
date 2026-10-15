@@ -18,6 +18,7 @@ describe('Storefront routes and shared bilingual navigation', () => {
     const fixture = TestBed.createComponent(AppComponent); fixture.detectChanges();
     http.expectOne('/api/auth/session').flush({ loggedIn: false, user: null });
     http.expectOne('/api/deals').flush({date:'2026-10-10',products:[]});
+    http.expectOne('/api/products?page=0&size=1&sort=recommended').flush(productPage([keyboard], 0, 1));
     http.expectOne('/api/products?page=0&size=12&sort=recommended').flush(productPage([keyboard], 0, 12)); fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement;
     expect(element.querySelector('app-product-list')).not.toBeNull(); expect(element.querySelector('app-product-detail')).toBeNull();
@@ -40,6 +41,7 @@ describe('Storefront routes and shared bilingual navigation', () => {
     const fixture = TestBed.createComponent(AppComponent); fixture.detectChanges();
     http.expectOne('/api/auth/session').flush({ loggedIn: false, user: null });
     http.expectOne('/api/deals').flush({date:'2026-10-10',products:[]});
+    http.expectOne('/api/products?page=0&size=1&sort=recommended').flush(productPage([], 0, 1, 0));
     http.expectOne('/api/products?page=0&size=12&sort=recommended').flush(productPage([], 0, 12, 0)); fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement; element.querySelector<HTMLButtonElement>('.nexus-language')!.click(); fixture.detectChanges();
     expect(document.cookie).toContain('store_lang=zh'); expect(element.querySelector('a[href="/cart"]')?.textContent).toContain('购物车');

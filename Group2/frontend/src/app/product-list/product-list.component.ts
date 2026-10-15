@@ -16,12 +16,13 @@ export class ProductListComponent implements OnInit, OnDestroy {
   readonly lang = inject(LanguageService);
   private request?: Subscription;
   readonly categories = CATEGORIES;
-  // Put today's strongest offer in the first banner position.
+  // Banner numbers, arrow navigation and autoplay share the same display order.
   readonly campaign = signal(0);
-  readonly visualCampaign = signal(2);
   private scrollToCatalog = false;
   readonly featuredDeal = signal<Product | null>(null);
+  readonly recommendedProduct = signal<Product | null>(null);
   private dealRequest?: Subscription;
+  private recommendationRequest?: Subscription;
   private refreshQueued = false;
   private destroyed = false;
   private readonly visibleCampaign = () => { this.scheduleCampaign(); this.refreshVisibleData(); };
@@ -36,6 +37,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       this.refreshQueued = false;
       if (this.destroyed || document.hidden) return;
       if (!this.dealRequest || this.dealRequest.closed) this.loadFeaturedDeal();
+      if (!this.recommendationRequest || this.recommendationRequest.closed) this.loadRecommendedProduct();
       this.load(true);
     });
   }
@@ -44,6 +46,13 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.dealRequest = this.productService.getDailyDeals().subscribe({
       next: result => this.featuredDeal.set(result.products[0] ?? null),
       error: () => this.featuredDeal.set(null),
+    });
+  }
+  private loadRecommendedProduct(): void {
+    this.recommendationRequest?.unsubscribe();
+    this.recommendationRequest = this.productService.getPage(0, 1, { sort: 'recommended' }).subscribe({
+      next: result => this.recommendedProduct.set(result.content[0] ?? null),
+      error: () => this.recommendedProduct.set(null),
     });
   }
   private campaignHover = false;
@@ -55,15 +64,14 @@ export class ProductListComponent implements OnInit, OnDestroy {
     if (this.campaignHover || this.campaignFocus || document.hidden || this.reducedMotion?.matches) return;
     this.campaignTimer = setTimeout(() => {
       if (!this.category() && !this.query()) {
-        const next = (this.campaign() + 1) % 3;
-        this.campaign.set(next); this.visualCampaign.set(next);
+        this.campaign.set((this.campaign() + 1) % 3);
       }
       this.scheduleCampaign();
     }, 6000);
   };
   showCampaign(index: number): void {
     const next = ((index % 3) + 3) % 3;
-    this.campaign.set(next); this.visualCampaign.set(next); this.scheduleCampaign();
+    this.campaign.set(next); this.scheduleCampaign();
   }
   setCampaignHover(value: boolean): void { this.campaignHover = value; this.scheduleCampaign(); }
   setCampaignFocus(value: boolean): void { this.campaignFocus = value; this.scheduleCampaign(); }
@@ -76,6 +84,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   readonly query = signal('');
   readonly sort = signal('');
   searchInput = '';
+  readonly searchError = signal(false);
   pageInput = '1';
   readonly pageJumpError = signal(false);
   readonly products = signal<Product[]>([]);
@@ -92,11 +101,12 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.reducedMotion?.addEventListener('change', this.scheduleCampaign);
     document.addEventListener('visibilitychange', this.visibleCampaign);
     this.loadFeaturedDeal();
+    this.loadRecommendedProduct();
     this.scheduleCampaign();
     window.addEventListener('popstate', this.restore);
     window.addEventListener('pageshow', this.restoreVisibleData);
   }
-  ngOnDestroy(): void { this.destroyed = true; clearTimeout(this.campaignTimer); document.removeEventListener('visibilitychange', this.visibleCampaign); this.dealRequest?.unsubscribe(); this.reducedMotion?.removeEventListener('change', this.scheduleCampaign); this.request?.unsubscribe(); window.removeEventListener('popstate', this.restore); window.removeEventListener('pageshow', this.restoreVisibleData); }
+  ngOnDestroy(): void { this.destroyed = true; clearTimeout(this.campaignTimer); document.removeEventListener('visibilitychange', this.visibleCampaign); this.dealRequest?.unsubscribe(); this.recommendationRequest?.unsubscribe(); this.reducedMotion?.removeEventListener('change', this.scheduleCampaign); this.request?.unsubscribe(); window.removeEventListener('popstate', this.restore); window.removeEventListener('pageshow', this.restoreVisibleData); }
   categoryName(slug = this.category()): string {
     const category = this.categories.find(c => c.slug === slug);
     return category ? this.lang.text(category.name, category.nameZh) : this.lang.text('All products', '全部商品');
@@ -115,9 +125,17 @@ export class ProductListComponent implements OnInit, OnDestroy {
     return '/products?' + params;
   }
   selectCategory(slug: string): void { this.scrollToCatalog = true; this.category.set(slug); this.page.set(0); this.updateLocation(); this.load(); }
-  search(event: Event): void { event.preventDefault(); this.query.set(this.searchInput.trim()); this.page.set(0); this.updateLocation(); this.load(); }
+  updateSearchInput(value: string): void { this.searchInput = value; this.searchError.set(false); }
+  search(event: Event): void {
+    event.preventDefault();
+    const query = this.searchInput.trim();
+    if (!query) { this.searchError.set(true); return; }
+    this.searchError.set(false); this.searchInput = query;
+    this.query.set(query); this.page.set(0); this.scrollToCatalog = true;
+    this.updateLocation(); this.load();
+  }
   changeSort(value: string): void { this.sort.set(value); this.page.set(0); this.updateLocation(); this.load(); }
-  reset(): void { this.category.set(''); this.query.set(''); this.searchInput = ''; this.sort.set(''); this.page.set(0); this.updateLocation(); this.load(); }
+  reset(): void { this.category.set(''); this.query.set(''); this.searchInput = ''; this.searchError.set(false); this.sort.set(''); this.page.set(0); this.updateLocation(); this.load(); }
   pageNumbers(): (number | null)[] {
     const total = this.totalPages();
     if (total <= 7) return Array.from({ length: total }, (_, index) => index);
@@ -150,6 +168,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
   retry(): void { this.load(); }
   private readLocation(): void {
+    this.searchError.set(false);
     const params = new URLSearchParams(window.location.search);
     this.category.set(params.get('category') || '');
     this.query.set(params.get('q') || ''); this.searchInput = this.query();

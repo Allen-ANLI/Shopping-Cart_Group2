@@ -78,7 +78,7 @@ public class CartController {
             try {
                 cartService.validateFormToken(session, token);
                 if (result != null && result.hasErrors()) {
-                    throw new BusinessException("Enter a valid product ID and a whole-number quantity from 0 to 99");
+                    throw new BusinessException("Enter a valid product ID and a positive whole-number quantity");
                 }
                 action.run();
                 flash.addFlashAttribute("successMessage", sg.edu.nus.iss.shoppingcart.service.UiText.localize(success));

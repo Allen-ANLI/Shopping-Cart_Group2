@@ -79,6 +79,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void validateFilters(String category, String query) {
+        if (query != null && query.isBlank()) {
+            throw new IllegalArgumentException("Please enter a search term.");
+        }
         if (category != null && !category.isBlank() && !CatalogCategory.isValid(category)) {
             throw new IllegalArgumentException("Unknown product category");
         }

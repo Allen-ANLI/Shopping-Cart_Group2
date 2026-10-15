@@ -11,7 +11,6 @@ public interface CartService {
     String CART_ATTRIBUTE = "cart";
     String CHECKOUT_STATE_ATTRIBUTE = "checkoutState";
     String FORM_TOKEN_ATTRIBUTE = "cartFormToken";
-    int MAX_QUANTITY = 99;
 
     Long requireUserId(HttpSession session);
 
