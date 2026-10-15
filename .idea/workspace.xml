@@ -5,88 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7df0f11e-403b-4df7-b3dd-28d3b88567c6" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Group2.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/db-forest-config.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/A模块开发日志.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/B模块开发日志.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/DELIVERY-SHA256.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/F录像提纲.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/F提交检查.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/F整合说明.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/F验收记录.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/NEXUS单行分类与公共头像更新.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/NEXUS商品浏览与订单交互更新.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/NEXUS商城升级说明.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/NEXUS导航清理与问题修复.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/NEXUS结账与评价流程更新.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/NEXUS账户密码更新.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/NEXUS首页轮播与头像更新.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/modules/B_AI使用声明.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/modules/C接入说明.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/modules/C文件变更清单.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/modules/D交接说明.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/modules/D新版A兼容说明.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/modules/E交付说明.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/mysql-smoke-results.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/review-http-results.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/screenshots/angular-desktop-detail-2026-10-06.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/screenshots/angular-desktop-list-2026-10-06.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/screenshots/angular-mobile-detail-2026-10-06.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/screenshots/angular-mobile-list-2026-10-06.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/screenshots/demo-products-desktop-2026-10-06.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/screenshots/demo-products-mobile-2026-10-06.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/screenshots/pagination-verification.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/screenshots/ui-desktop-2026-10-06.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/screenshots/ui-detail-2026-10-06.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/screenshots/ui-mobile-2026-10-06.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/sql/add-demo-products.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/store-upgrade/account-desktop.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/store-upgrade/browser-results.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/store-upgrade/checkout-mobile.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/store-upgrade/home-desktop.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/store-upgrade/http-results.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/商城功能扩展说明.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/商城升级说明.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/docs/本机检查与运行指南.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/frontend/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/services/auth-session.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/services/auth-session.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/services/cart.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/services/cart.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/frontend/src/app/services/product.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/frontend/src/app/services/product.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/mvnw" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/mvnw" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/runtime/nexus-v3-preview.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/runtime/nexus-v4-preview.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/runtime/nexus-v5-preview.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/runtime/nexus-v6-preview.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/runtime/nexus-v7-preview.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/runtime/nexus-v8-preview.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/runtime/shopping-cart.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/scripts/Start-Local.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/scripts/Start-Local.ps1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/scripts/Stop-ReviewDemo.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/scripts/Stop-ReviewDemo.ps1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/repository/ProductRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/repository/ProductRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/AdminDashboardService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/AdminDashboardService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/AdminProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/AdminProductService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/AuthService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/CartService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/CartService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/CheckoutService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/CheckoutService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/ProductReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/ProductReviewService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/ProductService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/PurchaseHistoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/PurchaseHistoryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/ShippingAddressService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/ShippingAddressService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/src/test/java/sg/edu/nus/iss/shoppingcart/CartModuleTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/Group2/src/test/java/sg/edu/nus/iss/shoppingcart/CartModuleTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Group2/video/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DEPLOY_AWS.md" beforeDir="false" afterPath="$PROJECT_DIR$/DEPLOY_AWS.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DatabaseLocalColorSettings">
+    <colors>
+      <entry key="a9d34576-4ac3-44c5-89db-9f5124e0f7ea" value="" />
+    </colors>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -107,23 +37,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000162410000986" />
-      <entry key="MS500" value="1.1102151516635543" />
-      <entry key="S2" value="1.7822992690054975" />
-      <entry key="S5" value="3.4319176666206803" />
-      <entry key="S10" value="5.536760936927076" />
-      <entry key="S30" value="8.532318038489029" />
-      <entry key="S60" value="9.65664302296354" />
-      <entry key="M2" value="10.298090994601836" />
-      <entry key="M5" value="10.711578251153984" />
-      <entry key="M10" value="10.854905625796047" />
-      <entry key="M15" value="10.914032785205906" />
-      <entry key="M30" value="11.57210695278928" />
-      <entry key="H1" value="16.511353428232244" />
-      <entry key="H2" value="28.85328980909029" />
-      <entry key="H4" value="49.388661109605515" />
-      <entry key="D1" value="249.0802933505405" />
-      <entry key="W1" value="694.4491431842632" />
+      <entry key="MS100" value="2.0019518147721485" />
+      <entry key="MS500" value="3.4180697822195296" />
+      <entry key="S2" value="6.458918677069838" />
+      <entry key="S5" value="9.254236486073768" />
+      <entry key="S10" value="10.861314986375469" />
+      <entry key="S30" value="13.348303369684825" />
+      <entry key="S60" value="16.76526819347727" />
+      <entry key="M2" value="21.748355064541165" />
+      <entry key="M5" value="27.695384636932307" />
+      <entry key="M10" value="30.545837661430454" />
+      <entry key="M15" value="31.63342273416144" />
+      <entry key="M30" value="33.35255580949803" />
+      <entry key="H1" value="38.72341997499949" />
+      <entry key="H2" value="51.24356552377388" />
+      <entry key="H4" value="71.90488812965027" />
+      <entry key="D1" value="271.71040395459397" />
+      <entry key="W1" value="717.3041401376497" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -145,23 +75,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.4965474464998887" />
-      <entry key="MS500" value="0.9347994005002283" />
-      <entry key="S2" value="1.6759846640243914" />
-      <entry key="S5" value="3.3704142146106504" />
-      <entry key="S10" value="5.49765299092566" />
-      <entry key="S30" value="8.515591295858032" />
-      <entry key="S60" value="9.647602307670244" />
-      <entry key="M2" value="10.29337870667613" />
-      <entry key="M5" value="10.709644027715152" />
-      <entry key="M10" value="10.853930005643933" />
-      <entry key="M15" value="10.913380401619662" />
-      <entry key="M30" value="11.571778308606351" />
-      <entry key="H1" value="16.5111829700952" />
-      <entry key="H2" value="28.8531969220388" />
-      <entry key="H4" value="49.38860724353906" />
-      <entry key="D1" value="249.08026872631544" />
-      <entry key="W1" value="694.4491343210744" />
+      <entry key="MS100" value="1.931384158643155" />
+      <entry key="MS500" value="3.3872637963429306" />
+      <entry key="S2" value="6.428025572415357" />
+      <entry key="S5" value="9.234429946526461" />
+      <entry key="S10" value="10.849504443728513" />
+      <entry key="S30" value="13.343003917636075" />
+      <entry key="S60" value="16.760840946596083" />
+      <entry key="M2" value="21.744520282475545" />
+      <entry key="M5" value="27.69300789066518" />
+      <entry key="M10" value="30.544440794872518" />
+      <entry key="M15" value="31.63243836501151" />
+      <entry key="M30" value="33.35203380147469" />
+      <entry key="H1" value="38.723145768342846" />
+      <entry key="H2" value="51.24341897737852" />
+      <entry key="H4" value="71.90480697999571" />
+      <entry key="D1" value="271.7103747243171" />
+      <entry key="W1" value="717.3041306127841" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -173,35 +103,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;JAR 应用程序.nexus-v8-preview.jar.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;Spring Boot.ShoppingCartApplication.executor&quot;: &quot;Run&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/DOCUMENTS/GDipSA/CA_Web Application/Group2&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.LLMThirdPartyAiProvidersConfigurable&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JAR 应用程序.nexus-v8-preview.jar.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.ShoppingCartApplication.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/DOCUMENTS/GDipSA/CA_Web Application/Group2",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "ml.llm.LLMThirdPartyAiProvidersConfigurable",
+    "to.speed.mode.migration.done": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ]
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Spring Boot.ShoppingCartApplication">
     <configuration name="nexus-v8-preview.jar" type="JarApplication" temporary="true">
       <option name="JAR_PATH" value="$PROJECT_DIR$/Group2/runtime/nexus-v8-preview.jar" />
