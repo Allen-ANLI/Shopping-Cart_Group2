@@ -1,0 +1,14 @@
+$ ng test --watch=false
+> Building...
+√ Building...
+Application bundle generation complete. [2.668 seconds] - 2026-10-16T08:43:44.360Z
+
+
+ RUN  v5.0.3 D:/DOCUMENTS/GDipSA/CA_Web Application/Group2/.audit-spec/frontend
+
+
+ Test Files  7 passed (7)
+      Tests  85 passed (85)
+   Start at  16:43:44
+   Duration  7.31s (environment 67%, setup 23%, tests 7%, transform 2%, import 1%, worker 1%)
+

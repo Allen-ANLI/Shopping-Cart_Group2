@@ -1,0 +1,34 @@
+$ node --test scripts/cart-page.test.mjs
+✔ saves valid changes automatically and updates line amount, counts, discount, GST and total (93.1718ms)
+✔ rejects "1.5", restores the saved value, and blocks checkout until a valid edit (20.3882ms)
+✔ rejects "", restores the saved value, and blocks checkout until a valid edit (12.5075ms)
+✔ rejects "abc", restores the saved value, and blocks checkout until a valid edit (11.8425ms)
+✔ rejects "1e2", restores the saved value, and blocks checkout until a valid edit (10.2263ms)
+✔ typing "100" waits for blur, even after a pause or change event (618.9511ms)
+✔ typing "0" waits for blur, even after a pause or change event (623.1021ms)
+✔ typing "-1" waits for blur, even after a pause or change event (618.4736ms)
+✔ typing "251" waits for blur, even after a pause or change event (624.0024ms)
+✔ typing "1.5" waits for blur, even after a pause or change event (622.4802ms)
+✔ typing "" waits for blur, even after a pause or change event (620.4582ms)
+✔ clamps 0 to 1 on blur, saves it and enables checkout after confirmation (13.1333ms)
+✔ clamps -1 to 1 on blur, saves it and enables checkout after confirmation (9.1201ms)
+✔ clamps -100 to 1 on blur, saves it and enables checkout after confirmation (17.2142ms)
+✔ clamps 251 to 250 on blur, saves it and enables checkout after confirmation (11.5507ms)
+✔ clamps 1000 to 250 on blur, saves it and enables checkout after confirmation (9.517ms)
+✔ clamps 9007199254740992 to 250 on blur, saves it and enables checkout after confirmation (9.8981ms)
+✔ clamping to an already saved quantity of 1 needs no request or further edit (9.6467ms)
+✔ clamping to an already saved quantity of 250 needs no request or further edit (6.8244ms)
+✔ zero stock never clamps to an unpurchasable quantity or enables checkout (6.7924ms)
+✔ Enter saves without submitting the old form or requiring an update button (78.8788ms)
+✔ server rejection restores the last confirmed quantity and keeps checkout blocked (13.4353ms)
+✔ network failures restore the last value and allow retrying a valid edit (12.5217ms)
+✔ serializes changes to multiple rows and preserves unsaved quantities while applying server totals (13.3912ms)
+✔ unavailable cart items remain blocked until the server confirms a valid correction (10.7454ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5862.1656

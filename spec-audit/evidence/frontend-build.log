@@ -1,0 +1,13 @@
+$ ng build --configuration production --base-href=/products/
+> Building...
+√ Building...
+Initial chunk files | Names         |  Raw size | Estimated transfer size
+main-OCMUNS7R.js    | main          | 235.00 kB |                63.77 kB
+styles-5TSKR4WW.css | styles        |  16.87 kB |                 3.72 kB
+
+                    | Initial total | 251.87 kB |                67.50 kB
+
+Application bundle generation complete. [3.530 seconds] - 2026-10-16T08:42:31.866Z
+
+Output location: D:\DOCUMENTS\GDipSA\CA_Web Application\Group2\.audit-spec\frontend\dist
+

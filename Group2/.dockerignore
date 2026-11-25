@@ -1,6 +1,7 @@
 .git
 .idea
 .local
+.deploy-backups
 runtime
 target
 frontend/node_modules

@@ -1,0 +1,104 @@
+Generation mode: built-in image_gen
+Final deliverables: 01-features.png, 02-architecture.png, 03-cloud-deployment.png
+
+IMAGE 1 - INITIAL PROMPT
+Use case: infographic-diagram. Create ONE finished raster presentation image for a university shopping-cart web application defense, not a photo of a slide. Landscape 16:9, target 3840x2160, sharp small details. Design a refined, restrained academic/product presentation: warm ivory background (#FAF9F6), deep forest green headings (#234A39), sage green panels, charcoal body text, subtle muted gold highlights. Flat clean line icons, thin arrows, precise grid, generous whitespace, no gradients, no photography, no 3D, no decorative clutter. Chinese-first typography resembling Noto Sans SC / Microsoft YaHei, crisp accurate Simplified Chinese, key technology names in English. Large projected-screen readable labels. Keep all content inside generous safe margins. Header has small brand 'NEXUS DIGITAL  /  GROUP 2', large Chinese title, concise subtitle, page number top right. Use consistent green-and-ivory professional visual language. Do not invent features, company logos, security guarantees or marketing slogans. Render only the supplied visible text and optional minimal line icons, no prose paragraphs.
+Title: "功能设计"
+Subtitle: "五项基础功能，延伸完整购物体验"
+Page marker: "01 / 03"
+
+Layout: upper section is a left-to-right customer journey with FIVE equally sized green cards connected by subtle arrows, spanning almost full width. Section heading exactly "基础功能 · 课程要求".
+Card 1: "浏览商品" / "列表与详情"
+Card 2: "登录 / 退出" / "用户身份与会话"
+Card 3: "购物车" / "加购 · 改数量 · 移除"
+Card 4: "结账下单" / "确认地址 · 创建订单"
+Card 5: "购买历史" / "订单列表与详情"
+
+Lower section heading exactly "附加功能 · 项目扩展". An elegant 4-column by 2-row grid of EIGHT pale sage/white feature cards, each with a distinct small line icon, large title and one readable subtitle. Keep equal padding; enough whitespace between rows.
+1 "账户与地址" / "注册 · 资料 · 密码 · 头像"
+2 "模拟支付" / "Visa / Mastercard · PDF 收据"
+3 "评分与评价" / "购买并确认收货后评价"
+4 "商品查找" / "搜索 · 分类 · 排序 · 分页"
+5 "个性化推荐" / "浏览 · 购买 · 评分驱动的规则推荐"
+6 "管理后台" / "商品 · 库存 · 折扣 · 销售看板"
+7 "中英文切换" / "跨页面保持语言选择"
+8 "云端交付" / "AWS 部署 · 自动测试与构建"
+
+Footer is one thin line and small but readable sentence exactly:
+"设计重点：购物流程完整、交互清晰、数据一致"
+Be especially accurate: payment is simulation, recommendation is rule-based; do not use AI recommendation wording, do not claim real payment. All supplied text is required, but do not add extra tiny labels.
+
+IMAGE 2 - INITIAL PROMPT
+Use case: infographic-diagram. Create ONE finished raster presentation image for a university shopping-cart web application defense, not a photo of a slide. Landscape 16:9, target 3840x2160, sharp small details. Design a refined, restrained academic/product presentation: warm ivory background (#FAF9F6), deep forest green headings (#234A39), sage green panels, charcoal body text, subtle muted gold highlights. Flat clean line icons, thin arrows, precise grid, generous whitespace, no gradients, no photography, no 3D, no decorative clutter. Chinese-first typography resembling Noto Sans SC / Microsoft YaHei, crisp accurate Simplified Chinese, key technology names in English. Large projected-screen readable labels. Keep all content inside generous safe margins. Header has small brand 'NEXUS DIGITAL  /  GROUP 2', large Chinese title, concise subtitle, page number top right. Use consistent green-and-ivory professional visual language. Do not invent features, company logos, security guarantees or marketing slogans. Render only the supplied visible text and optional minimal line icons, no prose paragraphs.
+Title: "技术架构与技术栈"
+Subtitle: "Angular + Thymeleaf 混合页面，Spring Boot 分层后端"
+Page marker: "02 / 03"
+
+Create a clean explanatory architecture diagram with three clearly labeled vertical regions across the main middle area. Left 30% "页面与交互", middle 42% "Spring Boot MVC  ·  Java 17", right 22% "数据存储". Render the two presentation technologies accurately as two UI approaches, not two separately deployed servers.
+
+LEFT: two stacked large cards.
+Top: "Angular + TypeScript"; sublines "商品列表 · 详情 · 特惠" and "HttpClient / RxJS / Signals".
+Bottom: "Thymeleaf + HTML / CSS / JS"; sublines "登录 · 账户 · 购物车" and "结账 · 订单 · 管理后台".
+A clear horizontal arrow from Angular card into the CENTER Controller box labeled "REST API / JSON".
+A separate clear connection between Thymeleaf card and CENTER Controller box labeled "页面请求 / HTML".
+This is a conceptual separation of UI and server responsibilities; Thymeleaf templates are rendered on the backend, so include a visible small label under its card exactly "后端生成 HTML".
+
+CENTER: three stacked green layer boxes connected DOWNWARD, ample spacing.
+"Controller · 请求入口" with secondary text "路由映射 · 参数校验 · 返回响应"
+"Service · 业务逻辑" with secondary text "商品 · 账户 · 购物车 · 订单 · 支付"
+"Repository · 数据访问" with secondary text "Spring Data JPA / Hibernate"
+Between layers use simple arrows with no crossing.
+RIGHT: one large database cylinder "MySQL", with subline "用户 · 商品 · 订单" and "地址 · 评价". Single connection from Repository to MySQL labeled "JDBC". Under cylinder a distinct small note "Session：登录状态与购物车", with connecting line back toward server, not into database. Do NOT portray cart as persisted in MySQL.
+
+BOTTOM: three equally sized capability bands, distinct from runtime arrows:
+"身份与权限" / "Session · BCrypt · 拦截器"
+"交易一致性" / "事务 · 悲观锁 · 防重复提交"
+"构建与测试" / "Maven · JUnit / MockMvc · Vitest"
+Footer small readable note exactly:
+"H2 仅用于自动化测试；部署运行使用 MySQL"
+Avoid claiming JWT, Redis, Spring Security filter-chain auth, real banking gateways, microservices or AI models. Maintain easy-to-follow line routing and accurate lettering.
+
+IMAGE 3 - INITIAL PROMPT
+Use case: infographic-diagram. Create ONE finished raster presentation image for a university shopping-cart web application defense, not a photo of a slide. Landscape 16:9, target 3840x2160, sharp small details. Design a refined, restrained academic/product presentation: warm ivory background (#FAF9F6), deep forest green headings (#234A39), sage green panels, charcoal body text, subtle muted gold highlights. Flat clean line icons, thin arrows, precise grid, generous whitespace, no gradients, no photography, no 3D, no decorative clutter. Chinese-first typography resembling Noto Sans SC / Microsoft YaHei, crisp accurate Simplified Chinese, key technology names in English. Large projected-screen readable labels. Keep all content inside generous safe margins. Header has small brand 'NEXUS DIGITAL  /  GROUP 2', large Chinese title, concise subtitle, page number top right. Use consistent green-and-ivory professional visual language. Do not invent features, company logos, security guarantees or marketing slogans. Render only the supplied visible text and optional minimal line icons, no prose paragraphs.
+Title: "云部署与交付流程"
+Subtitle: "AWS ECS Fargate + RDS MySQL"
+Page marker: "03 / 03"
+
+Main composition has TWO clear horizontal lanes with ample whitespace; upper lane is delivery pipeline, lower lane is cloud runtime. Use green as main color; muted amber highlights ONLY for the manual deployment step. All arrows have one clear direction. Do not imply CI directly invokes AWS.
+
+UPPER heading: "代码交付流程"
+Five left-to-right cards with arrows:
+1 "GitHub" / "推送代码"
+2 "GitHub Actions" / "自动检查与测试"
+3 "Docker" / "多阶段构建镜像"
+4 "Docker Hub" / "保存应用镜像"
+5 amber card "手动触发更新" / "ECS Force new deployment"
+Below Docker card in a compact separate inset, exact text: "Node 构建前端 → Maven 打包 → JRE 运行"
+Use a thin line from the final manual card to the ECS card in runtime lane indicating triggering update. A separate connection from Docker Hub to ECS labeled "拉取镜像", if it can be routed without crossing. If crowded, place Docker Hub directly above ECS so this pull relationship is obvious.
+
+LOWER heading: "云端运行架构"
+A large lightly outlined enclosure labelled "AWS". Outside its left edge is a browser icon card "用户浏览器".
+Inside AWS: a prominent central container card "ECS Fargate" with two lines "Spring Boot 应用" and "Angular + Thymeleaf".
+To its right, a database cylinder card "RDS MySQL" with line "业务数据持久化".
+Below/right of ECS a smaller card "CloudWatch Logs" with line "运行日志与排错".
+Browser connects INTO ECS with label "公网访问 :18080".
+ECS connects TO RDS with label "JDBC / 3306".
+ECS connects TO CloudWatch with label "应用日志".
+Clearly separate application runtime from independent persistent database.
+
+BOTTOM three concise green tags:
+"VPC / 安全组：网络访问控制"
+"环境变量：数据库连接配置"
+"IAM LabRole：任务角色"
+Footer readable exact sentence:
+"自动测试、构建与发布镜像；人工触发 ECS 更新"
+Keep this academically accurate: no Kubernetes, no EC2 host, no ECR, no load balancer, no automatic ECS deploy step, no HTTPS/domain claims, no cost claims, no live metrics. Do not include any actual passwords or IP addresses.
+
+IMAGE 2 - FINAL CORRECTION PROMPT
+Edit this technical architecture presentation image with strict preservation of its 16:9 layout, colors, typography, all main titles and existing correct labels. Fix ONLY these architecture issues:
+1. The lower left Thymeleaf card currently has a horizontal arrow labeled "页面请求 / HTML" pointing into the Repository card. This is WRONG. Erase that arrow's current endpoint. Reroute it from the right edge of the Thymeleaf card, horizontally into the gap, then upward in the gap, then right INTO THE CONTROLLER BOX, below the existing Angular arrow. Both UI request paths must end at "Controller · 请求入口". No left UI arrow may point to Service or Repository. Keep lines from crossing other text. Keep the "页面请求 / HTML" label next to its line.
+2. Remove the entire small "Session: 登录状态与购物车" box currently below MySQL and remove its left-pointing arrow to Repository. Session is NOT in the database tier and is not accessed through Repository. Preserve the MySQL cylinder, JDBC arrow and all its labels; it can be centered a little lower in the data storage region if needed.
+3. Replace the very bottom footnote with exact text: "Session 在应用端保存登录状态与购物车；H2 仅用于测试；运行数据库为 MySQL"
+4. Keep the small label "后端生成 HTML" within the Thymeleaf card. Keep the bottom three capability bands unchanged.
+Everything else must remain visually consistent and accurate. This is a finished Chinese university defense image, high-resolution, clear correct Chinese characters. Do not add any technologies or claims.
+

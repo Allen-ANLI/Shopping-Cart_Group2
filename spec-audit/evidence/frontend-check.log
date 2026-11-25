@@ -1,0 +1,1 @@
+$ ngc -p tsconfig.app.json --noEmit && ngc -p tsconfig.spec.json --noEmit

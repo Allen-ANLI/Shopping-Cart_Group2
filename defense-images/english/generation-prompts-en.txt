@@ -1,0 +1,118 @@
+Generation mode: built-in image_gen; text-localization edits of the three Chinese presentation images.
+Final images are English only.
+
+IMAGE 1 PROMPT
+Use case: text-localization. Edit the supplied image into a complete ENGLISH-ONLY version for a university project defense. Preserve its green/ivory/gold visual identity, original 16:9 landscape composition, hierarchy, icon style, numbered page marker, and all correct architecture connections. Replace ALL Chinese text, including footnotes and diagram labels, with the exact English text below. No Chinese characters may remain, including inside the language-switch icon: use an EN/globe icon instead. Keep "NEXUS DIGITAL / GROUP 2". Reflow text and adjust card padding or modestly reduce text size where English is longer, but keep labels readable on a projected screen, with no collisions, cropping, overlapping arrows or tiny body text. Preserve semantic accuracy. This is an edit target, not merely a style reference. Render one finished English presentation image; no explanatory prose outside the image.
+Title: "Feature Design"
+Subtitle: "Five core functions, extended into a complete shopping experience"
+Page marker "01 / 03".
+Upper section heading: "Core Functions · Course Requirements".
+Five top cards, each title and subtitle:
+"Browse Products" / "Product list and details"
+"Login / Logout" / "Identity and sessions"
+"Shopping Cart" / "Add · Update · Remove"
+"Checkout" / "Confirm address · Place order"
+"Purchase History" / "Order list and details"
+
+Lower heading: "Additional Features · Project Extensions".
+Eight cards, preserving the 4-column by 2-row arrangement:
+"Account & Addresses" / "Registration · Profile · Password · Avatar"
+"Simulated Payments" / "Visa / Mastercard · PDF receipts"
+"Ratings & Reviews" / "Review after confirming receipt"
+"Product Discovery" / "Search · Filter · Sort · Paginate"
+"Rule-based Recommendations" / "Browsing, purchases and ratings"
+"Admin Panel" / "Products · Stock · Discounts · Sales"
+"Bilingual Experience" / "Chinese / English across pages"
+"Cloud Deployment" / "AWS · Automated tests and builds"
+
+Use two lines for long card titles/subtitles when needed; generous inner padding. The recommendations title can break after "Rule-based". Use a globe or EN icon for Bilingual Experience; do not leave the original Chinese glyph icon.
+Footer: "Complete shopping flow · Clear interactions · Consistent data"
+Payment must be labeled simulated and recommendations rule-based.
+
+IMAGE 2 PROMPT
+Use case: text-localization. Edit the supplied image into a complete ENGLISH-ONLY version for a university project defense. Preserve its green/ivory/gold visual identity, original 16:9 landscape composition, hierarchy, icon style, numbered page marker, and all correct architecture connections. Replace ALL Chinese text, including footnotes and diagram labels, with the exact English text below. No Chinese characters may remain, including inside the language-switch icon: use an EN/globe icon instead. Keep "NEXUS DIGITAL / GROUP 2". Reflow text and adjust card padding or modestly reduce text size where English is longer, but keep labels readable on a projected screen, with no collisions, cropping, overlapping arrows or tiny body text. Preserve semantic accuracy. This is an edit target, not merely a style reference. Render one finished English presentation image; no explanatory prose outside the image.
+Title: "Architecture & Technology Stack"
+Subtitle: "Angular + Thymeleaf pages with a layered Spring Boot backend"
+Page marker "02 / 03".
+Three column headers:
+"Pages & Interaction"
+"Spring Boot MVC · Java 17"
+"Data Storage"
+
+Left upper card:
+"Angular + TypeScript"
+"Product list · Details · Deals"
+"HttpClient / RxJS / Signals"
+Its arrow INTO Controller remains labeled "REST API / JSON".
+
+Left lower card:
+"Thymeleaf + HTML / CSS / JS"
+"Login · Account · Shopping cart"
+"Checkout · Orders · Admin"
+Its bottom strip reads "HTML rendered on the server".
+Its elbow arrow MUST continue up into Controller, never into Service or Repository. Label the line "Page requests / HTML". Keep line routing in the gap free of text collisions.
+
+Center layers, downward arrows:
+"Controller · Request Handling"
+"Routing · Validation · Responses"
+"Service · Business Logic"
+"Products · Accounts · Cart · Orders · Payments"
+"Repository · Data Access"
+"Spring Data JPA / Hibernate"
+
+Right database:
+"MySQL"
+"Users · Products · Orders"
+"Addresses · Reviews"
+Keep only the JDBC connection from Repository into MySQL. Do not add Session storage in this database panel.
+
+Bottom three bands can be reflowed to a title on first line and supporting text below:
+"Identity & Access" / "Session · BCrypt · Interceptors"
+"Transaction Integrity" / "Transactions · Pessimistic locks · Idempotency"
+"Build & Test" / "Maven · JUnit / MockMvc · Vitest"
+
+Footer exact meaning, use two readable lines if necessary:
+"Sessions store login and cart state in the application. H2 is used only for tests; MySQL is used at runtime."
+No translation omissions. Preserve the final corrected arrows in the reference.
+
+IMAGE 3 PROMPT
+Use case: text-localization. Edit the supplied image into a complete ENGLISH-ONLY version for a university project defense. Preserve its green/ivory/gold visual identity, original 16:9 landscape composition, hierarchy, icon style, numbered page marker, and all correct architecture connections. Replace ALL Chinese text, including footnotes and diagram labels, with the exact English text below. No Chinese characters may remain, including inside the language-switch icon: use an EN/globe icon instead. Keep "NEXUS DIGITAL / GROUP 2". Reflow text and adjust card padding or modestly reduce text size where English is longer, but keep labels readable on a projected screen, with no collisions, cropping, overlapping arrows or tiny body text. Preserve semantic accuracy. This is an edit target, not merely a style reference. Render one finished English presentation image; no explanatory prose outside the image.
+Title: "Cloud Deployment & Delivery"
+Subtitle: "AWS ECS Fargate + RDS MySQL"
+Page marker "03 / 03".
+
+Upper section heading: "1  Code Delivery Pipeline"
+Five pipeline cards:
+"GitHub" / "Push code"
+"GitHub Actions" / "Automated checks and tests"
+"Docker" / "Multi-stage image build"
+"Docker Hub" / "Application image registry"
+Amber card: "Manual Deployment" / "ECS: Force new deployment"
+Docker inset: "Node: build frontend → Maven: package → JRE: run"
+Label Docker Hub connection down to ECS "Pull image".
+Label amber manual card connection down to ECS "Trigger update".
+
+Lower section heading: "2  Cloud Runtime Architecture".
+Preserve the outlined AWS enclosure. GitHub, GitHub Actions, Docker, Docker Hub and manual trigger remain outside the AWS boundary.
+Outside-left browser card: "User Browser".
+Browser to ECS arrow: "Public access :18080".
+Inside AWS central card:
+"ECS Fargate"
+"Spring Boot application"
+"Angular + Thymeleaf"
+Right upper database card:
+"RDS MySQL"
+"Persistent application data"
+ECS to RDS arrow: "JDBC / 3306".
+Right lower log card:
+"CloudWatch Logs"
+"Runtime logs and diagnostics"
+ECS to logs arrow: "Application logs".
+
+Bottom three support tags, permit two lines:
+"VPC / Security Groups" / "Network access control"
+"Environment Variables" / "Database configuration"
+"IAM LabRole" / "Task roles"
+Footer: "Automated testing, image build and publishing; manually triggered ECS updates."
+Do not add a load balancer, HTTPS, Kubernetes, ECR or automatic deployment to ECS. Preserve all correct arrows and visual emphasis on manual deployment.
+

@@ -1,131 +1,240 @@
-[README.md](https://github.com/user-attachments/files/33283503/README.md)
-# Group 2 Shopping Cart
+# Nexus Digital — 全栈电商 Web 应用
 
-整合负责人：李岸 Li An（F）。本项目以老师的 Shopping Cart C26 PDF 为验收依据。商品页面使用 Angular，账号、购物车、结账和历史页面使用 Spring Boot MVC 与 Thymeleaf；MySQL 为正式数据库，Spring Data JPA 负责持久化。
+Nexus Digital 是一个以数码与办公产品为主题的 B2C 电商 Web 应用，覆盖
+**浏览 → 购物车 → 结账 → 支付 → 收货 → 评价** 的完整购物闭环，并提供管理后台与销售数据看板。
+商品目录由 Angular 单页应用驱动，账号、购物车、结账与订单页面采用 Spring Boot MVC + Thymeleaf 服务端渲染，
+两者共享同一套 REST API 与会话认证。
 
-本交付已包含 A–E 的整合源码、构建后的 Angular 静态页面、可运行 JAR、验收记录及录像提纲。演示视频尚未提供，最终提交前必须将视频放入 video 目录，并由组员核对实际作者归属。
+> English summary at the bottom. 中文为主，文末附英文摘要。
 
-2026-10-10 最新首页与导航更新：桌面分类保持单行，窄屏使用分类选择框；横幅移除播放/暂停按钮，修正台灯矩形背景，新增动态展示最高折扣商品的第三张横幅；用户头像在各页面用户名旁显示，上传后同步更新。后端 212 项、前端 66 项、浏览器 53 项检查通过。最新运行包为 `runtime/nexus-shopping-cart.jar`，预览地址为 http://127.0.0.1:18090/products ，详见 [单行分类、三张横幅与公共头像](docs/NEXUS单行分类与公共头像更新.md)。以下记录保留为历史版本。
+## 主要功能
 
-2026-10-10 上一轮首页与账户更新：修复中文搜索按钮换行，分类使用无需横向滑动的紧凑网格；支持上传图片并圆形裁剪头像；首页横幅支持悬停显示箭头、自动轮播与悬停暂停；新增每日促销页面。后端 212 项、前端 63 项、浏览器 43 项检查通过，记录见 [首页轮播与头像更新](docs/NEXUS首页轮播与头像更新.md)。
+### 购物体验
+- 商品目录：分类筛选、关键词搜索、按价格 / 评分 / 销量排序、分页（支持点击与输入页码跳转）
+- 商品详情：图片放大、快速加购、评分分布与评价列表
+- 首页轮播横幅：自动轮播、悬停暂停，动态展示最高折扣商品；每日促销页 `/deals`
+- 折扣与基于规则的个性化推荐（依据浏览、购买、好评、评分与销量）
+- 中 / 英双语一键切换
 
-2026-10-10 商品浏览与订单交互修复：促销与非促销商品的 View details 按钮对齐；商品分页支持点击和输入页码；订单使用小尺寸铅笔评价入口，商品栏改为 Order products／订单商品，商品名称可打开详情，评价与评分及时刷新。手机订单商品栏也已适配。前端 59 项、相关后端 33 项、浏览器 27 项检查通过，说明见 [商品浏览与订单交互更新](docs/NEXUS商品浏览与订单交互更新.md)。
+### 账号与安全
+- 注册、登录、登出；密码 BCrypt 哈希存储
+- 个人资料编辑、修改密码、头像上传（圆形裁剪，全站同步显示）
+- 收货地址管理；拦截器统一校验登录态与管理员权限
 
-2026-10-10 上一轮交互更新：提交订单后进入独立支付页，支持 Visa / Mastercard 自动格式化输入；加入 9% GST、PDF 支付凭证下载，以及确认收货后逐商品进入五星评价页。注册眼睛按钮、登录回首页、分类导航、购物车数量同步、评论语言与评分分布、99% 折扣也已更新。后端 205 项、前端 55 项、浏览器 38 项检查通过。使用说明见 [结账与评价流程更新](docs/NEXUS结账与评价流程更新.md)。
+### 购物车、结账与支付
+- 会话级购物车：数量加减、失焦自动更新与合法性校验，非法数量无法结账
+- 结账须选择本人收货地址；事务内完成重新核价、库存校验与订单快照（商品名 / 价格 / 收货地址）
+- 结账令牌 + 订单锁防止重复提交；订单创建后进入待支付状态
+- 模拟 Visa / Mastercard 支付（不产生真实扣款）：事务内校验并扣减库存，含 9% GST
+- PDF 支付凭证下载（Apache PDFBox）；完整卡号与 CVV 不落库
 
-2026-10-10 NEXUS Digital 升级：本轮调整账号与双语登录交互、统一导航、扩充数码办公产品矩阵，并加入折扣、银行卡与加密货币支付模拟、物流及确认收货后原地评价。13 项需求、数据规则和演示步骤见 [NEXUS 商城升级说明](docs/NEXUS商城升级说明.md)。本轮最终测试与打包结果以该文档为准，下方记录属于此前版本。
+### 订单与评价
+- 订单历史、订单详情，待支付订单可继续支付
+- 确认收货后逐商品进行五星评分与文字评价
 
-2026-10-10 功能扩展：已完成总览数量加减、强化详情入口、示例评价与评分/销量排序、购买后评价权限、导航高亮、首页广告与每日推荐、后台库存及缺货自动隐藏、服务层扩展和模拟支付。后端 179 项、前端 55 项测试通过，源码、静态资源与 runtime JAR 已同步。功能规则、示例数据及演示步骤见 [商城功能扩展说明](docs/商城功能扩展说明.md)。下方商城升级记录属于本轮扩展前的版本。
+### 管理后台
+- 商品增删改查、库存与上下架管理，缺货自动隐藏
+- 销售数据看板：基于真实已支付订单聚合统计
 
-2026-10-10 商城升级：已完成首页与分类重设计、40 件双语商品、图片放大与快速加购、真实评价、资料编辑、收货地址管理、订单地址快照及中英文切换。后端 170 项、前端 51 项、HTTP 流程 35 项、浏览器流程 21 项检查通过，源码、Angular 静态资源及 runtime JAR 已同步更新。功能、运行与演示步骤见 [商城升级说明](docs/商城升级说明.md)。本轮使用隔离 H2 验证，尚未连接你现有的 MySQL；下方早期 MySQL 验收记录属于历史记录。
+## 技术栈
 
-2026-10-09 的启动器与故障排查仍可参考 [本机检查与运行指南](docs/本机检查与运行指南.md)，其中商品数量与测试数量以本轮升级说明为准。
+| 层面 | 技术 |
+|---|---|
+| 后端框架 | Spring Boot 4.1.1（Java 17）、Spring MVC、Bean Validation |
+| 服务端渲染 | Thymeleaf |
+| 前端 | Angular 22.2.1、TypeScript 6.0、RxJS |
+| 持久化 | Spring Data JPA / Hibernate、MySQL 8 |
+| 安全 | 会话认证 + 拦截器、BCrypt（spring-security-crypto） |
+| PDF 生成 | Apache PDFBox 3.0.8 |
+| 测试 | Spring Boot Test（隔离 H2）、Vitest + jsdom、Node test runner |
+| 构建 | Maven Wrapper、Angular CLI |
+| CI/CD | GitHub Actions、Docker 多阶段构建、Docker Hub |
+| 云部署 | AWS ECS Fargate、Amazon RDS for MySQL、CloudWatch Logs |
 
-## 环境
+## 架构与工程亮点
 
-- JDK 17 或以上；本次实际使用 JDK 25.0.3，编译目标 Java 17。
-- MySQL 8；本次在全新独立 MySQL 8.0.46 数据库验证。
-- 修改前端时需要 Node.js；本次实际使用 24.19.0。Angular 22.2.1，精确依赖由锁文件确定。
-- Maven Wrapper 已固定为本次验证使用的 3.9.9。首次构建需联网。
-- 本次后端 146 项自动化测试、前端 44 项测试及 MySQL 25 项流程检查均通过。详见 docs/F验收记录.md。
-- 上述 146 项与 MySQL 记录是原交付记录；本机复查后的结果以 docs/本机检查与运行指南.md 为准。
+- **混合渲染架构**：Angular SPA 负责强交互的商品目录，Thymeleaf 负责表单密集的账号 / 结账页面，共享 REST API 与会话身份
+- **清晰分层**：controller → service → repository；DTO / Form 与实体分离；`@ControllerAdvice` 统一异常处理
+- **事务一致性**：结账核价、库存校验 / 扣减、订单快照与购物车清空在同一事务内完成；支付同样在事务内校验库存
+- **防重与幂等**：结账令牌与订单锁抵御重复提交
+- **订单快照**：历史订单保留下单时的商品名、价格与收货地址，不受后续商品变更影响
+- **版本化种子数据**：商品与示例评价初始化记录版本号，重启不重复插入
+- **国际化**：中 / 英资源束（`messages*.properties`）
+- **前后端一体交付**：Angular 构建产物嵌入 Spring Boot 静态资源，单 JAR / 单容器即可运行
 
-## 正式 MySQL 运行
+## 项目结构
 
-在 MySQL 客户端创建空库（已有库无需重复建）：
-
-```sql
-CREATE DATABASE IF NOT EXISTS shopping_cart
-  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```text
+Group2/                          Spring Boot Maven 工程
+├── pom.xml / mvnw / mvnw.cmd    依赖与构建配置（含 Maven Wrapper）
+├── Dockerfile                   多阶段构建：Node → Maven → JRE
+├── src/main/java/sg/edu/nus/iss/shoppingcart/
+│   ├── config/                  应用配置与数据初始化
+│   ├── controller/              MVC 页面与 REST 端点
+│   ├── service/                 业务规则与事务
+│   ├── repository/              Spring Data JPA 数据访问
+│   ├── entity/                  领域实体
+│   ├── dto/  form/              请求响应数据与校验表单
+│   ├── interceptor/             登录与管理员权限拦截
+│   ├── exception/               业务异常与统一处理
+│   └── model/                   会话购物车与目录模型
+├── src/main/resources/          配置、Thymeleaf 模板、静态资源、国际化资源
+├── src/test/                    后端测试（隔离 H2）
+└── frontend/                    Angular 源码与前端测试
+.github/workflows/ci.yml         CI：前后端测试 → Docker 镜像发布
 ```
 
-在项目根目录打开 PowerShell，使用你自己已有的 MySQL 账号密码：
+## 页面入口
+
+| 路径 | 说明 |
+|---|---|
+| `/products` | Angular 商品目录、分页与详情 |
+| `/deals` | 每日促销 |
+| `/register`、`/login` | 注册与登录 |
+| `/account`、`/account/addresses` | 个人资料、密码、头像与收货地址 |
+| `/cart`、`/checkout` | 购物车与结账 |
+| `/orders` | 订单历史、继续支付与订单详情 |
+| `/admin/products` | 商品、库存与上下架管理 |
+| `/admin/dashboard` | 销售数据看板 |
+
+## 快速开始
+
+环境要求：JDK 17、MySQL 8（Maven Wrapper 已内置）。仓库已包含编译好的 Angular 静态资源，
+仅修改前端时需要 Node.js 22+。
+
+1. 创建数据库：
+
+   ```sql
+   CREATE DATABASE IF NOT EXISTS shopping_cart
+     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+
+2. 配置数据库连接并启动（PowerShell 示例；macOS / Linux 用 `export` 设置同名变量）：
+
+   ```powershell
+   $env:DB_URL = 'jdbc:mysql://localhost:3306/shopping_cart'
+   $env:DB_USERNAME = 'your_mysql_username'
+   $env:DB_PASSWORD = 'your_mysql_password'
+   cd Group2
+   .\mvnw.cmd spring-boot:run
+   ```
+
+   JPA 自动建表 / 更新表结构，首次启动初始化商品目录与示例评价数据。
+
+3. 打开 <http://localhost:18080/products>。
+
+演示账号：`alice / demo123`、`bob / demo123`（普通顾客）。
+管理员：先通过 `/register` 注册账号，再由数据库管理员执行
+`UPDATE shopping_cart.app_users SET role = 'ADMIN' WHERE username = '你的用户名';`，
+重新登录后访问 `/admin/products`。
+
+演示支付（模拟，不产生真实扣款）：持卡人 `Demo Customer`，Visa 卡号
+`4242 4242 4242 4242`，有效期 `12/99`，安全码 `123`。
+
+打包为 JAR 运行：
 
 ```powershell
-$env:DB_USERNAME = Read-Host 'MySQL username'
-$mysqlPassword = Read-Host 'MySQL password' -AsSecureString
-$env:DB_PASSWORD = [System.Net.NetworkCredential]::new('', $mysqlPassword).Password
-java -jar runtime/shopping-cart.jar
-```
-
-地址：http://localhost:18080/products 。正式运行只需一个后端进程，Angular 已打包到 JAR 中，无需另开 4200。
-
-若数据库主机、端口或库名不同，可先设置：
-
-```powershell
-$env:DB_URL = 'jdbc:mysql://localhost:3306/shopping_cart'
-```
-
-JPA 使用 `ddl-auto=update` 建立/更新实体对应表。首次升级会补充四类示例商品（新库每类 10 件，共 40 件），并记录初始化版本；后续启动不重建已删除商品。缺失的 alice/bob 会被创建，已有商品内容、账号、密码与角色不会重置。默认普通账号 alice / demo123、bob / demo123，仅在账号首次初始化时适用。
-
-### 正式库的管理员
-
-正式 MySQL 配置不会自动创建 admin。先通过 `/register` 注册专用账号，例如 group2admin；然后由数据库管理者执行以下语句，并核对更新的是该账号：
-
-```sql
-USE shopping_cart;
-UPDATE app_users SET role = 'ADMIN' WHERE username = 'group2admin';
-SELECT id, username, role FROM app_users WHERE username = 'group2admin';
-```
-
-再以注册时设置的密码登录，访问 `/admin/products`。注册页面不能自行指定管理员身份。
-
-## 无需 MySQL 的临时演示
-
-```powershell
-java -jar runtime/shopping-cart.jar --spring.profiles.active=b-demo
-```
-
-地址：http://127.0.0.1:18083/products 。普通账号 alice / demo123、bob / demo123；管理员 admin / admin123。此模式使用内存 H2，停止应用后数据丢失，只用于临时演示，不代替老师要求的 MySQL 验收。
-
-## 从源码重建
-
-在项目根目录执行：
-
-```powershell
-cd frontend
-npm ci
-npm run deploy
-cd ..
 .\mvnw.cmd clean package
 java -jar target/shopping-cart-0.0.1-SNAPSHOT.jar
 ```
 
-`deploy` 依次检查类型、运行前端测试、构建并部署静态资源；旧静态目录备份到项目内 `.deploy-backups`。如需自定义备份位置，设置 `SHOPPING_CART_BACKUP_DIR`。必须先部署前端，再打包后端，确保 JAR 与源码一致。`runtime/shopping-cart.jar` 是交付时构建的版本；修改源码后使用新生成的 target JAR，或自行更新 runtime JAR。
+## 测试
 
-后端自动化测试使用隔离 H2，不会操作你的 MySQL。若仅改后端，可运行 `.\mvnw.cmd test`。本次受限执行环境的测试参数调整记录在 docs/F验收记录.md，普通电脑通常无需这些参数。
+后端测试使用隔离的内存 H2（MySQL 兼容模式），不触碰正式数据库：
 
-前端开发使用 `cd frontend; npm run dev`，开发入口 http://127.0.0.1:4200/ ，代理默认连接 18080。需要同一浏览器主机名，避免混用 localhost 与 127.0.0.1 导致会话不一致；更换后端端口时同步修改 frontend/proxy.conf.json。
+```powershell
+cd Group2
+.\mvnw.cmd test
+```
 
-## 页面与接口
+前端类型检查与测试：
 
-| 功能 | 地址 |
-| --- | --- |
-| Angular 首页、分类与分页 | /products、/products?category=audio |
-| Angular 商品详情 | /products?id=1 |
-| 商品 REST | /api/products?page=0&size=6、/api/products/1 |
-| 登录、注册、资料 | /login、/register、/account |
-| 收货地址管理 | /account/addresses |
-| 分类、评价、快速加购 REST | /api/categories、/api/products/{id}/reviews、/api/cart/items |
-| 购物车、结账 | /cart、/checkout |
-| 购买历史 | /orders |
-| 管理后台 | /admin/products |
+```powershell
+cd Group2/frontend
+npm ci
+npm run check      # TypeScript 类型检查
+npm test           # Vitest 组件 / 服务测试
+npm run test:cart  # 购物车页面流程测试
+```
 
-商品 ID 以上仅为新库示例。Angular 加购先取得当前 Session 的购物车令牌，再向 `/api/cart/items` 提交 JSON，原 `/cart/add` 表单接口保留。身份只取服务器 Session 的 `loginUserId`（Long）。结账必须选择自己的收货地址；订单在事务中重新核价、保存商品明细与收货地址快照，事务提交成功后清空购物车。
+重建前端并部署到 Spring Boot 静态资源：`npm run deploy`
+（依次执行类型检查、测试、构建与复制，并自动备份旧产物）。
 
-## 成员与交付
+## CI/CD 与部署
 
-| 成员 | 现有标注姓名 | 模块 |
-| --- | --- | --- |
-| A | 王重一 | 商品 REST、Angular 与分页 |
-| B | luopeiwen | 账号、登录、资料与权限 |
-| C | Letian Xie | Session 购物车、结账页面、Angular 加购 |
-| D | 邱弈杰 | 订单、结账事务、重复请求处理 |
-| E | 蔡千一 | 历史查询、商品后台 |
-| F | 李岸 Li An | 差异核对、构建配置、整合验证、运行与交付材料 |
+GitHub Actions 在推送 `main` 时自动执行：
 
-A–E 姓名来自各自交付文件，请组员最终确认。原始缺少作者注释的三个基础类保留共享实现，并标明 Group 2 原始工程及 Li An 的整合验收职责；具体原始作者仍请 A/B 核对，不能将注释补充视为 F 独立开发这些类。
+1. 前端类型检查、测试、构建并嵌入后端静态资源
+2. 后端全量测试
+3. Docker 多阶段构建，推送 Docker Hub 镜像（`latest` + commit SHA 双标签）
 
-源码目录为 src，Angular 源码为 frontend，交付说明为 docs，可运行程序为 runtime，录像放入 video。压缩包排除 node_modules、target、缓存、IDE 设置和本机数据库。
+Dockerfile 三阶段构建：`node:22-alpine` 编译 Angular → `maven:3.9-temurin-17` 打包 Spring Boot →
+`eclipse-temurin:17-jre` 最终运行镜像，前后端交付为单个容器。
 
-PDF 第 4 页要求一个以队名命名的 ZIP，包含整合源码和演示视频，视频尽量 15 分钟内。PDF 写明 10 月 16 日 23:00 截止，同时要求参考 Canvas，最终以 Canvas 为准。现场演示无需 PPT。提交前按 docs/F提交检查.md 完成最后检查。
+云端运行于 AWS：ECS Fargate 承载应用容器，Amazon RDS for MySQL 提供数据库，
+CloudWatch Logs 收集日志；数据库凭据通过环境变量注入，安全组限制应用端口 18080 与数据库访问。
+
+本地 Docker 运行：
+
+```powershell
+docker build -t nexus-shopping-cart ./Group2
+docker run --rm -p 18080:18080 `
+  -e DB_URL='jdbc:mysql://your_mysql_endpoint:3306/shopping_cart' `
+  -e DB_USERNAME='your_mysql_username' `
+  -e DB_PASSWORD='your_mysql_password' `
+  nexus-shopping-cart
+```
+
+---
+
+## English Summary
+
+**Nexus Digital** is a full-stack B2C e-commerce web application for digital and
+office products, covering the complete journey from browsing to cart, checkout,
+simulated payment, receipt confirmation and product reviews, plus an admin
+console with a sales dashboard.
+
+### Key features
+- Angular catalogue with category filters, search, sorting (price / rating /
+  sales), pagination, image zoom and quick add-to-cart; home carousel and daily deals
+- Registration / login with BCrypt-hashed passwords, profile editing, avatar
+  upload and shipping-address management
+- Session cart with quantity validation; transactional checkout with server-side
+  repricing, stock checks and order snapshots (product name / price / address);
+  checkout tokens and order locking prevent duplicate submissions
+- Simulated Visa / Mastercard payment with in-transaction stock deduction, 9% GST
+  and downloadable PDF receipts (Apache PDFBox); full card numbers and CVV are never persisted
+- Purchase history, five-star reviews after receipt confirmation, rule-based
+  recommendations, Chinese / English i18n
+- Admin product / stock / visibility management (out-of-stock auto-hide) and a
+  sales dashboard aggregated from real paid orders
+
+### Tech stack
+Spring Boot 4.1.1 (Java 17), Spring MVC + Thymeleaf, Angular 22.2.1 /
+TypeScript 6.0, Spring Data JPA / Hibernate, MySQL 8, Bean Validation,
+BCrypt, Apache PDFBox 3.0.8; tests with Spring Boot Test (isolated H2) and
+Vitest; GitHub Actions CI publishing multi-stage Docker images to Docker Hub;
+deployed on AWS ECS Fargate with Amazon RDS for MySQL and CloudWatch Logs.
+
+### Run locally
+Requires JDK 17 and MySQL 8 (Maven wrapper included; compiled Angular assets are
+already bundled, Node.js 22+ only for frontend development):
+
+```powershell
+$env:DB_URL = 'jdbc:mysql://localhost:3306/shopping_cart'
+$env:DB_USERNAME = 'your_mysql_username'
+$env:DB_PASSWORD = 'your_mysql_password'
+cd Group2
+.\mvnw.cmd spring-boot:run
+```
+
+Then open <http://localhost:18080/products>. Demo customers: `alice / demo123`,
+`bob / demo123`. Demo payment: cardholder `Demo Customer`, Visa
+`4242 4242 4242 4242`, expiry `12/99`, CVV `123` (simulation only).
+
+### Tests and delivery
+`.\mvnw.cmd test` runs the backend suite against an isolated in-memory H2;
+`npm run check`, `npm test` and `npm run test:cart` cover the frontend.
+On every push to `main`, GitHub Actions runs all checks and tests, then builds
+and publishes a Docker image (`latest` + commit SHA) for deployment to ECS
+Fargate.

@@ -1,0 +1,291 @@
+﻿Group2 规格对照检查清单
+检查日期：2026-10-16（Asia/Shanghai）
+规格来源：D:\DOCUMENTS\GDipSA\CA_Web Application\CA_Project_Specs - Shopping Cart C26.pdf
+代码根目录：D:\DOCUMENTS\GDipSA\CA_Web Application\Group2\Group2
+检查方式：PDF正文+配图、源码/模板/配置、现有自动化测试、当前提交ZIP内容。
+范围：按用户要求，将PDF p4列出的全部6项bonus建议及p3的RESTful bonus都按必需检查。
+没有修改业务代码、没有连接或写入云数据库，也没有上传作业。
+
+结论：5项基础功能与全部6项bonus功能已有实现和对应通过测试；技术要求在代码和配置层面满足。不能将整份规格标为全部完成：作者标注不完整，当前提交ZIP缺少演示视频；公网/MySQL实连、UI现场验收及Canvas/答辩事项仍需确认。
+
+实际验证结果
+- 后端：24个测试套件，242项，Failures=0，Errors=0，Skipped=0。
+- Angular：7个测试文件，85项全部通过。
+- 购物车页面：25项全部通过。
+- TypeScript/Angular类型检查：通过。
+- Angular生产构建：通过。
+- 本机仅JDK25，初次后端停在Mockito自加载；使用显式-javaagent后全部通过。没有修改pom或业务代码。
+- 前端缺node_modules，已在隔离副本基于package-lock导入安装依赖；第一次Angular测试因沙箱临时文件不可见未完成，改为项目共享临时目录后85项通过。
+- 测试使用H2 MySQL兼容模式，不能将通过结果当成云MySQL或公网可用性的证明。
+
+逐项清单
+[B1] 浏览商品
+  规格：PDF p2；类别：基础；结论：满足
+  检查说明：商品列表、详情、仅展示可见商品。
+  源码/证据位置：controller/ProductRestController.java; service/ProductServiceImpl.java; frontend/src/app/product-list/; frontend/src/app/product-detail/
+  验证：CatalogReviewIntegrationTest; CatalogPromotionIntegrationTest; frontend product-list/product-detail tests
+
+[B2] 登录与退出
+  规格：PDF p2；类别：基础；结论：满足
+  检查说明：服务端校验登录；退出销毁会话，隔离身份和购物车。
+  源码/证据位置：controller/AuthController.java; service/AuthServiceImpl.java; interceptor/LoginInterceptor.java
+  验证：BIntegratedFlowTest; AuthExperienceIntegrationTest
+
+[B3] 加入购物车
+  规格：PDF p2；类别：基础；结论：满足
+  检查说明：添加、合并数量、修改、删除、清空及金额计算；拒绝非法数量和缺货。
+  源码/证据位置：controller/CartController.java; controller/CartRestController.java; service/CartServiceImpl.java
+  验证：CartModuleTest; MarketplaceIntegrationTest; frontend/scripts/cart-page.test.mjs
+
+[B4] 结账下单
+  规格：PDF p2；类别：基础；结论：满足
+  检查说明：选择地址后创建待付款订单，保存订单明细和地址/价格快照；令牌处理重复提交。
+  源码/证据位置：controller/CheckoutController.java; service/CheckoutCoordinator.java; service/CheckoutTransactionService.java
+  验证：DeliveryCheckoutTest; PendingPaymentIntegrationTest; BIntegratedFlowTest
+
+[B5] 浏览购买历史
+  规格：PDF p2；类别：基础；结论：满足
+  检查说明：自己的订单列表和详情，支持分页；拒绝读取他人订单。
+  源码/证据位置：controller/PurchaseHistoryController.java; service/PurchaseHistoryServiceImpl.java
+  验证：ModuleEWebTest; PurchaseHistoryServiceTest
+
+[T1] Spring Boot MVC
+  规格：PDF p3；类别：技术；结论：满足
+  检查说明：Spring Boot 4.1.1 + Java 17；MVC Controllers 和视图模板。
+  源码/证据位置：pom.xml; controller/; src/main/resources/templates/
+  验证：后端编译及242项测试通过
+
+[T2] HTML/JavaScript/Angular或React视图
+  规格：PDF p3；类别：技术；结论：满足
+  检查说明：Angular 22.2.1 + TypeScript；Thymeleaf HTML/CSS/JS 页面。
+  源码/证据位置：frontend/package.json; frontend/src/app/; src/main/resources/templates/
+  验证：前端类型检查、85项Angular测试及生产构建通过
+
+[T3] MySQL + Spring Data JPA
+  规格：PDF p3；类别：技术；结论：配置满足；实连未重测
+  检查说明：运行时为MySQL，DB_URL/DB_USERNAME/DB_PASSWORD环境变量；JPA/Hibernate数据访问。本次测试使用隔离H2，没有连接云数据库。
+  源码/证据位置：pom.xml; src/main/resources/application.properties; repository/
+  验证：JPA相关集成测试通过，但不作为云MySQL实连证据
+
+[T4] Spring URL映射与Controller路由
+  规格：PDF p3；类别：技术；结论：满足
+  检查说明：/products、/login、/cart、/checkout、/orders、/admin及/api路由。
+  源码/证据位置：controller/
+  验证：MockMvc路由与HTTP错误测试通过
+
+[T5] 服务端表单校验
+  规格：PDF p3；类别：技术；结论：满足
+  检查说明：注册、资料、商品、购物车、地址、付款和评价均有服务端注解或业务规则校验。
+  源码/证据位置：form/; dto/ProductForm.java; controller/CartRestController.java; service/PaymentService.java
+  验证：BIntegratedFlowTest; ModuleEWebTest; AccountAddressIntegrationTest; CatalogReviewIntegrationTest
+
+[T6] 至少一项功能使用REST API + Angular/React
+  规格：PDF p3；类别：技术；结论：满足
+  检查说明：Angular通过HttpClient调用商品列表/详情等REST API；实际前端接入，不只是定义接口。
+  源码/证据位置：controller/ProductRestController.java; frontend/src/app/services/product.service.ts; frontend/src/app/product-list/
+  验证：前后端相关测试及生产构建通过
+
+[X0] RESTful API实现及额外功能
+  规格：PDF p3；类别：Bonus按必需；结论：满足
+  检查说明：商品/评价/分类等GET接口，购物车POST/PUT/DELETE；Angular实际调用。
+  源码/证据位置：controller/ProductRestController.java; controller/CartRestController.java; controller/ProductReviewController.java
+  验证：REST及HTTP错误处理集成测试通过
+
+[X1] 模拟支付
+  规格：PDF p4；类别：Bonus按必需；结论：满足
+  检查说明：下单后模拟Visa/Mastercard支付；校验卡号、品牌、有效期、安全码；成功后扣库存并提供PDF收据。没有真实银行扣款。
+  源码/证据位置：controller/OrderPaymentController.java; service/OrderPaymentService.java; service/PaymentService.java; service/PaymentReceiptPdfService.java
+  验证：PaymentServiceTest; PendingPaymentIntegrationTest; PaymentLifecycleIntegrationTest; PaymentReceiptPdfTest
+
+[X2] MVC中加入Service Layer
+  规格：PDF p4；类别：Bonus按必需；结论：满足
+  检查说明：商品、认证、购物车、结账、支付、订单、评价和后台业务均有服务类。
+  源码/证据位置：service/
+  验证：相关单元测试和集成测试通过
+
+[X3] 商品评价及评分
+  规格：PDF p4；类别：Bonus按必需；结论：满足
+  检查说明：1-5星和文字评价；购买并确认收货后可评价，同用户同商品更新已有评价。
+  源码/证据位置：controller/ProductReviewController.java; service/ProductReviewService.java; service/OrderCompletionService.java
+  验证：CatalogReviewIntegrationTest; MarketplaceIntegrationTest; PaymentLifecycleIntegrationTest
+
+[X4] 商品分页
+  规格：PDF p4；类别：Bonus按必需；结论：满足
+  检查说明：后端PageRequest；前端每页6/12/24、前后页、页码和跳页。
+  源码/证据位置：service/ProductServiceImpl.java; controller/ProductRestController.java; frontend/src/app/product-list/product-list.component.html
+  验证：分页相关后端测试及frontend product-list tests
+
+[X5a] 后台新增/编辑/删除商品
+  规格：PDF p4；类别：Bonus按必需；结论：满足
+  检查说明：有后台表单与增删改；无订单/评价引用的商品允许物理删除；已被引用时拒绝删除并提示下架，以保护历史。
+  源码/证据位置：controller/AdminProductController.java; service/AdminProductServiceImpl.java; src/main/resources/templates/admin/
+  验证：AdminProductServiceTest; ModuleEWebTest
+
+[X5b] 库存管理及商品可见性
+  规格：PDF p4；类别：Bonus按必需；结论：满足
+  检查说明：设置库存、上下架，支持缺货自动隐藏；补库存后可恢复可见。
+  源码/证据位置：entity/Product.java; dto/ProductForm.java; service/AdminProductServiceImpl.java; repository/ProductRepository.java
+  验证：MarketplaceIntegrationTest; ModuleEWebTest
+
+[X6] 注册/登录/管理个人资料
+  规格：PDF p4；类别：Bonus按必需；结论：满足
+  检查说明：注册、用户名/邮箱/电话登录、修改资料及密码，另有地址和头像管理。
+  源码/证据位置：controller/AuthController.java; controller/AccountController.java; service/AuthServiceImpl.java; form/
+  验证：AccountAddressIntegrationTest; AccountPasswordIntegrationTest; AuthExperienceIntegrationTest
+
+[N1] 清晰且模块化的项目结构
+  规格：PDF p3；类别：非功能；结论：满足
+  检查说明：controller/service/repository/entity/dto/form/config/interceptor/exception分层；Angular按组件/服务组织。
+  源码/证据位置：src/main/java/sg/edu/nus/iss/shoppingcart/; frontend/src/app/
+  验证：目录与依赖静态审查
+
+[N2] 适当的异常处理
+  规格：PDF p3；类别：非功能；结论：满足
+  检查说明：不存在资源404、非法输入400、认证/权限处理、HTML与JSON错误响应及意外异常兜底。
+  源码/证据位置：exception/GlobalExceptionHandler.java; controller/StoreRestErrorAdvice.java; controller/AuthHttpErrorAdvice.java
+  验证：HttpErrorHandlingTest; GlobalExceptionHandlerTest; ModuleEWebTest
+
+[N3] 命名、注释及可维护性
+  规格：PDF p3；类别：非功能；结论：基本满足
+  检查说明：分层和业务命名清晰，部分代码较紧凑；作者标注尚未覆盖完整，见S3。此项包含主观质量评价，不能据此保证得分。
+  源码/证据位置：src/main/java/; frontend/src/
+  验证：静态审查；未进行新的格式化修改
+
+[Q1] 功能工作正常
+  规格：PDF p3；类别：评分维度；结论：自动化验证通过
+  检查说明：后端242，Angular85，购物车页面25项全部通过；不等于完整浏览器验收或云环境测试。
+  源码/证据位置：Group2/target/surefire-reports/; spec-audit/evidence/
+  验证：本次实际运行结果
+
+[Q2] UI直观、易导航
+  规格：PDF p3；类别：评分维度；结论：待人工确认
+  检查说明：有导航、错误提示、分页、空状态和双语实现；本次未进行完整浏览器视觉/交互验收。
+  源码/证据位置：src/main/resources/templates/; frontend/src/app/
+  验证：源码和组件测试；建议答辩前走一遍完整用户及管理员流程
+
+[S1] 单一集成源码方案
+  规格：PDF p4；类别：提交；结论：满足
+  检查说明：前后端在同一Spring Boot方案；现有ZIP含源码、构建配置和已打包Angular静态资源。
+  源码/证据位置：Group2-submission-20261016.zip; Group2/Dockerfile
+  验证：ZIP检查：289个条目，已检查ZIP文件与当前工作区对应文件内容一致
+
+[S2] 单一ZIP中包含演示视频（尽量15分钟内）
+  规格：PDF p4；类别：提交；结论：未满足（当前ZIP）
+  检查说明：现有ZIP没有mp4/mov/avi/mkv/webm/wmv等视频条目；如视频另存，最终需按要求一起提交。
+  源码/证据位置：Group2-submission-20261016.zip
+  验证：ZIP内容扫描
+
+[S3] 所有类或方法标明作者
+  规格：PDF p4；类别：提交；结论：未满足
+  检查说明：生产Java、前端类和测试文件有缺漏；后附未找到@author的完整清单。请按真实贡献填写，不应推测作者。
+  源码/证据位置：Group2/src/main/java/; Group2/src/test/java/; Group2/frontend/src/
+  验证：全文件@author扫描，含类/接口/record/enum定义的文件
+
+[S4] 文件名使用团队名称
+  规格：PDF p4；类别：提交；结论：基本满足
+  检查说明：现有名称Group2-submission-20261016.zip含Group2。为贴近示例可简化为Group2.zip；原文未要求固定只能使用这一文件名。
+  源码/证据位置：Group2-submission-20261016.zip
+  验证：文件名检查
+
+[S5] 每组仅一次提交，按Canvas要求按时上传
+  规格：PDF p4；类别：提交；结论：待确认
+  检查说明：本地代码无法证明已上传Canvas或仅提交一次；PDF列出2026-10-16 23:00，最新要求以Canvas为准。
+  源码/证据位置：规格PDF
+  验证：本次未访问Canvas
+
+[P1] 集成演示并解释代码
+  规格：PDF p4-p5；类别：答辩；结论：代码集成满足；现场待确认
+  检查说明：准备真实客户流程和管理员流程；组员需能解释所写代码。PPT不是规格要求的必交件。
+  源码/证据位置：Group2/
+  验证：现场演示和口头解释不由本地代码检查代替
+
+[P2] 全员到场、开摄像头、提前15分钟到场
+  规格：PDF p5；类别：答辩；结论：待确认
+  检查说明：PDF列Team2为10月17日10:00-10:20，最终以课程通知为准。
+  源码/证据位置：规格PDF
+  验证：团队线下确认
+
+作者标注缺漏清单
+统计规则：包含class/interface/record/enum定义的源文件，整个文件未找到@author（忽略大小写）。文件级扫描并不代替逐个嵌套类型/方法的人工确认。
+
+Group2/src/main/java：108个定义文件中45个未找到@author
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/config/CatalogSeedProducts.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/config/DataInitializer.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/config/LocaleConfig.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/config/ReviewSampleInitializer.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/controller/AvatarController.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/controller/CartRestController.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/controller/CategoryRestController.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/controller/DailyDealsController.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/controller/OrderPaymentController.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/controller/ProductReviewController.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/controller/ShippingAddressController.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/controller/StoreRestErrorAdvice.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/dto/AdminProductSalesDto.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/dto/OrderPricing.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/dto/PaymentDetails.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/entity/AccountAvatar.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/entity/CatalogSeedVersion.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/entity/ProductReview.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/entity/ShippingAddress.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/entity/ShippingSnapshot.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/form/PasswordChangeForm.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/form/ShippingAddressForm.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/model/CatalogCategory.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/repository/AccountAvatarRepository.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/repository/CatalogSeedVersionRepository.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/repository/ProductReviewRepository.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/repository/ShippingAddressRepository.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/AccountFormTokens.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/AdminDashboardService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/AdminDashboardServiceImpl.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/AdminProductService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/AuthService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/AvatarService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/CartService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/CheckoutService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/OrderCompletionService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/OrderPaymentService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/PaymentReceiptPdfService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/PaymentService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/ProductReviewService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/PurchaseHistoryService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/RecommendationService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/ShippingAddressService.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/ShippingAddressServiceImpl.java
+  - Group2/src/main/java/sg/edu/nus/iss/shoppingcart/service/UiText.java
+
+Group2/src/test/java：25个定义文件中14个未找到@author
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/AccountAddressIntegrationTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/AccountPasswordIntegrationTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/AuthExperienceIntegrationTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/AvatarDealsIntegrationTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/CatalogPromotionIntegrationTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/CatalogReviewIntegrationTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/DeliveryCheckoutTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/GlobalExceptionHandlerTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/MarketplaceIntegrationTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/PaymentLifecycleIntegrationTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/PaymentReceiptPdfTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/PaymentServiceTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/PendingPaymentIntegrationTest.java
+  - Group2/src/test/java/sg/edu/nus/iss/shoppingcart/config/DataInitializerTests.java
+
+Group2/frontend/src：15个定义文件中8个未找到@author
+  - Group2/frontend/src/app/add-to-cart/add-to-cart.component.ts
+  - Group2/frontend/src/app/daily-deals/daily-deals.component.ts
+  - Group2/frontend/src/app/image-zoom/image-zoom.component.ts
+  - Group2/frontend/src/app/product-detail/product-detail.component.ts
+  - Group2/frontend/src/app/product-list/product-list.component.ts
+  - Group2/frontend/src/app/services/cart.service.ts
+  - Group2/frontend/src/app/services/language.service.ts
+  - Group2/frontend/src/app/store-layout/store-layout.component.ts
+
+建议完成顺序
+1. 按真实分工补齐作者标注。
+2. 将演示视频并入最终提交ZIP，控制在约15分钟内。
+3. 重新打包，确认包含最新源码、配置和静态前端；统一团队提交文件名。
+4. 在实际公网地址检查：浏览→注册/登录→加购/改数量→地址→下单/付款→历史/PDF→确认收货/评价；再演示管理员增改删、库存和可见性。
+5. 确认Canvas最终截止时间、提交状态与答辩安排。
+
+以上为规格符合性检查，不是成绩承诺，也没有将额外安全加固或企业生产部署标准当作本作业的新要求。

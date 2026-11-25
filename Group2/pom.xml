@@ -78,11 +78,11 @@
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
 
-        <!-- Optional isolated demonstration and regression tests; MySQL remains the default. -->
+        <!-- Isolated automated tests only; production uses MySQL. -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>runtime</scope>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

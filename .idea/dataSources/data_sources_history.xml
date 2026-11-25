@@ -42,7 +42,11 @@
   </DataSourceFromHistory>
   <DataSourceFromHistory isRemovedFromProject="false">
     <data-source source="LOCAL" name="@shopping-cart-db.cvkyemekqd8w.us-east-1.rds.amazonaws.com" uuid="a9d34576-4ac3-44c5-89db-9f5124e0f7ea">
-      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="MYSQL" />
+      <database-info product="MySQL" version="8.4.11" jdbc-version="4.2" driver-name="MySQL Connector/J" driver-version="mysql-connector-j-9.7.0 (Revision: 0aade1f13bcc98faf7dda5c02e782481eb291f62)" dbms="MYSQL" exact-version="8.4.11" exact-driver-version="9.7">
+        <extra-name-characters>$</extra-name-characters>
+        <identifier-quote-string>`</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact" />
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
@@ -54,7 +58,11 @@
       </jdbc-additional-properties>
       <secret-storage>master_key</secret-storage>
       <user-name>admin</user-name>
-      <schema-mapping />
+      <schema-mapping>
+        <introspection-scope>
+          <node kind="schema" qname="shopping_cart" />
+        </introspection-scope>
+      </schema-mapping>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </DataSourceFromHistory>

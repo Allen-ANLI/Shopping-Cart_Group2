@@ -1,0 +1,17 @@
+{"kind":"deck","id":"pr/se2xp6","name":"Deck"}
+{"kind":"layout","id":"ly/0vuxcjad","editable":false,"name":"Master","type":"master"}
+{"kind":"layout","id":"ly/fqdwzahc","editable":false,"name":"Title Slide","type":"title","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"}]}
+{"kind":"layout","id":"ly/f2t0ve98","editable":false,"name":"Section Header","type":"sectionHeader","placeholders":[{"name":"title","type":"title"}]}
+{"kind":"layout","id":"ly/mdo36hgj","editable":false,"name":"Title and Body","type":"tx","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"}]}
+{"kind":"layout","id":"ly/svqdwnm5","editable":false,"name":"Title and Two Column","type":"twoColTx","placeholders":[{"name":"title","type":"title"},{"name":"Left column","type":"body"},{"name":"Right column","type":"body"}]}
+{"kind":"layout","id":"ly/crexw7at","editable":false,"name":"Title and One Column","type":"tx","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"}]}
+{"kind":"layout","id":"ly/h0valovy","editable":false,"name":"Blank","type":"blank"}
+{"kind":"slide","id":"sl/7a9i69","slideIndex":0,"layout":{"id":"ly/h0valovy","name":"Blank"},"title":"Slide 1","textShapes":0,"backgroundColor":"rgba(255,255,255,1)"}
+{"kind":"image","id":"im/2lkza1k7","slideIndex":0,"position":{"left":0,"top":0,"width":1672,"height":941},"fit":"contain","name":"","alt":"Feature Design — Core Features and Enhancements"}
+{"kind":"notes","id":"nt/7a9i69","slideIndex":0,"text":"Source: D:\\DOCUMENTS\\GDipSA\\CA_Web Application\\Group2\\defense-images\\english\\01-feature-design-en.png\nOriginal English presentation image created for the Group2 project defense. Included unchanged at its original aspect ratio."}
+{"kind":"slide","id":"sl/qjylv3","slideIndex":1,"layout":{"id":"ly/h0valovy","name":"Blank"},"title":"Slide 2","textShapes":0,"backgroundColor":"rgba(255,255,255,1)"}
+{"kind":"image","id":"im/obetcrqt","slideIndex":1,"position":{"left":0,"top":0,"width":1672,"height":941},"fit":"contain","name":"","alt":"System Architecture and Technology Stack"}
+{"kind":"notes","id":"nt/qjylv3","slideIndex":1,"text":"Source: D:\\DOCUMENTS\\GDipSA\\CA_Web Application\\Group2\\defense-images\\english\\02-architecture-en.png\nOriginal English presentation image created for the Group2 project defense. Included unchanged at its original aspect ratio."}
+{"kind":"slide","id":"sl/p7qsnv","slideIndex":2,"layout":{"id":"ly/h0valovy","name":"Blank"},"title":"Slide 3","textShapes":0,"backgroundColor":"rgba(255,255,255,1)"}
+{"kind":"image","id":"im/0fih0nax","slideIndex":2,"position":{"left":0,"top":0,"width":1672,"height":941},"fit":"contain","name":"","alt":"Cloud Deployment and Delivery Pipeline"}
+{"kind":"notes","id":"nt/p7qsnv","slideIndex":2,"text":"Source: D:\\DOCUMENTS\\GDipSA\\CA_Web Application\\Group2\\defense-images\\english\\03-cloud-deployment-en.png\nOriginal English presentation image created for the Group2 project defense. Included unchanged at its original aspect ratio."}
